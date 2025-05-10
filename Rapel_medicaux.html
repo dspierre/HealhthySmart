@@ -1,0 +1,341 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rappels Médicaux</title>
+    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.7/main.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, button, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #56c29c;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #70e0b6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        /* Mode sombre */
+        body.dark-mode {
+            background-color:  #2c3e50;
+            color: #ffffff;
+        }
+        .container.dark-mode {
+            background-color: #2c3e50;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+        }
+        button.dark-mode {
+            background-color: #424242;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 id="app-title">Rappels Médicaux</h1>
+    <button id="dark-mode-toggle" aria-label="Basculer en mode sombre">Activer le mode sombre</button>
+    <form id="reminder-form">
+        <label for="title">Titre :</label>
+        <input type="text" id="title" name="title" placeholder="Ex : Prendre mon médicament" aria-label="Titre du rappel" required>
+        <label for="description">Description :</label>
+        <textarea id="description" name="description" placeholder="Ex : Dose de 20mg à 8h du matin" aria-label="Description du rappel"></textarea>
+        <label for="date">Date et Heure :</label>
+        <input type="datetime-local" id="date" name="date" aria-label="Date et heure du rappel" required>
+        <label for="recurrence">Récurrence :</label>
+        <select id="recurrence" name="recurrence" aria-label="Récurrence du rappel">
+            <option value="once">Une seule fois</option>
+            <option value="daily">Tous les jours</option>
+            <option value="weekdays">Du lundi au vendredi</option>
+        </select>
+        <button type="submit">Ajouter un rappel</button>
+    </form>
+    <label for="search">Rechercher :</label>
+    <input type="text" id="search" placeholder="Tapez pour rechercher..." aria-label="Barre de recherche">
+    <h2>Mes Rappels :</h2>
+    <ul id="reminder-list" aria-live="polite"></ul>
+    <div id="gamification">
+        <h3>Vos Points : <span id="points">0</span></h3>
+    </div>
+    <div id="statistics">
+        <h3>Statistiques</h3>
+        <p>Rappels créés : <span id="total-reminders">0</span></p>
+        <p>Points totaux : <span id="total-points">0</span></p>
+    </div>
+    <div id="calendar-container">
+        <h2>Calendrier</h2>
+        <div id="calendar"></div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const reminderForm = document.getElementById("reminder-form");
+        const reminderList = document.getElementById("reminder-list");
+        const searchInput = document.getElementById("search");
+        const pointsDisplay = document.getElementById("points");
+        const totalRemindersDisplay = document.getElementById("total-reminders");
+        const totalPointsDisplay = document.getElementById("total-points");
+        const darkModeToggle = document.getElementById("dark-mode-toggle");
+        const calendarEl = document.getElementById("calendar");
+        let points = parseInt(localStorage.getItem("points")) || 0;
+        let reminders = JSON.parse(localStorage.getItem("reminders") || "[]");
+        let suspendedDays = new Set(JSON.parse(localStorage.getItem("suspendedDays") || "[]"));
+        // Mise à jour des points
+        function updatePoints(amount) {
+            points += amount;
+            pointsDisplay.textContent = points;
+            totalPointsDisplay.textContent = points;
+            localStorage.setItem("points", points);
+        }
+        // Sauvegarde et chargement des rappels
+        function saveReminders() {
+            localStorage.setItem("reminders", JSON.stringify(reminders));
+        }
+        function loadReminders() {
+            reminders.forEach(addReminderItem);
+            updateStatistics();
+        }
+        // Ajouter un rappel à la liste
+        function addReminderItem(reminder) {
+            const reminderItem = document.createElement("li");
+            reminderItem.dataset.recurrence = reminder.recurrence;
+            reminderItem.innerHTML = `
+            <b>${reminder.title}</b><br>
+            ${reminder.description ? reminder.description + "<br>" : ""}
+            <i>${reminder.date}</i><br>
+            <button class="delete-btn">Supprimer</button>
+        `;
+            reminderList.appendChild(reminderItem);
+            reminderItem.querySelector(".delete-btn").addEventListener("click", () => {
+                reminderList.removeChild(reminderItem);
+                reminders = reminders.filter(r => r !== reminder);
+                saveReminders();
+                updatePoints(-5);
+                updateStatistics();
+            });
+        }
+        // Gestion de la soumission du formulaire
+        reminderForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const title = document.getElementById("title").value.trim();
+            const description = document.getElementById("description").value.trim();
+            const date = document.getElementById("date").value;
+            const recurrence = document.getElementById("recurrence").value;
+            if (title && new Date(date) > new Date()) {
+                const reminder = { title, description, date, recurrence };
+                reminders.push(reminder);
+                addReminderItem(reminder);
+                saveReminders();
+                scheduleNotification(date, title, recurrence);
+                updatePoints(10);
+                updateStatistics();
+                reminderForm.reset();
+            } else {
+                alert("Veuillez entrer une date future !");
+            }
+        });
+        // Recherche dans les rappels
+        searchInput.addEventListener("input", () => {
+            const query = searchInput.value.toLowerCase();
+            Array.from(reminderList.children).forEach(reminderItem => {
+                const title = reminderItem.querySelector("b").textContent.toLowerCase();
+                const description = reminderItem.querySelector("i").previousSibling.nodeValue.toLowerCase();
+                reminderItem.style.display = title.includes(query) || description.includes(query) ? "" : "none";
+            });
+        });
+        // Mode sombre
+        darkModeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            document.querySelector(".container").classList.toggle("dark-mode");
+            const isDarkMode = document.body.classList.contains("dark-mode");
+            localStorage.setItem("dark-mode", isDarkMode);
+            darkModeToggle.textContent = isDarkMode ? "Désactiver le mode sombre" : "Activer le mode sombre";
+        });
+        if (localStorage.getItem("dark-mode") === "true") {
+            document.body.classList.add("dark-mode");
+            document.querySelector(".container").classList.add("dark-mode");
+            darkModeToggle.textContent = "Désactiver le mode sombre";
+        }
+        // Notifications système avancées
+        function sendSystemNotification(title) {
+            if (Notification.permission === "granted") {
+                new Notification(`Rappel : ${title}`, {
+                    body: "N'oubliez pas votre rappel médical !",
+                    icon: "icon.png"
+                });
+            } else {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        sendSystemNotification(title);
+                    }
+                });
+            }
+        }
+        // Planification des notifications
+        function scheduleNotification(date, title, recurrence) {
+            const timeDifference = new Date(date) - new Date();
+            if (timeDifference > 0) {
+                setTimeout(() => {
+                    sendSystemNotification(title);
+                    if (recurrence === "daily") {
+                        const nextDate = new Date(date);
+                        nextDate.setDate(nextDate.getDate() + 1);
+                        scheduleNotification(nextDate.toISOString(), title, recurrence);
+                    } else if (recurrence === "weekdays") {
+                        const nextDate = new Date(date);
+                        do {
+                            nextDate.setDate(nextDate.getDate() + 1);
+                        } while (nextDate.getDay() === 0 || nextDate.getDay() === 6);
+                        scheduleNotification(nextDate.toISOString(), title, recurrence);
+                    }
+                }, timeDifference);
+            }
+        }
+        // Statistiques des rappels
+        function updateStatistics() {
+            totalRemindersDisplay.textContent = reminders.length;
+            totalPointsDisplay.textContent = points;
+        }
+        // Chargement des données au démarrage
+        loadReminders();
+        pointsDisplay.textContent = points;
+        // Intégration du calendrier FullCalendar
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: "dayGridMonth",
+            headerToolbar: {
+                start: "prev,next today",
+                center: "title",
+                end: "dayGridMonth,dayGridWeek"
+            },
+            events: reminders.map(reminder => ({
+                title: reminder.title,
+                start: new Date(reminder.date).toISOString(),
+                description: reminder.description
+            })),
+            eventClick: function(info) {
+                alert(`Rappel : ${info.event.title}\nDescription : ${info.event.extendedProps.description}`);
+            }
+        });
+        calendar.render();
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.7/main.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.7/main.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.7/main.global.min.js"></script>
+</body>
+</html>
+<script>
+    (function() {
+        var ws = new WebSocket('ws://' + window.location.host +
+            '/jb-server-page?reloadMode=RELOAD_ON_SAVE&'+
+            'referrer=' + encodeURIComponent(window.location.pathname));
+        ws.onmessage = function (msg) {
+            if (msg.data === 'reload') {
+                window.location.reload();
+            }
+            if (msg.data.startsWith('update-css ')) {
+                var messageId = msg.data.substring(11);
+                var links = document.getElementsByTagName('link');
+                for (var i = 0; i < links.length; i++) {
+                    var link = links[i];
+                    if (link.rel !== 'stylesheet') continue;
+                    var clonedLink = link.cloneNode(true);
+                    var newHref = link.href.replace(/(&|\?)jbUpdateLinksId=\d+/, "$1jbUpdateLinksId=" + messageId);
+                    if (newHref !== link.href) {
+                        clonedLink.href = newHref;
+                    }
+                    else {
+                        var indexOfQuest = newHref.indexOf('?');
+                        if (indexOfQuest >= 0) {
+                            // to support ?foo#hash
+                            clonedLink.href = newHref.substring(0, indexOfQuest + 1) + 'jbUpdateLinksId=' + messageId + '&' +
+                                newHref.substring(indexOfQuest + 1);
+                        }
+                        else {
+                            clonedLink.href += '?' + 'jbUpdateLinksId=' + messageId;
+                        }
+                    }
+                    link.replaceWith(clonedLink);
+                }
+            }
+        };
+    })();
+    // Fonction pour vérifier si une date correspond à un jour de la semaine (lundi à vendredi)
+    function isWeekday(date) {
+        const day = new Date(date).getDay();
+        return day >= 1 && day <= 5; // 1 = Lundi, 5 = Vendredi
+    }
+    // Fonction pour planifier une notification 15 minutes avant l'heure de rappel
+    function scheduleReminder(reminder) {
+        const reminderTime = new Date(reminder.date).getTime();
+        const notificationTime = reminderTime - (15 * 60 * 1000); // 15 minutes avant
+        // Si la date est un jour de semaine et que l'heure est dans le futur
+        if (isWeekday(reminder.date) && notificationTime > Date.now()) {
+            setTimeout(() => {
+                sendSMS(reminder); // Appelle la fonction pour envoyer un SMS
+                showConfirmationDialog(); // Affiche une boîte de dialogue de confirmation
+            }, notificationTime - Date.now());
+        }
+    }
+    // Exemple d'utilisation
+    const reminder = {
+        title: "Prendre mon médicament",
+        date: "2025-04-04T08:00:00" // Date et heure du rappel
+    };
+    scheduleReminder(reminder);
+</script>

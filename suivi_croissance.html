@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi de Croissance avec Normes</title>
+    <style>
+        /* Style général */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafc;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #70e0b6;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+        }
+        main {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #58c6a2;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        thead {
+            background-color: #70e0b6;
+            color: white;
+        }
+        canvas {
+            width:80%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>📈 Suivi de Croissance avec Normes</h1>
+</header>
+<main>
+    <section class="form-section">
+        <h2>Ajouter les Données de Croissance</h2>
+        <form id="growthForm">
+            <label for="childName">Nom de l'enfant :</label>
+            <input type="text" id="childName" required>
+            <label for="sex">Sexe :</label>
+            <select id="sex" required>
+                <option value="male">Garçon</option>
+                <option value="female">Fille</option>
+            </select>
+            <label for="age">Âge (mois) :</label>
+            <input type="number" id="age" required>
+            <label for="height">Taille (cm) :</label>
+            <input type="number" id="height" required>
+            <label for="weight">Poids (kg) :</label>
+            <input type="number" id="weight" required>
+            <button type="submit">Ajouter</button>
+        </form>
+    </section>
+    <section class="data-section">
+        <h2>Données de Croissance</h2>
+        <table id="growthTable">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Sexe</th>
+                <th>Âge (mois)</th>
+                <th>Taille (cm)</th>
+                <th>Poids (kg)</th>
+                <th>Comparaison</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+    <section class="chart-section">
+        <h2>Courbes de Croissance</h2>
+        <canvas id="growthChart"></canvas>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2025 Suivi de Croissance Familial</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Tableau pour stocker les données de croissance
+    const growthData = [];
+    let chartInstance; // Stocke l'instance du graphique
+    // Normes complètes pour les garçons et les filles
+    const growthStandards = {
+        male: {
+            0: { height: 50, weight: { min: 3, max: 3.6 } },
+            1: { height: 54, weight: { min: 3, max: 5 } },
+            2: { height: 57, weight: { min: 3.7, max: 5.9 } },
+            3: { height: 60, weight: { min: 4.5, max: 6.9 } },
+            4: { height: 63, weight: { min: 5.1, max: 7.7 } },
+            5: { height: 65, weight: { min: 5.5, max: 8.5 } },
+            6: { height: 67, weight: { min: 6, max: 9.1 } },
+            7: { height: 68, weight: { min: 6.8, max: 9.8 } },
+            8: { height: 69, weight: { min: 7, max: 10.5 } },
+            9: { height: 71, weight: { min: 7.5, max: 11.5 } },
+            10: { height: 72, weight: { min: 8, max: 11.5 } },
+            11: { height: 73, weight: { min: 8.5, max: 12 } },
+            12: { height: 74, weight: { min: 9, max: 12 } }
+        },
+        female: {
+            0: { height: 50, weight: { min: 2.8, max: 3.5 } },
+            1: { height: 54, weight: { min: 2.8, max: 4.6 } },
+            2: { height: 57, weight: { min: 3.7, max: 5.5 } },
+            3: { height: 60, weight: { min: 4.3, max: 6.3 } },
+            4: { height: 63, weight: { min: 4.7, max: 7.3 } },
+            5: { height: 65, weight: { min: 5, max: 8 } },
+            6: { height: 67, weight: { min: 5.5, max: 8.3 } },
+            7: { height: 68, weight: { min: 6, max: 9 } },
+            8: { height: 69, weight: { min: 6.5, max: 10.5 } },
+            9: { height: 71, weight: { min: 7, max: 11 } },
+            10: { height: 72, weight: { min: 7, max: 11.5 } },
+            11: { height: 73, weight: { min: 7.5, max: 12 } },
+            12: { height: 74, weight: { min: 8, max: 11 } }
+        }
+    };
+    // Sélection des éléments HTML
+    const growthForm = document.getElementById('growthForm');
+    const growthTableBody = document.querySelector('#growthTable tbody');
+    const growthChartCanvas = document.getElementById('growthChart');
+    // Fonction pour ajouter les données de croissance
+    growthForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const childName = document.getElementById('childName').value;
+        const sex = document.getElementById('sex').value;
+        const age = parseInt(document.getElementById('age').value, 10);
+        const height = parseFloat(document.getElementById('height').value);
+        const weight = parseFloat(document.getElementById('weight').value);
+        // Comparaison avec les normes
+        const standards = growthStandards[sex][age];
+        if (!standards) {
+            alert("Données pour cet âge non disponibles.");
+            return;
+        }
+        const heightComparison = height < standards.height
+            ? "Petit pour son âge"
+            : height > standards.height
+                ? "Grand pour son âge"
+                : "Normal";
+        const weightComparison = weight < standards.weight.min
+            ? "Sous-poids"
+            : weight > standards.weight.max
+                ? "Surpoids"
+                : "Normal";
+        // Ajouter les résultats dans le tableau des données
+        growthData.push({
+            name: childName,
+            sex,
+            age,
+            height,
+            weight,
+            heightComparison,
+            weightComparison
+        });
+        // Afficher un message selon le poids
+        if (weightComparison === "Sous-poids") {
+            alert(`${childName} est en sous-poids. Il est recommandé de consulter un pédiatre pour un suivi.`);
+        } else if (weightComparison === "Surpoids") {
+            alert(`${childName} est en surpoids. Consultez un nutritionniste ou un médecin pour obtenir des conseils.`);
+        } else {
+            alert(`${childName} est dans la norme pour son âge.`);
+        }
+        // Réinitialiser le formulaire
+        growthForm.reset();
+        // Mettre à jour l'affichage
+        updateGrowthTable();
+        updateGrowthChart();
+    });
+    document.getElementById("growthForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let ageInput = parseInt(document.getElementById("age").value);
+            let ageDisplay = ageInput >= 12 ? (ageInput / 12).toFixed(1) + " ans" : ageInput + " mois";
+            let row = document.createElement("tr");
+            row.innerHTML = `<td>${ageDisplay}</td>`;
+            document.querySelector("#growthTable tbody").appendChild(row);
+        });
+    // Fonction pour mettre à jour la table des données
+    function updateGrowthTable() {
+        growthTableBody.innerHTML = '';
+        growthData.forEach(data => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${data.name}</td>
+                <td>${data.sex}</td>
+                <td>${data.age}</td>
+                <td>${data.height} cm</td>
+                <td>${data.weight} kg</td>
+                <td>
+                    Taille : ${data.heightComparison}<br>
+                    Poids : ${data.weightComparison}
+                </td>
+            `;
+            growthTableBody.appendChild(row);
+        });
+    }
+    // Initialisation des données et affichage
+    updateGrowthTable();
+</script>
+</body>
+</html>
+

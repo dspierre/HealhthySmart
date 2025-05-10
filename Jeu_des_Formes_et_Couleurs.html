@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu des Formes et Couleurs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #shape-container {
+            margin: 20px auto;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shape {
+            width: 100px;
+            height: 100px;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        #color-buttons {
+            margin-top: 20px;
+        }
+
+        .color-button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .red { background-color: red; }
+        .blue { background-color: blue; }
+        .yellow { background-color: yellow; color: black; }
+        .green { background-color: green; }
+        .orange { background-color: orange; }
+        .purple { background-color: purple; }
+        .pink { background-color: pink; color: black; }
+        .brown { background-color: brown; }
+
+        #message {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Jeu des Formes et Couleurs 🔺🔵🟡</h1>
+    <p>Associe la bonne couleur à la forme affichée !</p>
+    <div id="shape-container"></div>
+    <div id="color-buttons">
+        <button class="color-button red" onclick="verifierCouleur('red')">🔴 Rouge</button>
+        <button class="color-button blue" onclick="verifierCouleur('blue')">🔵 Bleu</button>
+        <button class="color-button yellow" onclick="verifierCouleur('yellow')">🟡 Jaune</button>
+        <button class="color-button green" onclick="verifierCouleur('green')">🟢 Vert</button>
+        <button class="color-button orange" onclick="verifierCouleur('orange')">🟠 Orange</button>
+        <button class="color-button purple" onclick="verifierCouleur('purple')">🟣 Violet</button>
+        <button class="color-button pink" onclick="verifierCouleur('pink')">💗 Rose</button>
+        <button class="color-button brown" onclick="verifierCouleur('brown')">🤎 Marron</button>
+    </div>
+    <p id="message"></p>
+    <script>
+        const formes = ["cercle", "carré", "triangle"];
+        const couleurs = ["red", "blue", "yellow", "green", "orange", "purple", "pink", "brown"];
+        let formeActuelle = null;
+        let couleurActuelle = null;
+        function choisirForme() {
+            formeActuelle = formes[Math.floor(Math.random() * formes.length)];
+            couleurActuelle = couleurs[Math.floor(Math.random() * couleurs.length)];
+            let shapeContainer = document.getElementById("shape-container");
+            shapeContainer.innerHTML = "";
+            let shape = document.createElement("div");
+            shape.className = "shape";
+            shape.style.backgroundColor = couleurActuelle;
+            shape.style.borderRadius = formeActuelle === "cercle" ? "50%" : "0";
+            shape.style.clipPath = formeActuelle === "triangle" ? "polygon(50% 0%, 0% 100%, 100% 100%)" : "none";
+            shape.style.transform = "scale(1.1)";
+            shapeContainer.appendChild(shape);
+        }
+        function verifierCouleur(couleur) {
+            let message = document.getElementById("message");
+            if (couleur === couleurActuelle) {
+                message.textContent = "✅ Bravo ! Bonne réponse 🎉";
+                setTimeout(choisirForme, 2000);
+            } else {
+                message.textContent = "❌ Oups ! Essaie encore.";
+            }
+        }
+        choisirForme(); // Afficher une première forme au chargement
+    </script>
+</body>
+</html>

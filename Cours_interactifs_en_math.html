@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cours de Maths Interactif</title>
+    <style>
+      body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+header {
+    background-color: #70e0b6;
+    color: white;
+    padding: 20px;
+}
+button {
+    margin: 10px;
+    padding: 12px;
+    background-color: #70e0b6;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+button:hover {
+    background-color: #54c597;
+}
+#contenu {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+.correct {
+    color: green;
+    animation: bounce 0.5s;
+}
+.incorrect {
+    color: red;
+    animation: shake 0.5s;
+}
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%, 75% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+}
+
+</style>
+</head>
+<body>
+    <header>
+        <h1>Cours de Maths Interactif</h1>
+        <p>Choisis une leçon :</p>
+    </header>
+    <nav>
+        <button onclick="chargerCours(1)">Addition & Soustraction</button>
+        <button onclick="chargerCours(2)">Multiplication & Division</button>
+        <button onclick="chargerCours(3)">Fractions</button>
+        <button onclick="chargerCours(4)">Géométrie</button>
+        <button onclick="chargerCours(5)">Calcul Mental</button>
+        <button onclick="chargerCours(6)">Horloge & Temps</button>
+        <button onclick="chargerCours(7)">Suites Logiques</button>
+        <button onclick="chargerCours(8)">Masse, Longueur & Volume</button>
+        <button onclick="chargerCours(9)">Graphiques & Tableaux</button>
+        <button onclick="chargerCours(10)">Monnaie & Budget</button>
+        <button onclick="chargerCours(11)">Proportionnalité & Pourcentages</button>
+        <button onclick="chargerCours(12)">Nombres Premiers</button>
+        <button onclick="chargerCours(13)">Problèmes de Logique</button>
+        <button onclick="chargerCours(14)">Équations Simples</button>
+        <button onclick="chargerCours(15)">Géométrie : Polygones & Périmètre</button>
+        <button onclick="chargerCours(16)">Conversions d’unités</button>
+        <button onclick="chargerCours(17)">Volume des Solides</button>
+        <button onclick="chargerCours(18)">Statistiques : Moyenne & Médiane</button>
+        <button onclick="chargerCours(19)">Probabilités</button>
+        <button onclick="chargerCours(20)">Nombres Pairs & Impairs</button>
+    </nav>
+    <div id="contenu"></div>
+    <script>
+        const exercices = {
+    1: { question: "7 + 5 = ?", reponse: 12 },
+    2: { question: "4 × 3 = ?", reponse: 12 },
+    3: { question: "1/2 de 8 = ?", reponse: 4 },
+    4: { question: "Combien d'angles dans un triangle ?", reponse: 3 },
+    5: { question: "20 - 7 = ?", reponse: 13 },
+    6: { question: "Combien de minutes dans une heure ?", reponse: 60 },
+    7: { question: "Complète la suite : 2, 4, 6, ... ?", reponse: 8 },
+    8: { question: "1 kilogramme = combien de grammes ?", reponse: 1000 },
+    9: { question: "Quel est l’axe horizontal dans un graphique ?", reponse: "x" },
+    10: { question: "Si tu as 5€, combien peux-tu acheter à 1€ pièce ?", reponse: 5 },
+    11: { question: "Si 3 pommes coûtent 6€, combien coûte une seule ?", reponse: 2 },
+    12: { question: "Quel est le premier nombre premier après 10 ?", reponse: 11 },
+    13: { question: "Si Pierre a 3 balles et en donne 1 à Marie, combien lui reste-t-il ?", reponse: 2 },
+    14: { question: "Résous x + 4 = 10. Quelle est la valeur de x ?", reponse: 6 },
+    15: { question: "Quel est le périmètre d’un carré de 5cm de côté ?", reponse: 20 },
+    16: { question: "Combien de mètres font 250cm ?", reponse: 2.5 },
+    17: { question: "Quel est le volume d’un cube de 3cm de côté ?", reponse: 27 },
+    18: { question: "Quelle est la moyenne de 10, 20 et 30 ?", reponse: 20 },
+    19: { question: "Si tu tires un dé, quelle est la probabilité d’obtenir un 6 ?", reponse: "1/6" },
+    20: { question: "Quel est le prochain nombre impair après 15 ?", reponse: 17 }
+};
+function chargerCours(id) {
+    let contenu = document.getElementById("contenu");
+    contenu.innerHTML = `
+        <p>${exercices[id].question}</p>
+        <input type="number" id="reponse">
+        <button onclick="verifierReponse(${id})">Vérifier</button>
+        <p id="message"></p>
+    `;
+}
+
+function verifierReponse(id) {
+    let reponseUtilisateur = document.getElementById("reponse").value;
+    let message = document.getElementById("message");
+    
+    if (parseInt(reponseUtilisateur) === exercices[id].reponse) {
+        message.textContent = "Bravo ! Bonne réponse ✅";
+        message.classList.add("correct");
+        score++;
+        document.getElementById("score").textContent = "Score : " + score;
+        new Audio("correct.mp3").play();
+    } else {
+        message.textContent = "Oups ! Essaie encore ❌";
+        message.classList.add("incorrect");
+        new Audio("wrong.mp3").play();
+    }
+}
+function modeDefi() {
+    let contenu = document.getElementById("contenu");
+    let randomId = Math.floor(Math.random() * Object.keys(exercices).length) + 1;
+    contenu.innerHTML = `
+        <p>${exercices[randomId].question}</p>
+        <input type="number" id="reponse">
+        <button onclick="verifierReponse(${randomId})">Vérifier</button>
+        <p id="message"></p>
+    `;
+}
+</script>
+</body>
+</html>

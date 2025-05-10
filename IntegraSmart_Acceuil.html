@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Integrasmart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SpendSmart - Transformez vos finances, transformez votre vie. Découvrez notre solution de gestion complète pour les bons gestionnaires de budgets.">
+  <meta name="keywords" content="gestion financière, budget, économies, retraite, impôts, IA, immobilier">
+  <style>
+    /* Section Contact */
+    #contact {
+      background-color: #ffffff;
+      padding: 50px 20px;
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    form input, form textarea {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 100%;
+    }
+    form button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #1e90ff;
+      color: #fff;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #1c86ee;
+    }
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: #fff;
+      font-size: 0.9em;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #FFDEAD, #ffffff); /* Dégradé vert clair */
+      margin: 0;
+      padding: 0;
+      color: #333333;
+    }
+    header nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    header nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+    header nav ul li {
+      display: inline;
+      position: relative;
+    }
+    header nav ul li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    header nav ul li:hover .dropdown-content {
+      display: block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      padding: 10px;
+    }
+    .dropdown-content a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      white-space: nowrap;
+    }
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    header nav .profile {
+      display: flex;
+      align-items: center;
+    }
+    
+    header nav .profile .login, .inscription-button {
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      color: #333;
+      background-color: #fff;
+      border: 2px solid #333;
+      margin-left: 10px;
+    }
+    header nav .profile .login:hover, .inscription-button:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
+    header nav .logo {
+      width: 80px; /* Ajustez cette valeur pour réduire la taille du logo */
+      height: auto;
+    }
+    /* Section Hero */
+    #hero {
+      background: url('Paysage futuriste ou minimaliste _ Un graphisme élégant qui évoque technologie, organisation et innovation. (2).png') no-repeat center center/cover;
+      color: #fff;
+      padding: 100px 20px;
+    }
+    #hero .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    #hero h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+    #hero p {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    #features, #pricing, #testimonials, #contact {
+      padding: 50px 20px;
+      text-align: center;
+    }
+    .feature-grid, .pricing-grid, .testimonial-grid {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .feature, .pricing-plan, .testimonial {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 400px;
+    }
+    .feature .icon {
+      font-size: 2.5em; /* Augmentez la taille des icônes */
+      display: block;
+      margin-bottom: 10px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: #fff;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    form label {
+      text-align: left;
+    }
+    form input, form textarea {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    form button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #1e90ff;
+      color: #fff;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #1c86ee;
+    }
+    /* Media Queries for Responsive Design */
+    @media (max-width: 768px) {
+      .feature, .pricing-plan, .testimonial {
+        width: 100%;
+      }
+    }
+    @media (max-width: 480px) {
+      header nav ul {
+        flex-direction: column;
+        gap: 10px;
+      }
+      #hero h1 {
+        font-size: 2em;
+      }
+      #hero p {
+        font-size: 1em;
+      }
+    }
+    .feature-grid .feature {
+      background-color: #ffffff;
+      padding: 10px; /* Réduit l'espace interne */
+      border-radius: 6px; /* Réduction de l'arrondi */
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Ajustement de l'ombre */
+      width: 180px; /* Taille réduite à 180px au lieu de 230px */
+      text-align: center;
+      margin: 10px; /* Espace externe réduit */
+    }
+    #images-alignees {
+      text-align: center;
+      padding: 20px;
+    }
+    .image-grid {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap; /* S'ajuste si la taille de l'écran est petite */
+    }
+    .image-item {
+      width: 250px; /* Ajustez la largeur selon vos besoins */
+      height: auto;
+      border-radius: 10px; /* Arrondit les angles */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre légère */
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .feature-grid .feature {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.feature-grid .feature:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+body {
+  background: linear-gradient(135deg, #1A237E, #1A237E); /* Dégradé bleu lumineux */
+  color: #333333;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+h2, h3 {
+  font-family: 'Lato', sans-serif;
+}
+#hero {
+  background: url('Paysage futuriste ou minimaliste.png') no-repeat center center/cover;
+  background-attachment: fixed;
+  background: linear-gradient(145deg, #1A237E, #1A237E);
+  color: #fff;
+  padding: 100px 20px;
+}
+.pricing-plan {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.pricing-plan:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.image-item {
+  border: 5px solid #1e90ff;
+  transition: transform 0.3s;
+}
+.image-item:hover {
+  transform: scale(1.1);
+}
+@media (max-width: 480px) {
+  body {
+    font-size: 0.9em;
+  }
+  .feature-grid {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <img src="spendsmart.png" alt="Logo SpendSmart" class="logo">
+    <ul>
+      <li class="dropdown">
+        <a href="domaine activité.html">domaine activité</p>
+        <div class="dropdown-content">
+          <a href="Event_Index_starter.html">Finance & Gestion des Dépenses :</a>
+          <a href="Event_Index_premium.html">Éducation & Développement Personnel</a>
+          <a href="Event_Index_premium.html">Santé & Bien-être</a>
+          <a href="Event_Index_premium.html">Gestion du Temps & Planification</a>
+          <a href="Event_Index_premium.html">Voyages & Déplacements</a>
+          <a href="Event_Index_premium.html">Famille & Gestion Domestique</a>
+          <a href="Event_Index_premium.html">Cybersécurité & Protection</a>
+          <a href="Event_Index_premium.html">Écologie & Impact Environnemental</a>
+        </div>
+      </li>
+      <ul>
+        <li class="dropdown">
+        <a href="IntegraSmart.html">produit</a>
+        <div class="dropdown-content">
+          <a href="index.html">HealthSmart</a>
+          <a href="Event_Index_premium.html">SpendSmart</a>
+          <a href="Event_Index_premium.html">InvestSmart</a>
+          <a href="Event_Index_premium.html">EduSkill</a>
+          <a href="Event_Index_premium.html">HealthSmart</a>
+          <a href="Event_Index_premium.html">TimeSmart</a>
+          <a href="Event_Index_premium.html">EventSmart</a>
+          <a href="Event_Index_premium.html">TravelSmart</a>
+          <a href="Event_Index_premium.html">FamilySmart</a>
+          <a href="Event_Index_premium.html">HomeSmart</a>
+          <a href="Event_Index_premium.html">VaultSmart</a>
+          <a href="Event_Index_premium.html">PlanetSmart</a>
+      </div>
+  </div>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="profile">
+      <a href="Abonnez_vous_a_la_suite.html" class="login"><span class="icon"> </span>Abonnez vous</a>
+      <a href="login.html" class="login"><span class="icon">🔑</span>Login</a>
+      <a href="register3.html" class="inscription-button">Inscription</a>
+    </div>
+  </nav>
+</header>
+<main>
+  <section id="hero">
+    <div class="container">
+      <h2> Connecter vos besoins à des solutions intelligentes </h2>
+      <h3>Parce que chaque problème mérite une solution innovante</h3>
+  </section>
+  <section id="images-alignees">
+    <div class="image-grid">
+      <img src="images/une jolie femme médecin.png" alt="Image 1" class="image-item">
+      <img src="images/pexels-nghia-trinh-333496-931796 (1).jpg" alt="Image 2" class="image-item">
+      <img src="images/earth-blue-planet-globe-planet-41953.jpeg" alt="Image 3" class="image-item">
+      <img src="images/pexels-max-fischer-5212323.jpg" alt="Image 4" class="image-item">
+      <img src="images/pexels-te-lensfix-380994-1371360.jpg" alt="Image 1" class="image-item">
+      <img src="images/pexels-catscoming-421999.jpg" alt="Image 4" class="image-item">
+      <img src="images/pexels-shkrabaanthony-5475786.jpg" alt="Image 4" class="image-item">
+       <img src="images/pexels-pixabay-39691.jpg" alt="Image 4" class="image-item">
+    </div>
+  </section>
+    </section>
+    <section id="contact">
+      <h2>Contact</h2>
+      <form id="contactForm">
+        <label for="name">Nom :</label>
+        <input type="text" id="name" name="name" required>
+        <label for="email">Email :</label>
+        <input type="email" id="email" name="email" required>
+        <label for="message">Message :</label>
+        <textarea id="message" name="message" required></textarea>
+        <button type="submit" class="blue-button">Envoyer</button>
+      </form>
+    </section>
+</main>
+<footer>
+  <p>&copy; 2025 HealthSmart. Tous droits réservés.</p>
+</footer>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Amélioration pour éviter les alertes intempestives
+    const contactForm = document.getElementById('contactForm');
+    contactForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      alert('Votre message a été envoyé avec succès !');
+    });
+  });
+</script>
+</body>

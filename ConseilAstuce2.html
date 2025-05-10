@@ -1,0 +1,283 @@
+<style>
+    .tips ul {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .tips {
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        color: #333;
+    }
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        text-align: center;
+    }
+    h1 {
+        font-size: 24px;
+        color: #70e0b6;
+        margin-bottom: 20px;
+    }
+    select, button, input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+    button {
+        background-color: #70e0b6;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    button:hover {
+        background-color: #56c29c;
+    }
+    .tips {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #555;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+<div class="container">
+    <select id="health-topic" aria-label="Selectionner une catégorie de sante">
+        <option value="all">Categories générales</option>
+        <option value="hydration">Hydratation</option>
+        <option value="sleep">Sommeil</option>
+        <option value="cardio">Santé cardiovasculaire</option>
+        <option value="stress">Gestion du stress</option>
+        <option value="nutrition">Nutrition</option>
+        <option value="mentalWellbeing">Bien-être mental</option>
+        <option value="healthTech">Technologie de sante</option>
+        <option value="fitness">Fitness</option>
+        <option value="advancedMentalHealth">Santé mentale avancee</option>
+        <option value="environmentAndHealth">Environnement et sante</option>
+    </select>
+    <input type="text" id="search-input" placeholder="Rechercher une astuce..." aria-label="Rechercher une astuce" />
+    <button id="show-tips">Afficher les Astuces</button>
+    <button id="clear-search">Effacer la recherche</button>
+    <div class="tips" id="tips-container">Les astuces s'afficheront ici.</div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const healthTopics = {
+            all: [
+                "Buvez au moins 1,5 litre d'eau par jour pour rester hydraté.",
+                "Essayez de dormir entre 7 et 8 heures par nuit pour un repos optimal.",
+                "Faites au moins 30 minutes d'exercice physique modéré par jour pour protéger votre cœur.",
+                "Mangez 5 portions de fruits et légumes chaque jour pour des apports en vitamines.",
+                "Réduisez la consommation de sucre ajouté pour éviter les pics d'énergie suivis de fatigue.",
+                "Prenez un moment chaque jour pour respirer profondément et vous recentrer.",
+                "Ajoutez des noix à vos repas pour un excellent apport en oméga-3.",
+                "Évitez les boissons sucrées : l'eau reste la meilleure option pour vous hydrater.",
+                "Pratiquez une activité physique en extérieur pour profiter de la vitamine D et améliorer votre humeur.",
+                "Écoutez votre corps : reposez-vous si vous êtes fatigué et évitez de forcer pendant l'exercice.",
+                "Commencez une routine matinale pour structurer votre journée (sport, lecture, méditation).",
+                "Planifiez vos repas pour la semaine afin de limiter les achats impulsifs et les aliments peu sains.",
+                "Privilégiez les produits locaux et de saison pour une alimentation plus nutritive et respectueuse de l'environnement.",
+            ],
+            hydration: [
+                "Commencez chaque matin par un verre d'eau pour réveiller votre métabolisme.",
+                "Ajoutez une tranche de concombre ou des fraises dans votre eau pour une saveur rafraîchissante.",
+                "Buvez un verre d'eau avant chaque repas pour favoriser une bonne digestion.",
+                "Portez une bouteille d'eau réutilisable pour ne jamais oublier de vous hydrater.",
+                "Surveillez la couleur de votre urine : une teinte pâle indique une bonne hydratation.",
+                "Si vous ressentez une petite faim, commencez par boire de l'eau, cela peut réduire les fringales.",
+                "Intégrez des aliments riches en eau, comme les concombres ou les pastèques, pour rester hydraté tout au long de la journée.",
+                "Évitez l'alcool et les boissons riches en caféine, car elles peuvent entraîner une déshydratation.",
+                "Fixez une alarme toutes les heures pour vous rappeler de boire un verre d'eau.",
+                "Utilisez une application de suivi pour garder une trace de votre consommation d'eau quotidienne.",
+            ],
+            sleep: [
+                "Établissez une routine de coucher pour améliorer la qualité de votre sommeil.",
+                "Essayez des tisanes naturelles comme la camomille pour favoriser la relaxation.",
+                "Investissez dans un bon matelas et des oreillers ergonomiques pour un sommeil réparateur.",
+                "Réglez une alarme pour vous coucher, pas seulement pour vous réveiller.",
+                "Évitez la caféine après 14h pour éviter de perturber votre sommeil.",
+                "Privilégiez une lecture calme avant de dormir plutôt que les écrans lumineux.",
+                "Créez un environnement propice au sommeil en réduisant le bruit et en éteignant les lumières artificielles.",
+                "Évitez les siestes prolongées dans l’après-midi pour ne pas perturber votre rythme de sommeil.",
+                "Maintenez des horaires réguliers pour vous endormir et vous réveiller, même les week-ends.",
+                "Essayez des sons apaisants, comme des bruits de pluie ou des vagues, pour faciliter l’endormissement.",
+                "Limitez les repas copieux avant de dormir pour éviter les troubles digestifs nocturnes."
+            ],
+            cardio: [
+                "Faites une promenade rapide après les repas pour améliorer la circulation sanguine.",
+                "Intégrez des exercices cardio amusants, comme la danse ou le vélo, dans votre routine.",
+                "Évitez les longues périodes d'inactivité : levez-vous et bougez toutes les 30 minutes.",
+                "Les escaliers sont vos amis : prenez-les chaque fois que possible.",
+                "Apprenez à mesurer votre fréquence cardiaque pour suivre vos progrès sportifs.",
+                "Incluez des aliments riches en magnésium, comme les bananes, pour soutenir votre cœur.",
+                "Pratiquez des exercices de renforcement comme les squats ou les pompes pour compléter votre cardio.",
+                "Utilisez un podomètre pour viser au moins 10 000 pas par jour.",
+                "Essayez l'entraînement fractionné (HIIT) pour des séances cardio rapides mais efficaces.",
+                "Trouvez un partenaire d'exercice pour rester motivé et responsable.",
+                "Participez à des événements communautaires, comme des marathons ou des séances de groupe en plein air.",
+            ],
+            stress: [
+                "Pratiquez des exercices de respiration profonde pour vous détendre.",
+                "Essayez des techniques de visualisation positive pour calmer votre esprit.",
+                "Prenez une pause : sortez vous promener dans la nature pour réduire le stress.",
+                "Faites une liste de ce pourquoi vous êtes reconnaissant pour booster votre humeur.",
+                "Le yoga peut être un excellent moyen de réduire les tensions.",
+                "Tenez un journal pour écrire vos pensées et mieux gérer vos émotions.",
+                "Créez un espace dédié à la détente dans votre maison, comme un coin lecture ou méditation.",
+                "Pratiquez la gratitude en notant trois choses positives à la fin de chaque journée.",
+                "Faites une activité artistique ou manuelle pour libérer votre esprit (dessin, tricot, bricolage).",
+                "Déconnectez-vous des réseaux sociaux pendant une journée pour réduire les facteurs de stress numériques.",
+                "Utilisez des huiles essentielles, comme la lavande ou l'eucalyptus, pour une relaxation instantanée.",
+            ],
+            nutrition: [
+                "Optez pour des aliments riches en fibres comme les légumes verts et les légumineuses.",
+                "Ajoutez des super-aliments comme les baies et les graines de chia à votre alimentation.",
+                "Préparez vos repas à l'avance pour éviter les tentations de malbouffe.",
+                "Mangez lentement et mastiquez bien pour faciliter la digestion.",
+                "Hydratez-vous avec des smoothies faits maison riches en nutriments.",
+                "Réduisez les produits ultra-transformés pour protéger votre microbiote intestinal.",
+                "Prévoyez une journée végétarienne chaque semaine pour diversifier vos apports nutritionnels.",
+                "Ajoutez des herbes fraîches comme le persil ou la coriandre pour rehausser vos plats tout en réduisant le sel.",
+                "Essayez des protéines alternatives comme les lentilles, le tofu ou le tempeh dans vos repas.",
+                "Intégrez des fruits secs comme les abricots ou les amandes pour une collation énergisante et riche en nutriments.",
+                "Explorez de nouvelles cuisines (japonaise, méditerranéenne) pour diversifier vos habitudes alimentaires.",
+            ],
+            mentalWellbeing: [
+                "Essayez le journaling pour mieux comprendre et gérer vos émotions.",
+                "Pratiquez des exercices de visualisation pour atteindre vos objectifs.",
+                "Passez du temps dans la nature pour apaiser votre esprit et améliorer votre humeur.",
+                "Évitez les distractions numériques en mettant en place des périodes de déconnexion.",
+                "Participez à des activités sociales pour renforcer votre santé mentale.",
+                "Adoptez une routine de sommeil régulière pour un bien-être mental optimal.",
+                "Trouvez un passe-temps créatif (peinture, écriture, musique) pour exprimer vos émotions.",
+                "Pratiquez la pleine conscience pour rester ancré dans le moment présent.",
+                "Lisez un livre inspirant ou éducatif pour stimuler votre esprit.",
+                "Entourez-vous de personnes positives et encourageantes pour nourrir votre moral.",
+                "Participez à des ateliers ou des groupes de soutien pour échanger des idées positives.",
+                "Développez une habitude de gratitude en écrivant des lettres à des proches ou mentors.",
+                "Détachez-vous des pensées négatives en essayant des techniques de relaxation guidée.",
+                "Regardez des films motivants ou écoutez des podcasts de développement personnel.",
+                "Faites des pauses régulières au travail pour éviter l'épuisement mental."
+            ],
+            healthTech: [
+            "Explorez les plateformes de coaching sportif en ligne pour personnaliser vos entraînements.",
+            "Testez des applications de suivi alimentaire pour équilibrer vos repas.",
+            "Investissez dans un purificateur d'air intelligent pour améliorer la qualité de l'air chez vous.",
+            "Configurez des rappels pour vous lever et bouger toutes les heures via votre smartwatch.",
+            "Utilisez des trackers de sommeil pour analyser et améliorer vos habitudes nocturnes.",
+            "Essayez une balance connectée pour surveiller votre poids et vos progrès de santé.",
+            "Recherchez des forums en ligne spécialisés en bien-être pour échanger sur vos objectifs.",
+            "Utilisez un tensiomètre intelligent pour surveiller votre pression artérielle à domicile.",
+            "Configurez un objectif quotidien de pas sur votre smartwatch pour rester actif.",
+            "Téléchargez des jeux de fitness interactifs pour rendre vos séances d'exercice plus amusantes.",
+            "Essayez des gadgets comme des lunettes de luminothérapie pour réguler votre horloge biologique.",
+            "Trouvez une application de yoga ou de méditation guidée pour des séances accessibles partout.",
+            "Investissez dans des appareils de cuisine connectés pour préparer des repas sains facilement.",
+            "Suivez vos niveaux d'hydratation avec des bouteilles d'eau intelligentes connectées.",
+            "Surveillez vos niveaux de glucose ou autres indicateurs avec des appareils connectés dédiés."
+        ],
+            fitness: [
+                "Testez des cours de yoga ou de Pilates pour renforcer vos muscles tout en améliorant votre souplesse.",
+                "Adoptez une routine matinale comprenant des exercices pour bien démarrer la journée.",
+                "Essayez la natation pour un exercice complet qui ménage vos articulations.",
+                "Utilisez une corde à sauter pour des séances cardio rapides et efficaces.",
+                "Fixez des jalons hebdomadaires pour suivre vos progrès et rester motivé.",
+                "Reposez-vous suffisamment entre vos entraînements pour éviter le surmenage.",
+                "Faites des exercices fonctionnels comme le gainage pour améliorer la posture."
+            ],
+            advancedMentalHealth: [
+                "Planifiez des pauses régulières au cours de la journée pour réduire l'épuisement mental.",
+                "Essayez l'art-thérapie pour exprimer vos émotions de manière créative.",
+                "Pratiquez la méditation guidée pour mieux gérer le stress et améliorer votre concentration.",
+                "Créez un environnement calme chez vous avec des éléments apaisants comme des bougies ou de la musique douce.",
+                "Lisez des livres sur le développement personnel pour nourrir votre esprit.",
+                "Adoptez une alimentation équilibrée pour optimiser votre santé mentale.",
+                "Fixez des limites claires dans vos interactions sociales pour réduire les tensions."
+            ],
+    environmentAndHealth: [
+            "Optez pour les transports en commun ou le covoiturage pour réduire votre empreinte carbone.",
+            "Essayez le compostage pour diminuer vos déchets alimentaires tout en enrichissant votre jardin.",
+            "Privilégiez les vêtements fabriqués à partir de matériaux durables et écologiques.",
+            "Participez à des initiatives locales de nettoyage pour préserver l'environnement.",
+            "Utilisez des appareils économes en énergie pour réduire votre consommation d'électricité.",
+            "Investissez dans des panneaux solaires pour une maison plus respectueuse de l'environnement.",
+            "Pratiquez le recyclage systématique et sensibilisez votre entourage à cette démarche."
+        ],
+    };
+        const elements = {
+            healthTopicSelect: document.getElementById("health-topic"),
+            searchInput: document.getElementById("search-input"),
+            showTipsButton: document.getElementById("show-tips"),
+            clearSearchButton: document.getElementById("clear-search"),
+            tipsContainer: document.getElementById("tips-container")
+        };
+        const displayTips = (tips, category) => {
+            const categoryColors = {
+                hydration: "#70c1b3",
+                sleep: "#b3cde0",
+                cardio: "#f4b400",
+                stress: "#ff8c94",
+                nutrition: "#6c5ce7",
+                all: "#f0f0f0",
+                mentalWellbeing: "#ffb6c1", // Rose pour le bien-être mental
+                healthTech: "#8d99ae", // Gris-bleu pour la technologie de santé
+                fitness: "#00b894", // Vert vif pour le fitness
+                advancedMentalHealth: "#ff7675", // Rose chaud pour la santé mentale avancée
+                environmentAndHealth: "#55efc4" // Vert clair pour l'environnement et la santé
+            };
+            elements.tipsContainer.style.backgroundColor = categoryColors[category] || "#ffffff";
+            if (tips.length > 0) {
+                elements.tipsContainer.innerHTML = `<ul>${tips.map(tip => `<li>${tip}</li>`).join("")}</ul>`;
+            } else {
+                elements.tipsContainer.textContent = "Aucune astuce disponible pour ce sujet.";
+            }
+        };
+        const saveTipToHistory = (tips) => {
+            localStorage.setItem("viewedTips", JSON.stringify(tips));
+        };
+        elements.showTipsButton.addEventListener("click", () => {
+            const selectedTopic = elements.healthTopicSelect.value;
+            const searchTerm = elements.searchInput.value.toLowerCase();
+            let tips = healthTopics[selectedTopic] || [];
+            if (searchTerm) {
+                tips = tips.filter(tip => tip.toLowerCase().includes(searchTerm));
+            }
+            displayTips(tips, selectedTopic);
+            saveTipToHistory(tips);
+        });
+        elements.clearSearchButton.addEventListener("click", () => {
+            elements.searchInput.value = "";
+            elements.tipsContainer.textContent = "Recherchez une astuce parmi les catégories disponibles !";
+            elements.tipsContainer.style.backgroundColor = "#ffffff";
+        });
+    });
+</script>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SpendSmart - Transformez vos finances, transformez votre vie. Découvrez notre solution de gestion complète pour les bons gestionnaires de budgets.">
+    <meta name="keywords" content="gestion financière, budget, économies, retraite, impôts, IA, immobilier">
+    <title></title>
+    <style>
+.feature-grid .feature {
+    background-color: #ffffff;
+    padding: 17px; /* Reduced from 20px to approximately 85% */
+    border-radius: 8.5px; /* Proportional adjustment from 10px */
+    box-shadow: 0 1.7px 3.4px rgba(0, 0, 0, 0.085); /* Slightly reduced for consistency */
+    width: 230px; /* Reduced from 300px (15%) */
+    text-align: center;
+    margin: 17px; /* Adjusted for spacing consistency */
+}
+.feature-grid {
+    gap: 8.5px; /* Reduced the spacing between features by 15% */
+}
+.feature-grid img {
+    width: 25.5%; /* Reduced image size from 30% */
+    height: auto;
+}
+     body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #70e0b6, #ffffff); /* Dégradé vert clair */
+    margin: 0;
+    padding: 0;
+    color: #333333;
+}
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        header nav ul li {
+            display: inline;
+            position: relative;
+        }
+        header nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        header nav ul li:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 10px;
+        }
+        .dropdown-content a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            white-space: nowrap;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        header nav .profile {
+            display: flex;
+            align-items: center;
+        }
+        header nav .profile .login, .inscription-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            background-color: #fff;
+            border: 2px solid #333;
+            margin-left: 10px;
+        }
+        header nav .profile .login:hover, .inscription-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+        header nav .logo {
+            width: 80px; /* Ajustez cette valeur pour réduire la taille du logo */
+            height: auto;
+        }
+        #hero {
+    background: url('pexels-shkrabaanthony-5215017.jpg') no-repeat center center/cover;
+    color: #fff;
+    text-align: center;
+    padding: 100px 20px;
+}
+        #hero .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        #hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        #hero p {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        #features, #pricing, #testimonials, #contact {
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .feature-grid, .pricing-grid, .testimonial-grid {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .feature, .pricing-plan, .testimonial {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 150px;
+        }
+        .feature .icon {
+            font-size: 2.5em; /* Augmentez la taille des icônes */
+            display: block;
+            margin-bottom: 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+        form label {
+            text-align: left;
+        }
+        form input, form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1e90ff;
+            color: #fff;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #1c86ee;
+        }
+        /* Media Queries for Responsive Design */
+        @media (max-width: 768px) {
+            .feature, .pricing-plan, .testimonial {
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            header nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+            #hero h1 {
+                font-size: 2em;
+            }
+            #hero p {
+                font-size: 1em;
+            }
+        }
+        .feature, .pricing-plan, .testimonial {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 250px;
+        }
+        .feature-grid {
+            gap: 10px; /* Réduit l'espace entre les éléments dans la grille */
+        }
+        button, .blue-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #1e90ff;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        button:hover, .blue-button:hover {
+            background-color: #1c86ee;
+            transform: scale(1.05);
+        }
+        .outil-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff8c00;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .outil-button:hover {
+            background-color: #e67e00;
+            transform: scale(1.05);
+        } 
+        .feature {
+            text-align: center;
+            margin: 20px;
+        }
+        .feature img {
+            width: 30%; /* Réduit la taille à 25% de l'original */
+            height: auto;
+        }
+        .feature h3 {
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+        .feature p {
+            font-size: 1em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <img src="spendsmart.png" alt="Logo SpendSmart" class="logo">
+            <ul>
+                <li><a href="#features">Fonctionnalités</a></li>
+                <li><a href="#pricing">Tarifs</a></li>
+                <li><a href="#testimonials">Témoignages</a></li>
+                <li class="dropdown">
+                    <a href="#outil" class="dropbtn">Outil</a>
+                    <div class="dropdown-content">
+                        <a href="Index.html">HealthSmart Starter</a>
+                        <a href="HealthSmart_index_premium.html">HealthSmart Premium</a>
+                    </div>
+                </li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="profile">
+                <a href="login.html" class="login"><span class="icon">🔑</span>Login</a>
+                <a href="register3.html" class="inscription-button">Inscription</a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section id="hero">
+            <div class="container">
+                <h2>Votre santé, simplifiée avec HealthSmart</h2>
+                <p>Gérez vos données médicales, suivez vos habitudes et plus encore.</p>
+                <a href="#features" class="blue-button">En savoir plus</a>
+            </div>
+        </section>
+        <section id="features">
+            <h2>Fonctionnalités</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <span class="icon">🌟</span>
+                    <h3><a href="Bibliothèque de Santé.html">Bibliothèque de Santé</a></h3>
+                    <p>Conseils et astuce du jour,</p>
+                    <p>Suivi des habitude.</p>
+                    <p>articles sur des sujets courants</p>
+                    <p>Communuauté :</p>
+                    <p>Gestion des Contacts Médicaux</p>
+                    <p>Rapports Annuels de Santé</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">🌿</span>
+                    <h3><a href="tracker_wellness.html">Tracker de Bien-être</a></h3>
+                    <p>Suivez vos habitudes de sommeil, hydratation, activité physique, et alimentation.</p>
+                    <p>Visualisez vos progrès avec des graphiques interactifs.</p>
+                    <p>Recevez des suggestions personnalisées pour améliorer votre bien-être.</p>
+                </div> 
+                <div class="feature">
+                    <span class="icon">🗂️</span>
+                    <h3><a href="medical_agenda.html">Agenda médical</a></h3>
+                    <p>Organisez et gérez vos rendez-vous, synchronisez-les avec votre calendrier.</p>
+                    <p>>Historique des Rendez-vous</p>
+                    <p>Recevez des notifications pour vos rendez-vous et médicaments.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">⚖️</span>
+                    <h3><a href="Calculateur_IMC.html">Calculateur IMC</a></h3>
+                    <p>Un outil simple pour évaluer l'IMC des utilisateurs et fournir des conseils adaptés.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">💉</span>
+                    <h3><a href="Rappels_de_Vaccination.html">Rappels de Vaccination</a></h3>
+                    <p>Mettez en place des notifications pour les rappels de vaccins essentiels,</p>
+                    <p>en fonction de l'âge ou des recommandations locales de santé publique.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">🚑</span>
+                    <h3><a href="urgence.html">Urgence</a></h3>
+                    <p> informations d'urgence. groupe sanguin ,groupe sanguin,allergènes,antécédents médicaux </p>
+                </div>
+                <div class="feature">
+                    <span class="icon">📋</span>
+                    <h3><a href="Données d’Assurance Santé">Données d’Assurance Santé</a></h3>
+                    <p> Données d’Assurance Santé sauvegardée tous vos document de santé bilan,</p>
+                    <p>ordonance,mutuelle,cartevitale,devis </p>
+                </div>
+                <div class="feature">
+                    <span class="icon">🥗</span>
+                    <h3><a href="Santé_Physique_et_Nutrition.html">Santé Physique et Nutrition</a></h3>
+                    <p>Améliorez votre santé avec un suivi nutritionnel et des défis sportifs adaptés à vos objectifs.</p>
+                    <p>Bénéficiez de rappels essentiels pour une vie équilibrée et active.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">⚕️</span>
+                    <h3><a href="Service_medical_et_urgence.html">Service médical et urgence</a></h3>
+                    <p>Accédez rapidement à des ressources médicales essentielles en cas d'urgence.</p>
+                    <p>Organisez les informations nécessaires pour optimiser votre gestion de crise.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">👨‍👩‍👧‍👦</span>
+                    <h3><a href="Gestion_de_la_santé_familiale.html">Gestion de la santé familiale</a></h3>
+                    <p>Centralisez les rendez-vous médicaux, les vaccinations et les courbes de croissance pour tous les membres de la famille.</p>
+                    <p>Favorisez un bien-être collectif grâce à des activités et des rappels adaptés à chacun.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">🔗</span>
+                    <h3><a href="Santé_connectée.html">Santé connectée</a></h3>
+                    <p>Intégrez vos montres connectées et autres appareils pour un suivi automatisé de vos données de santé.</p>
+                    <p>Analysez vos signes vitaux et recevez des recommandations basées sur vos performances en temps réel.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">💼</span>
+                    <h3><a href="Gestion_personnelle_et_financière.html">Gestion personnelle et financière</a></h3>
+                    <p>Suivez vos dépenses médicales et gérez vos remboursements avec précision.</p>
+                    <p>Accédez à des outils financiers pour optimiser vos coûts et votre budget santé.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">💼</span>
+                    <h3><a href="Carnet_de_Voyage_Médical.html">Carnet de Voyage Médical :</a></h3>
+                    <p> Planification des voyages avec rappels de vaccins et informations locales.</p>
+                </div>
+                <div class="feature">
+                    <span class="icon">🌿</span>
+                    <h3><a href="Suiviet_gestion_personnalisée.html">Tracker de Bien-être</a></h3>
+                    <p>Suivez vos habitudes de sommeil, hydratation, activité physique, et alimentation.</p>
+                    <p>Visualisez vos progrès avec des graphiques interactifs.</p>
+                    <p>Recevez des suggestions personnalisées pour améliorer votre bien-être.</p>
+                </div>
+            </div>
+        </section>
+        <section id="pricing">
+            <h2>Tarifs</h2>
+            <div class="pricing-grid">
+                <div class="pricing-plan">
+                    <h3>Starter</h3>
+                    <p>Prix : 9,99€/mois</p>
+                    <p>Le stockage sécurisé des données médicales</p>
+                    <p>Les rappels santé</p>
+                    <p>et le suivi des habitudes.</p>
+                </div>
+                <div class="pricing-plan">
+                    <h3>Premium</h3>
+                    <p>Prix : 15.5€/mois</p>
+                    <p>Accès complet aux fonctionnalités</p>
+                    <p>Coffre-fort électronique</p>
+                    <p>Finance, assurance, mutuelle, banque</p>
+                    <p>Intelligence artificielle pour gérer le budget</p>
+                    <p>Support prioritaire</p>
+                </div>
+            </div>
+        </section>
+        <section id="contact">
+            <h2>Contact</h2>
+            <form id="contactForm">
+                <label for="name">Nom :</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email :</label>
+                <input type="email" id="email" name="email" required>
+                <label for="message">Message :</label>
+                <textarea id="message" name="message" required></textarea>
+                <button type="submit" class="blue-button">Envoyer</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 HealthSmart. Tous droits réservés.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Amélioration pour éviter les alertes intempestives
+            const contactForm = document.getElementById('contactForm');
+            contactForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                alert('Votre message a été envoyé avec succès !');
+            });
+        });
+    </script>
+</body>
+

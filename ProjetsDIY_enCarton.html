@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projets DIY en Carton</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #70e0b6;
+            color: white;
+            padding: 1rem;
+        }
+
+        .project {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+        h2 {
+            color: #70e0b6;
+        }
+        .pagination {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Projets DIY en Carton</h1>
+    </header>
+    <main>
+        <section id="project-container"></section>
+        <div class="pagination">
+            <button onclick="previousProject()">Précédent</button>
+            <span id="page-number">Projet 1</span>
+            <button onclick="nextProject()">Suivant</button>
+        </div>
+    </main>
+    <script>
+        const projects = [
+            { 
+                title: "Atelier de peinture sur carton", 
+                materials: "Carton épais, peinture acrylique, pinceaux, ruban adhésif", 
+                steps: ["Découpe un morceau de carton.", "Utilise du ruban adhésif pour créer des zones.", "Peins chaque section.", "Retire le ruban pour révéler les motifs."]
+            },
+            { 
+                title: "Étagère modulable en carton", 
+                materials: "Boîtes en carton, colle forte, peinture", 
+                steps: ["Découpe et assemble les boîtes.", "Fixe-les avec de la colle.", "Peins l’étagère.", "Utilise-la pour ranger des objets légers."]
+            },
+            { 
+                title: "Jeu de dominos en carton", 
+                materials: "Carton fin, feutres, règle", 
+                steps: ["Découpe des petits rectangles.", "Trace une ligne au centre.", "Dessine les points des dominos.", "Personnalise-les et joue !"]
+            },
+            { 
+                title: "Voiture en carton avec roues mobiles", 
+                materials: "Boîte en carton, bouchons de bouteille, colle forte, axes en bois", 
+                steps: ["Découpe une forme de voiture.", "Fixe les bouchons pour les roues.", "Colle les axes sous la voiture.", "Décore et fais rouler !"]
+            },
+            { 
+                title: "Maison d’oiseau en carton", 
+                materials: "Boîte en carton, ciseaux, colle forte, peinture", 
+                steps: ["Découpe les morceaux de la maison.", "Assemble avec de la colle.", "Ajoute une ouverture pour l’oiseau.", "Peins et protège avec du vernis."]
+            },
+            { 
+                title: "Caisse en carton transportable", 
+                materials: "Boîte solide en carton, ruban adhésif renforcé, poignées en ficelle", 
+                steps: ["Renforce la boîte.", "Perce deux trous et insère une ficelle.", "Décore la caisse.", "Utilise-la pour ranger des objets."]
+            },
+            { 
+                title: "Théâtre de marionnettes en carton",
+                materials: "Boîte en carton, ciseaux, peinture, bâtonnets en bois",
+                steps: ["Découpe une ouverture dans la boîte.", "Décore l’intérieur et l’extérieur.", "Fabrique des marionnettes en papier.", "Ajoute un rideau en tissu."]
+            },
+            { 
+                title: "Labyrinthe à billes en carton",
+                materials: "Boîte à chaussures, pailles, colle forte, billes",
+                steps: ["Trace le parcours du labyrinthe.", "Colle les murs en carton.", "Ajoute une sortie pour la bille.", "Place une bille et essaie de la faire avancer."]
+            },
+            { 
+                title: "Boîte secrète avec mécanisme coulissant",
+                materials: "Boîte en carton, cutter, colle forte",
+                steps: ["Découpe une fente dans la boîte.", "Assemble un tiroir coulissant.", "Ajoute du papier décoratif.", "Utilise la boîte pour ranger des trésors."]
+            },
+            { 
+                title: "Fusée en carton avec lancement élastique",
+                materials: "Rouleau de papier toilette, carton fin, élastique",
+                steps: ["Découpe et fixe les ailes.", "Peins la fusée.", "Attache un élastique en dessous.", "Lâche la fusée et regarde-la décoller !"]
+            },
+            { 
+                title: "Calendrier perpétuel en carton",
+                materials: "Carton épais, attaches parisiennes, feutres",
+                steps: ["Découpe trois plaques.", "Inscris les jours et les mois.", "Assemble avec des attaches.", "Tourne les plaques pour changer la date."]
+            },
+            { 
+                title: "Porte-stylos décoratif en carton",
+                materials: "Tube en carton, papier coloré, colle",
+                steps: ["Découpe des morceaux.", "Recouvre avec du papier coloré.", "Assemble sur une base.", "Utilise-le pour ranger des stylos."]
+            },
+            { 
+                title: "Robot articulé en carton",
+                materials: "Carton épais, attaches parisiennes",
+                steps: ["Découpe les différentes parties.", "Assemble avec des attaches parisiennes.", "Peins le robot.", "Amuse-toi à lui donner des poses."]
+            },
+            { 
+                title: "Château en carton avec pont-levis",
+                materials: "Grande boîte en carton, ficelle, peinture",
+                steps: ["Découpe les tours et les murs.", "Assemble le château.", "Ajoute un pont-levis avec une ficelle.", "Décore le château avec des créneaux."]
+            },
+            { 
+                title: "Boîte surprise avec mécanisme",
+                materials: "Carton fin, ressort, colle",
+                steps: ["Assemble la boîte.", "Fixe un ressort.", "Ajoute un couvercle.", "Ouvre-la pour voir l’objet surgir !"]
+            }
+        ];
+        let currentProject = 0;
+        function displayProject() {
+            const container = document.getElementById("project-container");
+            container.innerHTML = "";
+            const project = projects[currentProject];
+            let stepsList = "<ul>";
+            project.steps.forEach((step, index) => {
+                stepsList += `<li><strong>Étape ${index + 1}:</strong> ${step}</li>`;
+            });
+            stepsList += "</ul>";
+            container.innerHTML = `<div class="project">
+                                    <h2>${project.title}</h2>
+                                    <p><strong>Matériel :</strong> ${project.materials}</p>
+                                    <p><strong>Étapes :</strong></p> ${stepsList}
+                                   </div>`;
+            document.getElementById("page-number").innerText = `Projet ${currentProject + 1}`;
+        }
+        function previousProject() {
+            if (currentProject > 0) {
+                currentProject--;
+                displayProject();
+            }
+        }
+        function nextProject() {
+            if (currentProject < projects.length - 1) {
+                currentProject++;
+                displayProject();
+            }
+        }
+        document.addEventListener("DOMContentLoaded", displayProject);
+    </script>
+</body>
+</html>

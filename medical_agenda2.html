@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda Médical Hebdomadaire</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Corps et mise en page globale */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #e0f7fa, #fff);
+      color: #333;
+      text-align: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #34d8c5;
+      margin-bottom: 20px;
+    }
+    /* Navigation entre les semaines */
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .calendar-header button {
+      background-color: #08f1d6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .calendar-header button:hover {
+      background-color: #10e7c3;
+    }
+    /* Vue hebdomadaire */
+    .week-view {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 15px;
+    }
+    .day {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    .day h3 {
+      font-size: 1.2rem;
+      background-color: #34d8c5;
+      color: white;
+      margin: 0;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    /* Créneaux horaires */
+    .hour {
+      padding: 5px;
+      font-size: 0.8rem;
+      border-top: 1px solid #ddd;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .hour:hover {
+      background-color: #e0f2f1;
+    }
+    .event {
+      background-color: #007bff;
+      color: white;
+      padding: 5px;
+      margin-top: 5px;
+      border-radius: 3px;
+      font-size: 0.9rem;
+    }
+    .event button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .event button:hover {
+      text-decoration: underline;
+    }
+    /* Mode sombre */
+    body.dark-mode {
+      background: #121212;
+      color: #e0e0e0;
+    }
+    .container.dark-mode {
+      background-color: #1e1e1e;
+    }
+    .day.dark-mode {
+      background-color: #242424;
+      border-color: #444;
+    }
+    .day h3.dark-mode {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Agenda Médical Hebdomadaire</h1>
+    <div class="calendar-header">
+      <button id="prev-week">« Semaine précédente</button>
+      <h2 id="week-dates">Semaine du 1 au 7 Janvier</h2>
+      <button id="next-week">Semaine suivante »</button>
+    </div>
+    <div class="week-view" id="week-view"></div>
+    <button id="toggle-dark-mode">Activer le mode nuit</button>
+    <input type="text" id="search-bar" placeholder="Rechercher un événement...">
+    <div id="event-list">
+      <h3>Liste des événements :</h3>
+    </div>
+    <button id="export-button">Exporter les événements</button>
+  </div>
+  <script>
+    // Sélection des éléments du DOM
+    const weekView = document.getElementById('week-view');
+    const weekDates = document.getElementById('week-dates');
+    const prevWeekButton = document.getElementById('prev-week');
+    const nextWeekButton = document.getElementById('next-week');
+    const toggleDarkModeButton = document.getElementById('toggle-dark-mode');
+    const searchBar = document.getElementById('search-bar');
+    const eventList = document.getElementById('event-list');
+    const exportButton = document.getElementById('export-button');
+
+    // Variables globales
+    let currentWeekStart = new Date();
+    currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay());
+    let events = JSON.parse(localStorage.getItem('weeklyEvents')) || [];
+
+    // Générer la vue hebdomadaire
+    function renderWeekView(startDate) {
+      weekView.innerHTML = '';
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(startDate);
+        day.setDate(startDate.getDate() + i);
+
+        const dayColumn = document.createElement('div');
+        dayColumn.classList.add('day');
+        dayColumn.innerHTML = `<h3>${day.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric' })}</h3>`;
+
+        for (let hour = 0; hour < 24; hour++) {
+          const hourDiv = document.createElement('div');
+          hourDiv.classList.add('hour');
+          hourDiv.textContent = `${hour}:00`;
+
+          const hourEvents = events.filter(event => event.date === day.toDateString() && event.hour === hour);
+          hourEvents.forEach(event => {
+            const eventDiv = document.createElement('div');
+            eventDiv.classList.add('event');
+            eventDiv.innerHTML = `
+              ${event.name} (${event.minute.toString().padStart(2, '0')} min)
+              <button onclick="editEvent('${event.date}', ${event.hour}, ${event.minute})">Modifier</button>
+              <button onclick="deleteEvent('${event.date}', ${event.hour}, ${event.minute})">Supprimer</button>
+            `;
+            hourDiv.appendChild(eventDiv);
+          });
+
+          hourDiv.onclick = () => {
+            const eventName = prompt('Nom de l\'événement :');
+            const eventMinute = prompt('À quelle minute ?');
+            if (eventName && eventMinute) {
+              events.push({ date: day.toDateString(), hour, minute: parseInt(eventMinute), name: eventName });
+              saveEvents();
+              renderWeekView(currentWeekStart);
+            }
+          };
+          dayColumn.appendChild(hourDiv);
+        }
+        weekView.appendChild(dayColumn);
+      }
+    }
+
+    // Sauvegarde des événements
+    function saveEvents() {
+      localStorage.setItem('weeklyEvents', JSON.stringify(events));
+    }
+
+    // Modifier un événement
+    function editEvent(day, hour, minute) {
+      const event = events.find(e => e.date === day && e.hour === hour && e.minute === minute);
+      const newName = prompt('Modifier le nom de l\'événement :', event.name);
+      if (newName) {
+        event.name = newName;
+        saveEvents();
+        renderWeekView(currentWeekStart);
+      }
+    }
+
+    // Supprimer un événement
+    function deleteEvent(day, hour, minute) {
+      events = events.filter(e => !(e.date === day && e.hour === hour && e.minute === minute));
+      saveEvents();
+      renderWeekView(currentWeekStart);
+    }
+
+    // Mise à jour des semaines
+    function updateWeek(offset) {
+      currentWeekStart.setDate(currentWeekStart.getDate() + offset * 7);
+      const endOfWeek = new Date(currentWeekStart);
+      endOfWeek.setDate(currentWeekStart.getDate() + 6);
+      weekDates.textContent = `Semaine du ${currentWeekStart.toLocaleDateString('fr-FR')} au ${endOfWeek.toLocaleDateString('fr-FR')}`;
+      renderWeekView(currentWeekStart);
+    }
+
+    // Recherche d'événements
+    searchBar.addEventListener('input', () => {
+      const searchTerm = searchBar.value.toLowerCase();
+      const filteredEvents = events.filter(event => event.name.toLower
+      (searchTerm));
+      renderFilteredEventList(filteredEvents);
+    });
+
+    function renderFilteredEventList(filteredEvents) {
+      eventList.innerHTML = '<h3>Résultats de la recherche :</h3>';
+      filteredEvents.forEach(event => {
+        const eventItem = document.createElement('div');
+        eventItem.textContent = `${event.date} à ${event.hour}:${event.minute.toString().padStart(2, '0')} - ${event.name}`;
+        eventList.appendChild(eventItem);
+      });
+    }
+    // Exportation des événements au format JSON
+    exportButton.onclick = () => {
+      const eventJSON = JSON.stringify(events, null, 2);
+      const blob = new Blob([eventJSON], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = 'events.json';
+      downloadLink.click();
+      alert('Les événements ont été exportés avec succès !');
+    };
+
+    // Gestion du mode sombre
+    toggleDarkModeButton.onclick = () => {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    };
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+    }
+    // Initialisation au chargement
+    updateWeek(0); // Charge la semaine actuelle
+    updateEventList(); // Met à jour la liste des événements
+  </script>
+</body>
+</html>

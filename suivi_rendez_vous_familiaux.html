@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Rendez-vous Familiaux</title>
+    <STYLE>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s ease;
+            background-color: #ffffff; /* Couleur de fond par défaut */
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #5c85d6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #4a70b2;
+        }
+        :root {
+            --bg-color-light: #ffffff;
+            --bg-color-dark: #333333;
+            --text-color-light: #000000;
+            --text-color-dark: #ffffff;
+            --highlight-color: #70e0b6;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: var(--bg-color-light);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .container.dark-mode {
+            background: var(--bg-color-dark);
+        }
+        form label, input, select, textarea, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: var(--highlight-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #50b68f;
+        }
+        #appointment-list {
+            list-style: none;
+            padding: 0;
+        }
+        #appointment-list li {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #appointment-list li button {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #appointment-list li button:hover {
+            background-color: #c9302c;
+        }
+        /* Typographie modernisée */
+        body {
+            font-family: "Roboto", sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            background-color: #f0f4f8; /* Couleur de fond plus douce */
+            color: #34495e; /* Couleur du texte plus moderne */
+        }
+        /* Style du conteneur */
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            text-align: center;
+            background: #ffffff; /* Fond blanc élégant */
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #dfe6e9;
+        }
+        /* Amélioration du titre */
+        h1 {
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: #2c3e50; /* Couleur du texte pour le titre */
+            letter-spacing: 1px; /* Espacement des lettres pour une finition propre */
+        }
+        /* Champs de formulaire */
+        form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: left;
+            display: block;
+        }
+        form input, form select, form textarea {
+            width: 95%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #dcdde1; /* Bordure légère */
+            background: #f9f9f9; /* Fond gris clair */
+            font-size: 14px;
+        }
+        /* Boutons modernisés */
+        button {
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #70e0b6; /* Bleu élégant */
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            padding: 12px 25px;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #70e0b6; /* Bleu plus clair au survol */
+            transform: translateY(-2px); /* Animation de soulèvement */
+        }
+        /* Liste des rendez-vous */
+        #appointment-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        #appointment-list li {
+            background: #ecf0f1; /* Fond gris clair */
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dfe6e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            transition: box-shadow 0.3s ease;
+        }
+        #appointment-list li:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Effet de survol */
+        }
+        /* Boutons dans la liste des rendez-vous */
+        #appointment-list li button {
+            font-size: 14px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #appointment-list li button:hover {
+            background-color: #c0392b; /* Rouge plus foncé au survol */
+        }
+        /* Recherche */
+        #search-bar {
+            width: 95%;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dcdde1;
+            margin-top: 20px;
+            background: #f9f9f9;
+            font-size: 14px;
+        }
+    </STYLE>
+</head>
+<body>
+<div class="container">
+    <h1>📅 Suivi des Rendez-vous Familiaux</h1>
+    <form id="appointment-form">
+        <label for="name">Nom :</label>
+        <input type="text" id="name" placeholder="Nom de la personne" required>
+        <label for="date">Date :</label>
+        <input type="date" id="date" required>
+        <label for="details">Détails :</label>
+        <textarea id="details" placeholder="Détails du rendez-vous"></textarea>
+        <label for="category">Catégorie :</label>
+        <select id="category">
+            <option value="Médical">Médical</option>
+            <option value="École">École</option>
+            <option value="Travail">Travail</option>
+        </select>
+        <button type="submit">Ajouter le Rendez-vous</button>
+    </form>
+    <input type="text" id="search-bar" placeholder="Rechercher par nom, date ou catégorie">
+    <h2>Liste des Rendez-vous :</h2>
+    <ul id="appointment-list"></ul>
+    <button id="export-csv">Exporter en CSV</button>
+</div>
+<script>
+    // Charger les rendez-vous au démarrage
+    document.addEventListener('DOMContentLoaded', loadAppointments);
+
+    // Basculer le mode sombre
+    document.getElementById('toggle-theme').addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        document.querySelector('.container').classList.toggle('dark-mode');
+    });
+
+    // Personnalisation des couleurs
+    document.getElementById('customize-theme').addEventListener('click', function () {
+        const newColor = prompt("Entrez une couleur hexadécimale pour le surlignage (exemple : #ff6347) :");
+        if (newColor && /^#([0-9A-F]{3}){1,2}$/i.test(newColor)) {
+            document.documentElement.style.setProperty('--highlight-color-light', newColor);
+        } else {
+            alert("Couleur invalide ! Veuillez entrer une valeur hexadécimale valide.");
+        }
+    });
+    // Ajouter un rendez-vous
+    document.getElementById('appointment-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const date = document.getElementById('date').value;
+        const details = document.getElementById('details').value;
+        const category = document.getElementById('category').value;
+        if (isDuplicate(name, date)) {
+            alert("Un rendez-vous similaire existe déjà !");
+            return;
+        }
+        const appointment = { name, date, details, category };
+        saveAppointment(appointment);
+        displayAppointment(appointment);
+        this.reset();
+    });
+    // Recherche et filtrage
+    document.getElementById('search-bar').addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        const appointments = document.querySelectorAll('#appointment-list li');
+        appointments.forEach(li => {
+            const text = li.textContent.toLowerCase();
+            li.style.display = text.includes(query) ? '' : 'none';
+        });
+    });
+    // Exporter en CSV
+    document.getElementById('export-csv').addEventListener('click', function () {
+        const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+        let csv = 'Nom,Date,Catégorie,Détails\n';
+        appointments.forEach(app => {
+            csv += `${app.name},${app.date},${app.category},${app.details}\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'appointments.csv';
+        link.click();
+    });
+    // Partager un rendez-vous via WhatsApp
+    function shareAppointment(appointment) {
+        const message = `📅 Rendez-vous Partagé :\nNom : ${appointment.name}\nDate : ${appointment.date}\nCatégorie : ${appointment.category}\nDétails : ${appointment.details}`;
+        const encodedMessage = encodeURIComponent(message);
+        const shareLink = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+        window.open(shareLink, "_blank");
+    }
+    // Afficher un rendez-vous
+    function displayAppointment(appointment) {
+        const list = document.getElementById('appointment-list');
+        const li = document.createElement('li');
+        li.innerHTML = `
+        <strong>${appointment.name}</strong> - ${appointment.date} (${appointment.category})<br>
+        <em>${appointment.details}</em>
+        <button onclick="removeAppointment(this)">Supprimer</button>
+        <button onclick='shareAppointment(${JSON.stringify(appointment)})'>Partager</button>
+    `;
+        list.appendChild(li);
+    }
+    // Sauvegarder un rendez-vous
+    function saveAppointment(appointment) {
+        const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+        appointments.push(appointment);
+        localStorage.setItem('appointments', JSON.stringify(appointments));
+    }
+    // Charger les rendez-vous
+    function loadAppointments() {
+        const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+        appointments.forEach(displayAppointment);
+    }
+    // Supprimer un rendez-vous
+    function removeAppointment(button) {
+        const li = button.parentElement;
+        const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+        const updatedAppointments = appointments.filter(app => {
+            return app.name !== li.querySelector('strong').textContent.split(' - ')[0];
+        });
+        localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+        li.remove();
+    }
+    // Vérifier les doublons
+    function isDuplicate(name, date) {
+        const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+        return appointments.some(app => app.name === name && app.date === date);
+    }
+    // Sélectionner le champ de couleur et le bouton de réinitialisation
+    const colorPicker = document.getElementById('color-picker');
+    const resetButton = document.getElementById('reset-color');
+
+    // Changer la couleur de fond quand une couleur est sélectionnée
+    colorPicker.addEventListener('input', function () {
+        document.body.style.backgroundColor = colorPicker.value;
+    });
+
+    // Réinitialiser la couleur de fond par défaut (blanc)
+    resetButton.addEventListener('click', function () {
+        document.body.style.backgroundColor = '#ffffff'; // Couleur par défaut
+        colorPicker.value = '#ffffff'; // Réinitialise le sélecteur
+    });
+
+</script>
+</body>
+</html>

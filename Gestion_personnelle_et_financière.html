@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion personnelle et financière</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafc;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #70e0b6;
+            color: white;
+        }
+        .main-content {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        .feature-section {
+            display: flex; /* Flexbox pour aligner les éléments */
+            overflow-x: auto; /* Activer le défilement horizontal si nécessaire */
+            gap: 20px; /* Espace entre les cards */
+            padding: 10px;
+        }
+        .feature-box {
+            min-width: 200px; /* Largeur minimale des cards */
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .feature-box:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+        .feature-box .icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: #70e0b6;
+        }
+        .feature-box h3 {
+            font-size: 18px;
+            margin: 10px 0;
+            color: #70e0b6;
+        }
+        .feature-box p {
+            font-size: 14px;
+            color: #555;
+        }
+        .feature-box a {
+            text-decoration: none;
+            color: #70e0b6;
+        }
+        footer {
+            background-color: #70e0b6;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        img[src="BeautifulimagerePresentingBudgetManagement.png"] {
+            width: 45%; /* Réduisez selon vos besoins */
+            height: auto; /* Conserve les proportions de l'image */
+            display: block; /* Centre l'image dans le conteneur, facultatif */
+            margin: 0 auto; /* Aligne l'image au centre horizontalement, facultatif */
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Gestion personnelle et financière</h1>
+</header>
+<div class="main-content">
+    <section class="feature-section">
+        <!-- Card 1 -->
+        <div class="feature-box">
+            <div class="icon">💲</div>
+            <h3><a href="Budget_Médical.html">Budget Médical</a></h3>
+            <p>Calcul des dépenses dédiées aux soins.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="feature-box">
+            <div class="icon">📋</div>
+            <h3><a href="Comparateur_d’Assurances_Santé.html">Comparateur d’Assurances Santé</a></h3>
+            <p>Identifiez la meilleure offre pour vos besoins.</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="feature-box">
+            <div class="icon">🔒</div>
+            <h3><a href="Enregistrer_carte_vitale.html">Enregistrez vos cartes vitale</a></h3>
+            <p>Enregistrez vos cartes vitale, ordonnances et rapports sous clé.</p>
+        </div>
+    </section>
+    <img src="BeautifulimagerePresentingBudgetManagement.png" alt="Bibliothèque Médicale">
+</div>
+<footer>
+    <p>&copy; 2025 Gestion Santé Familiale - Simplifiez votre vie avec nos outils</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Dossiers Familiaux</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #70e0b6;
+            color: white;
+            padding: 1em;
+            text-align: center;
+        }
+        main {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 800px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #60d0a8;
+            transform: scale(1.05);
+        }
+        #folderContainer {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .folder-icon {
+            width: 120px;
+            height: 120px;
+            background-color: #ccc;
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .folder-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+        .folder-actions {
+            margin-top: 5px;
+            text-align: center;
+        }
+        .folder-actions button {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .folder-actions button:hover {
+            background-color: darkred;
+        }
+        #documentViewer {
+            margin-top: 20px;
+        }
+        .file-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .file-item a {
+            color: #70e0b6;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .file-item .edit-recipient {
+            margin-left: 10px;
+            color: orange;
+            cursor: pointer;
+        }
+        #fullscreenViewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        #fullscreenViewer iframe, #fullscreenViewer img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            max-width: 90%;
+            max-height: 90%;
+            transform: translate(-50%, -50%);
+        }
+        #fullscreenViewer .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Gestion de Dossiers Familiaux</h1>
+</header>
+<main>
+    <form id="documentForm">
+        <label for="lastName">Nom de Famille :</label>
+        <input type="text" id="lastName" placeholder="Nom de famille" required>
+        <label for="firstName">Prénom :</label>
+        <input type="text" id="firstName" placeholder="Prénom" required>
+        <label for="file">Document :</label>
+        <input type="file" id="file" required>
+        <button type="submit">Ajouter le document</button>
+    </form>
+    <div id="folderContainer"></div>
+    <div id="documentViewer"></div>
+</main>
+<div id="fullscreenViewer">
+    <button class="close-btn">Fermer</button>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("documentForm");
+        const folderContainer = document.getElementById("folderContainer");
+        const documentViewer = document.getElementById("documentViewer");
+        const fullscreenViewer = document.getElementById("fullscreenViewer");
+        // Charger les dossiers depuis localStorage
+        const familyFolders = JSON.parse(localStorage.getItem("familyFolders")) || {};
+        const folderColors = ["#f28b82", "#fbbc04", "#34a853", "#4285f4", "#d7aefb", "#ffcccb"]; // Palette de couleurs
+        // Ajouter un document et un dossier
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const lastName = document.getElementById("lastName").value;
+            const firstName = document.getElementById("firstName").value;
+            const file = document.getElementById("file").files[0];
+            if (file) {
+                const folderName = `${lastName} ${firstName}`;
+                const fileURL = URL.createObjectURL(file);
+                const newFile = { fileName: file.name, url: fileURL, type: file.type, recipient: "N/A" };
+                // Créer un dossier s'il n'existe pas
+                if (!familyFolders[folderName]) {
+                    familyFolders[folderName] = [];
+                }
+                familyFolders[folderName].push(newFile);
+                // Sauvegarder dans localStorage
+                localStorage.setItem("familyFolders", JSON.stringify(familyFolders));
+                // Rafraîchir les dossiers affichés
+                updateFolderContainer();
+            }
+        });
+        // Mettre à jour l'affichage des dossiers
+        const updateFolderContainer = () => {
+            folderContainer.innerHTML = "";
+            let colorIndex = 0;
+            for (const [folderName, files] of Object.entries(familyFolders)) {
+                const folderColor = folderColors[colorIndex % folderColors.length];
+                const folderHTML = `
+                <div class="folder-item">
+                    <div class="folder-icon" style="background-color: ${folderColor}" data-folder="${folderName}">
+                        <p>${folderName}</p>
+                    </div>
+                    <div class="folder-actions">
+                        <button class="delete-folder" data-folder="${folderName}">Supprimer</button>
+                    </div>
+                </div>
+            `;
+                folderContainer.innerHTML += folderHTML;
+                colorIndex++;
+            }
+        };
+        // Supprimer un dossier
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("delete-folder")) {
+                const folderName = event.target.getAttribute("data-folder");
+                delete familyFolders[folderName];
+                // Mettre à jour localStorage
+                localStorage.setItem("familyFolders", JSON.stringify(familyFolders));
+                // Rafraîchir l'affichage
+                updateFolderContainer();
+                documentViewer.innerHTML = ""; // Réinitialiser l'affichage des fichiers
+            }
+        });
+        // Afficher les fichiers dans un dossier
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("folder-icon")) {
+                const folderName = event.target.getAttribute("data-folder");
+                const files = familyFolders[folderName];
+                let viewerHTML = `<h2>Documents pour ${folderName} :</h2>`;
+                files.forEach((fileData) => {
+                    viewerHTML += `
+                    <div class="file-item">
+                        <p><strong>Document :</strong> <a href="#" class="file-link" data-url="${fileData.url}" data-type="${fileData.type}">${fileData.fileName}</a></p>
+                        <p><strong>Destinataire :</strong> ${fileData.recipient}</p>
+                    </div>
+                `;
+                });
+                documentViewer.innerHTML = viewerHTML; // Mettre à jour l'affichage des fichiers
+            }
+        });
+        // Afficher un fichier en plein écran
+        document.addEventListener("click", (event) => {
+            if (event.target.classList.contains("file-link")) {
+                event.preventDefault();
+                const fileURL = event.target.getAttribute("data-url");
+                const fileType = event.target.getAttribute("data-type");
+
+                // Configuration du contenu dans la visionneuse plein écran
+                fullscreenViewer.innerHTML = `<button class="close-btn">Fermer</button>`;
+                if (fileType === "application/pdf") {
+                    fullscreenViewer.innerHTML += `<iframe src="${fileURL}" width="100%" height="100%"></iframe>`;
+                } else if (fileType.startsWith("image/")) {
+                    fullscreenViewer.innerHTML += `<img src="${fileURL}" alt="Document Image">`;
+                }
+                fullscreenViewer.style.display = "block"; // Afficher la visionneuse
+            }
+        });
+        // Gérer la fermeture de la visionneuse plein écran
+        fullscreenViewer.addEventListener("click", (event) => {
+            if (event.target.classList.contains("close-btn")) {
+                fullscreenViewer.style.display = "none"; // Masquer la visionneuse
+            }
+        });
+        // Afficher les dossiers sauvegardés au chargement
+        updateFolderContainer();
+    });
+</script>
+</body>
+</html>

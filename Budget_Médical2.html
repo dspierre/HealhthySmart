@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Médical</title>
+  <style>
+    .feature-box .icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+      color: #70e0b6;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fafc;
+    }
+    .feature-box {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      width: 400px;
+      margin: 20px auto;
+    }
+    .feature-box input, .feature-box select {
+      padding: 10px;
+      margin: 10px 0;
+      width: 80%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .feature-box button {
+      padding: 10px 20px;
+      background-color: #70e0b6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .feature-box button:hover {
+      background-color: #5ac7a3;
+    }
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      text-align: center;
+      padding: 10px;
+    }
+    th {
+      background-color: #70e0b6;
+      color: white;
+    }
+    .mark-reimbursed, .check-reimbursement {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    .mark-reimbursed {
+      background-color: #5ac7a3;
+      color: white;
+    }
+    .mark-reimbursed:hover {
+      background-color: #3f996c;
+    }
+    .check-reimbursement {
+      background-color: #f4b400;
+      color: white;
+    }
+    .check-reimbursement:hover {
+      background-color: #d39a00;
+    }
+  </style>
+</head>
+<body>
+<div class="feature-box">
+  <div class="icon">💲</div>
+  <h3>Budget Médical</h3>
+  <p>Ajoutez, vérifiez ou mettez à jour vos remboursements.</p>
+  <label for="category">Catégorie de dépense :</label>
+  <select id="category">
+    <option value="Consultation">Consultation</option>
+    <option value="Médicaments">Médicaments</option>
+    <option value="Hospitalisation">Hospitalisation</option>
+  </select>
+  <label for="expense">Montant de la dépense (€) :</label>
+  <input type="number" id="expense" placeholder="Entrez le montant">
+  <label for="payment-date">Date de paiement :</label>
+  <input type="date" id="payment-date">
+  <button id="save-expense">Enregistrer la dépense</button>
+  <div id="result"></div>
+</div>
+
+<table id="expenses-table">
+  <thead>
+  <tr>
+    <th>Catégorie</th>
+    <th>Montant (€)</th>
+    <th>Date de paiement</th>
+    <th>Date de remboursement</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- Les lignes seront ajoutées ici dynamiquement -->
+  </tbody>
+</table>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const saveButton = document.getElementById('save-expense');
+    const expensesTableBody = document.querySelector('#expenses-table tbody');
+    const result = document.getElementById('result');
+    const updateTable = () => {
+      expensesTableBody.innerHTML = '';
+      const expenses = JSON.parse(localStorage.getItem('medicalExpenses')) || [];
+      expenses.forEach((expense, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${expense.category}</td>
+          <td>${expense.amount.toFixed(2)}</td>
+          <td>${expense.paymentDate}</td>
+          <td>${expense.reimbursementDate || 'Non remboursé'}</td>
+          <td>
+            <button class="check-reimbursement" data-index="${index}">Vérifier remboursement</button>
+            <button class="mark-reimbursed" data-index="${index}">OK</button>
+          </td>
+        `;
+        expensesTableBody.appendChild(row);
+      });
+      // Vérification de remboursement
+      document.querySelectorAll('.check-reimbursement').forEach(button => {
+        button.addEventListener('click', (event) => {
+          const index = event.target.getAttribute('data-index');
+          const expenses = JSON.parse(localStorage.getItem('medicalExpenses')) || [];
+          const expense = expenses[index];
+          alert(expense.reimbursementDate ? `Déjà remboursé le ${expense.reimbursementDate}` : "Pas encore remboursé.");
+        });
+      });
+      // Marquer comme remboursé
+      document.querySelectorAll('.mark-reimbursed').forEach(button => {
+        button.addEventListener('click', (event) => {
+          const index = event.target.getAttribute('data-index');
+          const expenses = JSON.parse(localStorage.getItem('medicalExpenses')) || [];
+          const newReimbursementDate = prompt("Entrez la date de remboursement (YYYY-MM-DD) :");
+          if (newReimbursementDate) {
+            expenses[index].reimbursementDate = newReimbursementDate;
+            localStorage.setItem('medicalExpenses', JSON.stringify(expenses));
+            updateTable();
+          }
+        });
+      });
+    };
+    saveButton.addEventListener('click', () => {
+      const category = document.getElementById('category').value;
+      const expense = parseFloat(document.getElementById('expense').value);
+      const paymentDate = document.getElementById('payment-date').value;
+      if (!category || !expense || !paymentDate) {
+        result.textContent = "Veuillez remplir tous les champs.";
+        result.style.color = "red";
+        return;
+      }
+      const expenses = JSON.parse(localStorage.getItem('medicalExpenses')) || [];
+      expenses.push({ category, amount: expense, paymentDate, reimbursementDate: null });
+      localStorage.setItem('medicalExpenses', JSON.stringify(expenses));
+      result.textContent = "Dépense enregistrée avec succès !";
+      result.style.color = "green";
+
+      // Réinitialiser les champs
+      document.getElementById('expense').value = '';
+      document.getElementById('payment-date').value = '';
+      updateTable();
+    });
+
+    window.addEventListener('load', updateTable);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+        <html lang="fr">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard Bien-être</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafc;
+            color: #333;
+        }
+        header {
+            background-color: #70e0b6;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin: 0 0 10px;
+            color: #70e0b6;
+        }
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #5acaa4;
+        }
+        .dashboard {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        table, th, td {
+            width: 90%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #70e0b6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Dashboard Bien-être</h1>
+    <p>Suivez et enregistrez vos habitudes quotidiennes</p>
+</header>
+<div class="container">
+    <div class="card">
+        <h2>Renseignez vos informations</h2>
+        <label for="customDate">Date :</label>
+        <input type="date" id="customDate">
+        <label for="sleep">Durée de sommeil (heures) :</label>
+        <input type="number" id="sleep" min="0" step="0.5" placeholder="Entrez la durée de votre sommeil">
+        <label for="water">Consommation d'eau (litres) :</label>
+        <input type="number" id="water" min="0" step="0.1" placeholder="Entrez votre consommation d'eau">
+        <label for="steps">Nombre de pas :</label>
+        <input type="number" id="steps" min="0" step="1" placeholder="Entrez votre nombre de pas">
+        <label for="quality">Qualité du sommeil :</label>
+        <select id="quality">
+            <option value="excellent">Excellent</option>
+            <option value="bon">Bon</option>
+            <option value="moyen">Moyen</option>
+            <option value="faible">Faible</option>
+        </select>
+        <label for="heartRate">Fréquence cardiaque (bpm) :</label>
+        <input type="number" id="heartRate" min="0" step="1" placeholder="Entrez votre fréquence cardiaque">
+        <button type="button" id="submit-button">Enregistrer</button>
+        <div id="error-message" style="color: red;"></div>
+        <div id="success-message" style="color: green;"></div>
+        <button id="compare-button">Comparer les données et calculer les points</button>
+    </div>
+    <div class="card dashboard">
+        <h2>Résumé des données</h2>
+        <table id="wellness-table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Sommeil (heures)</th>
+                <th>Consommation d'eau (litres)</th>
+                <th>Nombre de pas</th>
+                <th>Qualité du sommeil</th>
+                <th>Fréquence cardiaque (bpm)</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Les données apparaîtront ici -->
+            </tbody>
+        </table>
+    </div>
+</div>
+    <script>
+        document.getElementById('submit-button').addEventListener('click', function () {
+        const customDate = document.getElementById('customDate').value;
+        const sleep = parseFloat(document.getElementById('sleep').value);
+        const water = parseFloat(document.getElementById('water').value);
+        const steps = parseInt(document.getElementById('steps').value, 10);
+        const quality = document.getElementById('quality').value;
+        const heartRate = parseInt(document.getElementById('heartRate').value, 10);
+        // Input validation
+        if (!customDate || isNaN(sleep) || isNaN(water) || isNaN(steps) || !quality || isNaN(heartRate)) {
+        showError("Veuillez remplir tous les champs correctement avant d'enregistrer !");
+        return;
+    }
+        if (sleep <= 0 || water <= 0 || steps <= 0 || heartRate < 40 || heartRate > 200) {
+        showError("Les valeurs doivent être valides : sommeil > 0, bpm entre 40 et 200.");
+        return;
+    }
+        const payload = { date: customDate, sleep, water, steps, quality, heartRate };
+        fetch('http://localhost:3000/add-wellness', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+        if (!response.ok) {
+        throw new Error('Erreur réseau ou serveur.');
+    }
+        return response.json();
+    })
+        .then(data => {
+        showSuccess(data.message || 'Données enregistrées avec succès.');
+        loadData(); // Reload data
+    })
+        .catch(error => showError('Erreur lors de l\'enregistrement : ' + error.message));
+    });
+
+        function loadData() {
+        fetch('http://localhost:3000/wellness')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erreur réseau pour charger les données : ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const table = document.getElementById('wellness-table').querySelector('tbody');
+                table.innerHTML = ''; // Clear table before reloading
+                data.forEach(entry => {
+                    const newRow = table.insertRow();
+                    newRow.insertCell(0).textContent = entry.date;
+                    newRow.insertCell(1).textContent = entry.sleep + " h";
+                    newRow.insertCell(2).textContent = entry.water + " L";
+                    newRow.insertCell(3).textContent = entry.steps;
+                    newRow.insertCell(4).textContent = entry.quality;
+                    newRow.insertCell(5).textContent = entry.heartRate + " bpm";
+                    const actionsCell = newRow.insertCell(6);
+                    actionsCell.innerHTML = `
+                    <button class="edit-button">Modifier</button>
+                    <button class="delete-button">Supprimer</button>
+                `;
+                    addRowEventListeners(newRow, entry.id);
+                });
+            })
+            .catch(error => showError('Erreur lors du chargement des données : ' + error.message));
+    }
+        function addRowEventListeners(row, id) {
+        const deleteButton = row.querySelector('.delete-button');
+        const editButton = row.querySelector('.edit-button');
+        // Delete data
+        deleteButton.addEventListener('click', () => {
+        fetch(`http://localhost:3000/delete-wellness/${id}`, {
+        method: 'DELETE'
+    })
+        .then(response => {
+        if (!response.ok) {
+        throw new Error(`Erreur lors de la suppression : ${response.status} ${response.statusText}`);
+    }
+        return response.json();
+    })
+        .then(data => {
+        showSuccess(data.message || 'Donnée supprimée avec succès.');
+        row.remove();
+    })
+        .catch(error => showError('Erreur lors de la suppression : ' + error.message));
+    });
+
+        // Edit data
+        editButton.addEventListener('click', () => {
+        const cells = row.querySelectorAll('td');
+        document.getElementById('customDate').value = cells[0].textContent;
+        document.getElementById('sleep').value = parseFloat(cells[1].textContent);
+        document.getElementById('water').value = parseFloat(cells[2].textContent);
+        document.getElementById('steps').value = parseInt(cells[3].textContent, 10);
+        document.getElementById('quality').value = cells[4].textContent;
+        document.getElementById('heartRate').value = parseInt(cells[5].textContent, 10);
+        // Update data on server
+        fetch(`http://localhost:3000/edit-wellness/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+        date: document.getElementById('customDate').value,
+        sleep: document.getElementById('sleep').value,
+        water: document.getElementById('water').value,
+        steps: document.getElementById('steps').value,
+        quality: document.getElementById('quality').value,
+        heartRate: document.getElementById('heartRate').value,
+    }),
+    })
+        .then(response => {
+        if (!response.ok) {
+        throw new Error(`Erreur lors de la modification : ${response.status} ${response.statusText}`);
+    }
+        return response.json();
+    })
+        .then(data => {
+        showSuccess(data.message || 'Donnée modifiée avec succès.');
+        loadData(); // Reload data
+    })
+        .catch(error => showError('Erreur lors de la modification : ' + error.message));
+    });
+    }
+        // Error display
+        function showError(message) {
+        const errorDisplay = document.getElementById('error-message');
+        errorDisplay.textContent = message;
+        const successDisplay = document.getElementById('success-message');
+        successDisplay.textContent = ''; // Clear previous success messages
+    }
+        // Success display
+        function showSuccess(message) {
+        const successDisplay = document.getElementById('success-message');
+        successDisplay.textContent = message;
+        const errorDisplay = document.getElementById('error-message');
+        errorDisplay.textContent = ''; // Clear previous error messages
+    }
+        // Compare wellness data with goals
+        function fetchAndCompare() {
+        Promise.all([
+            fetch('http://localhost:3000/wellness')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erreur serveur pour les données bien-être : ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                }),
+            fetch('http://localhost:3000/goals')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erreur serveur pour les objectifs : ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+        ])
+            .then(([wellnessData, goalsData]) => calculatePoints(wellnessData, goalsData))
+            .catch(error => showError('Échec de la comparaison : ' + error.message));
+    }
+        // Calculate points and save them
+        function calculatePoints(wellnessData, goalsData) {
+        let totalPoints = 0;
+        wellnessData.forEach(entry => {
+        const matchedGoal = goalsData.find(goal => goal.date === entry.date);
+        if (matchedGoal) {
+        let points = 0;
+        if (entry.steps >= matchedGoal.steps) points += 150;
+        if (entry.water >= matchedGoal.water) points += 150;
+        if (entry.sleep >= matchedGoal.sleep) points += 150;
+        if (entry.mood && entry.mood >= matchedGoal.mood) points += 150;
+        totalPoints += points;
+    }
+    });
+        saveUserPoints(totalPoints);
+        alert(`Vous avez gagné un total de ${totalPoints} points pour vos objectifs atteints !`);
+    }
+        // Save user points in the database
+        function saveUserPoints(points) {
+        fetch('http://localhost:3000/points', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: new Date().toISOString().split('T')[0], points }) // Add date and points
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erreur lors de l'enregistrement des points : ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                showSuccess(data.message || 'Points enregistrés avec succès dans la table points.');
+            })
+            .catch(error => showError('Erreur lors de l\'enregistrement des points : ' + error.message));
+    }
+        document.getElementById('compare-button').addEventListener('click', fetchAndCompare);
+</script>
+</body>
+</html>

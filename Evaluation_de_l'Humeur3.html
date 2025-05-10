@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation de l’Humeur</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: auto;
+            max-width: 300px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #70e0b6;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        button, select, input {
+            margin: 10px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        select, input[type="date"] {
+            font-size: 1rem;
+        }
+        canvas {
+            width: 50%; /* Réduit la largeur à 50% */
+            height: 200px; /* Réduit la hauteur à 50% */
+            display: block;
+            margin: auto;
+        }
+        .mood-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .mood-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+        }
+        .mood-item button {
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .mood-item button:hover {
+            background-color: #56c093;
+        }
+        .mood-item .delete-btn {
+            background-color: #ff6b6b;
+        }
+        .mood-item .delete-btn:hover {
+            background-color: #e05a5a;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Évaluation de l’Humeur</h1>
+    <p>Comment vous sentez-vous aujourd'hui ?</p>
+    <select id="mood">
+        <option value="Heureux">Heureux</option>
+        <option value="Stressé">Stressé</option>
+        <option value="Fatigué">Fatigué</option>
+        <option value="Motivé">Motivé</option>
+    </select>
+    <input type="date" id="goalDate">
+    <button id="saveMood">Sauvegarder</button>
+    <div class="mood-list" id="moodList">
+        <h4>Liste des Humeurs :</h4>
+    </div>
+    <h2>Graphiques</h2>
+    <canvas id="moodChart"></canvas>
+    <canvas id="barChart"></canvas>
+</div>
+</body>
+<script>
+    const API_URL = 'http://localhost:3000';
+    const saveMoodButton = document.getElementById('saveMood');
+    const moodList = document.getElementById('moodList');
+    const moodSelect = document.getElementById('mood');
+    const goalDate = document.getElementById('goalDate');
+    const moodChartCanvas = document.getElementById('moodChart').getContext('2d');
+    const barChartCanvas = document.getElementById('barChart').getContext('2d');
+    let lineChartInstance = null;
+    let barChartInstance = null;
+    saveMoodButton.addEventListener('click', () => {
+        const mood = moodSelect.value;
+        const date = goalDate.value || new Date().toISOString().split('T')[0];
+        if (!mood || !date) {
+            alert('Veuillez sélectionner une humeur et une date.');
+            return;
+        }
+        const moodData = { date, mood };
+        fetch(`${API_URL}/add-mood`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(moodData)
+        })
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(() => {
+                alert('Humeur sauvegardée avec succès !');
+                fetchMoods();
+            })
+            .catch(error => console.error('Erreur lors de la sauvegarde :', error));
+    });
+    function deleteMood(id) {
+        fetch(`${API_URL}/delete-mood/${id}`, { method: 'DELETE' })
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(() => {
+                alert('Humeur supprimée avec succès !');
+                fetchMoods();
+            })
+            .catch(error => console.error('Erreur lors de la suppression :', error));
+    }
+    function editMood(id) {
+        const mood = prompt('Nouvelle humeur :');
+        const date = prompt('Nouvelle date (AAAA-MM-JJ) :');
+        if (!mood || !date) {
+            alert('Tous les champs sont requis.');
+            return;
+        }
+        const updatedMood = { date, mood };
+        fetch(`${API_URL}/edit-mood/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedMood)
+        })
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(() => {
+                alert('Humeur modifiée avec succès !');
+                fetchMoods();
+            })
+            .catch(error => console.error('Erreur lors de la modification :', error));
+    }
+    function renderMoods(moods) {
+        moodList.innerHTML = '<h4>Liste des Humeurs :</h4>';
+        moods.forEach(mood => {
+            const moodItem = document.createElement('div');
+            moodItem.className = 'mood-item';
+            moodItem.innerHTML = `
+                <strong>Date :</strong> ${mood.date} <br>
+                <strong>Humeur :</strong> ${mood.mood} <br>
+                <button onclick="editMood(${mood.id})">Modifier</button>
+                <button class="delete-btn" onclick="deleteMood(${mood.id})">Supprimer</button>
+            `;
+            moodList.appendChild(moodItem);
+        });
+    }
+    function fetchMoods() {
+        fetch(`${API_URL}/moods`)
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(data => renderMoods(data))
+            .catch(error => console.error('Erreur lors de la récupération :', error));
+    }
+    function moodToValue(mood) {
+        return mood === 'Heureux' ? 3 :
+            mood === 'Motivé' ? 2 :
+                mood === 'Fatigué' ? 1 :
+                    mood === 'Stressé' ? 0 : -1;
+    }
+    function renderCharts() {
+        fetch(`${API_URL}/moods`)
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(moods => {
+                if (!moods || moods.length === 0) {
+                    alert("Aucune donnée à afficher.");
+                    return;
+                }
+                const dates = moods.map(m => m.date);
+                const moodValues = moods.map(m => moodToValue(m.mood));
+                const moodCounts = moods.reduce((acc, { mood }) => {
+                    acc[mood] = (acc[mood] || 0) + 1;
+                    return acc;
+                }, {});
+                if (lineChartInstance) lineChartInstance.destroy();
+                lineChartInstance = new Chart(moodChartCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Évolution de l’Humeur',
+                            data: moodValues,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.1
+                        }]
+                    }
+                });
+                if (barChartInstance) barChartInstance.destroy();
+                barChartInstance = new Chart(barChartCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(moodCounts),
+                        datasets: [{
+                            label: 'Fréquence des Humeurs',
+                            data: Object.values(moodCounts),
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(255, 205, 86, 0.6)',
+                                'rgba(54, 162, 235, 0.6)'
+                            ]
+                        }]
+                    }
+                });
+            })
+            .catch(error => console.error("Erreur lors des graphiques :", error));
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchMoods(); // Charger la liste des humeurs au démarrage
+        renderCharts(); // Afficher les graphiques
+    });
+
+    // Fonction pour charger les humeurs depuis l'API
+    function fetchMoods() {
+        fetch(`${API_URL}/moods`)
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(data => renderMoods(data))
+            .catch(error => console.error('Erreur lors de la récupération des humeurs :', error));
+    }
+
+    // Fonction pour afficher les humeurs
+    function renderMoods(moods) {
+        moodList.innerHTML = '<h4>Liste des Humeurs :</h4>';
+        moods.forEach(mood => {
+            const moodItem = document.createElement('div');
+            moodItem.className = 'mood-item';
+            moodItem.innerHTML = `
+                <strong>Date :</strong> ${mood.date} <br>
+                <strong>Humeur :</strong> ${mood.mood} <br>
+                <button onclick="editMood(${mood.id})">Modifier</button>
+                <button class="delete-btn" onclick="deleteMood(${mood.id})">Supprimer</button>
+            `;
+            moodList.appendChild(moodItem);
+        });
+    }
+
+    // Fonction pour afficher les graphiques des humeurs
+    function renderCharts() {
+        fetch(`${API_URL}/moods`)
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(moods => {
+                if (!moods || moods.length === 0) {
+                    alert('Aucune donnée à afficher pour les graphiques.');
+                    return;
+                }
+
+                const dates = moods.map(m => m.date);
+                const moodValues = moods.map(m => moodToValue(m.mood));
+                const moodCounts = moods.reduce((acc, { mood }) => {
+                    acc[mood] = (acc[mood] || 0) + 1;
+                    return acc;
+                }, {});
+
+                // Graphique linéaire
+                if (lineChartInstance) lineChartInstance.destroy();
+                lineChartInstance = new Chart(moodChartCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Évolution de l’Humeur',
+                            data: moodValues,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+
+                // Graphique en barres
+                if (barChartInstance) barChartInstance.destroy();
+                barChartInstance = new Chart(barChartCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(moodCounts),
+                        datasets: [{
+                            label: 'Fréquence des Humeurs',
+                            data: Object.values(moodCounts),
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(255, 205, 86, 0.6)',
+                                'rgba(54, 162, 235, 0.6)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            })
+            .catch(error => console.error('Erreur lors de l\'affichage des graphiques :', error));
+    }
+    // Conversion des humeurs en valeurs numériques
+    function moodToValue(mood) {
+        return mood === 'Heureux' ? 3 :
+            mood === 'Motivé' ? 2 :
+                mood === 'Fatigué' ? 1 :
+                    mood === 'Stressé' ? 0 : -1;
+    }
+    // Fonction pour modifier une humeur
+    function editMood(id) {
+        const mood = prompt('Nouvelle humeur :');
+        const date = prompt('Nouvelle date (AAAA-MM-JJ) :');
+        if (!mood || !date) {
+            alert('Tous les champs sont requis.');
+            return;
+        }
+        const updatedMood = { date, mood };
+        fetch(`${API_URL}/edit-mood/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedMood)
+        })
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(() => {
+                alert('Humeur modifiée avec succès !');
+                fetchMoods();
+            })
+            .catch(error => console.error('Erreur lors de la modification de l\'humeur :', error));
+    }
+    // Fonction pour supprimer une humeur
+    function deleteMood(id) {
+        fetch(`${API_URL}/delete-mood/${id}`, { method: 'DELETE' })
+            .then(response => response.ok ? response.json() : Promise.reject(response.status))
+            .then(() => {
+                alert('Humeur supprimée avec succès !');
+                fetchMoods();
+            })
+            .catch(error => console.error('Erreur lors de la suppression de l\'humeur :', error));
+    }
+</script>
+</html>

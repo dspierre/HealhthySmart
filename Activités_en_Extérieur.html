@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activités en Extérieur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef2f3;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #70e0b6;
+            color: white;
+            padding: 1rem;
+        }
+
+        .activity, .scenario {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+
+        h2 {
+            color: #70e0b6;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Activités en Extérieur</h1>
+    </header>
+    <main>
+        <section id="activity-container"></section>
+        <div class="pagination">
+            <button onclick="previousActivity()">Précédent</button>
+            <span id="page-number">Activité 1</span>
+            <button onclick="nextActivity()">Suivant</button>
+        </div>
+        <br>
+        <button onclick="showScenario()">Recevoir le scénario</button>
+        <section id="scenario-container" class="scenario" style="display: none;"></section>
+    </main>
+
+    <script>
+        const activities = [
+            { 
+                title: "Chasse au trésor en forêt", 
+                materials: "Carte, indices, objets à cacher", 
+                steps: ["Choisir un lieu et cacher des objets.", "Préparer des indices et des énigmes.", "Distribuer les indices et guider les participants.", "Suivre les étapes pour résoudre la chasse au trésor !"]
+            },
+            { 
+                title: "Créer un herbier", 
+                materials: "Carnet, feuilles, fleurs, papier absorbant, colle", 
+                steps: ["Ramasser différentes feuilles et fleurs.", "Les presser entre des feuilles de papier absorbant.", "Les coller dans un carnet et noter leurs noms.", "Ajouter des dessins et des infos sur chaque plante."]
+            },
+            { 
+                title: "Observer les oiseaux", 
+                materials: "Jumelles, guide des oiseaux, carnet", 
+                steps: ["Choisir un lieu propice à l’observation.", "Utiliser des jumelles pour voir les détails.", "Écouter leurs chants et les identifier.", "Noter les observations et les croquis."]
+            },
+            { 
+                title: "Apprendre les bases du jardinage", 
+                materials: "Terre, graines, pots, arrosoir", 
+                steps: ["Choisir des plantes faciles à cultiver.", "Remplir les pots avec de la terre adaptée.", "Planter les graines et arroser légèrement.", "Observer la croissance et prendre soin des plantes."]
+            },
+            { 
+                title: "Construire un abri pour insectes", 
+                materials: "Bois, paille, briques, pommes de pin", 
+                steps: ["Assembler une structure avec des planches de bois.", "Remplir chaque section avec différents matériaux.", "Placer l’abri dans un jardin ou un parc.", "Observer quels insectes viennent s’y réfugier."]
+            }
+        ];
+
+        let currentActivity = 0;
+        function displayActivity() {
+            const container = document.getElementById("activity-container");
+            const scenarioContainer = document.getElementById("scenario-container");
+            container.innerHTML = "";
+            scenarioContainer.style.display = "none"; // Masquer le scénario lorsqu'on change d'activité
+            const activity = activities[currentActivity];
+            let stepsList = "<ul>";
+            activity.steps.forEach((step, index) => {
+                stepsList += `<li><strong>Étape ${index + 1}:</strong> ${step}</li>`;
+            });
+            stepsList += "</ul>";
+            container.innerHTML = `<div class="activity">
+                                    <h2>${activity.title}</h2>
+                                    <p><strong>Matériel :</strong> ${activity.materials}</p>
+                                    <p><strong>Étapes :</strong></p> ${stepsList}
+                                   </div>`;
+            document.getElementById("page-number").innerText = `Activité ${currentActivity + 1}`;
+        }
+        function previousActivity() {
+            if (currentActivity > 0) {
+                currentActivity--;
+                displayActivity();
+            }
+        }
+        function nextActivity() {
+            if (currentActivity < activities.length - 1) {
+                currentActivity++;
+                displayActivity();
+            }
+        }
+        function showScenario() {
+            const scenarioContainer = document.getElementById("scenario-container");
+            scenarioContainer.style.display = "block";
+            scenarioContainer.innerHTML = `<h2>🏕️ Scénario : La Quête du Médaillon Perdu</h2>
+                <p><strong>Contexte :</strong> Il y a longtemps, un explorateur légendaire a caché un médaillon magique dans la forêt pour le protéger. Celui qui le retrouvera pourra faire un vœu puissant. Mais le chemin est semé d’embûches et il faudra résoudre des énigmes pour avancer.</p>
+                <p><strong>📌 Matériel nécessaire :</strong></p>
+                <ul>
+                    <li>Carte du terrain</li>
+                    <li>Indices écrits sur des parchemins</li>
+                    <li>Petits objets cachés</li>
+                    <li>Énigmes à résoudre</li>
+                    <li>Drapeau ou coffre pour la récompense</li>
+                </ul>
+                <h3>🗺️ Déroulement de la chasse au trésor</h3>
+                <h4>1️⃣ Point de départ – Le message du gardien</h4>
+                <p>Les participants reçoivent un message mystérieux du gardien du médaillon :</p>
+                <blockquote>"Le médaillon perdu repose au cœur de la forêt. Seuls les aventuriers les plus courageux pourront le retrouver. Chaque indice te rapprochera du trésor. Suis les étapes et écoute les signes de la nature."</blockquote>
+                <p>➡ <strong>Première énigme :</strong> "Je suis grand, j’ai des feuilles, et parfois je porte des fruits. Qui suis-je ?" (Réponse : Un arbre)</p>
+                <p>💡 <strong>Indice caché :</strong> Sous un arbre marqué par un ruban rouge.</p>
+                <h4>2️⃣ Étape intermédiaire – Le passage secret</h4>
+                <p>Les aventuriers arrivent devant un panneau ou une pierre avec une devinette :</p>
+                <blockquote>"Je brille le jour, mais disparais la nuit. Qui suis-je ?" (Réponse : Le soleil)</blockquote>
+                <p>💡 <strong>Indice caché :</strong> Derrière une pierre plate sous un rayon de soleil.</p>
+                <h4>3️⃣ Épreuve finale – Le coffre au trésor</h4>
+                <p>Une dernière épreuve physique attend les joueurs :</p>
+                <ul>
+                    <li>Trouver un message caché derrière un arbre creux.</li>
+                    <li>Résoudre une ultime énigme : "J'ai des aiguilles mais je ne couds pas. Qui suis-je ?" (Réponse : Un sapin)</li>
+                </ul>
+                <p>💡 <strong>Le trésor :</strong> Une boîte avec une fausse clé et un médaillon caché !</p>
+                <p>🏆 <strong>Récompense :</strong> Le groupe découvre le médaillon et célèbre leur réussite !</p>`;
+        }
+
+        document.addEventListener("DOMContentLoaded", displayActivity);
+    </script>
+</body>
+</html>

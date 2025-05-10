@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide pour les Parents</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef2f3;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #70e0b6;
+            color: white;
+            padding: 1rem;
+        }
+
+        .content {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            text-align: left;
+        }
+
+        h2 {
+            color: #70e0b6;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Guide pour les Parents d’Enfants de 13 ans et plus</h1>
+    </header>
+    <main>
+        <section id="lesson-container" class="content"></section>
+        <div class="pagination">
+            <button onclick="previousLesson()">Précédent</button>
+            <span id="page-number">Chapitre 1</span>
+            <button onclick="nextLesson()">Suivant</button>
+        </div>
+    </main>
+
+    <script>
+        const lessons = [
+    { 
+        title: "Comprendre les adolescents de 13 ans et plus", 
+        content: `<p>Les adolescents de 13 ans et plus traversent une période cruciale de leur développement. Ils cherchent à :</p>
+        <ul>
+            <li>Développer leur identité et gagner en indépendance.</li>
+            <li>Avoir des relations sociales enrichissantes.</li>
+            <li>Être reconnus pour leurs talents et compétences.</li>
+        </ul>
+        <h3>🔹 Comment les accompagner ?</h3>
+        <ul>
+            <li>Encouragez-les à exprimer leurs opinions sans les juger.</li>
+            <li>Donnez-leur des responsabilités adaptées à leur âge.</li>
+            <li>Respectez leur besoin de solitude et d’indépendance.</li>
+            <li>Instaurez un dialogue ouvert sans forcer la discussion.</li>
+        </ul>`
+    },
+    { 
+        title: "Développement personnel et gestion des émotions 📖", 
+        content: `<p>Les adolescents doivent apprendre à gérer leurs émotions :</p>
+        <ul>
+            <li>Techniques de relaxation : méditation, respiration.</li>
+            <li>Aider son enfant à gérer la pression scolaire.</li>
+            <li>Comment favoriser la confiance en soi et la motivation.</li>
+        </ul>
+        <h3>💡 Techniques pour mieux gérer les émotions</h3>
+        <ul>
+            <li>Encourager la tenue d’un journal des émotions.</li>
+            <li>Pratiquer des exercices de respiration et de pleine conscience.</li>
+            <li>Valoriser leurs efforts plutôt que les résultats.</li>
+            <li>Les aider à verbaliser leurs sentiments et à les comprendre.</li>
+        </ul>`
+    },
+    { 
+        title: "Stratégies éducatives et organisation 📆", 
+        content: `<p>Structurer l’apprentissage et développer l’autonomie :</p>
+        <ul>
+            <li>Comment organiser les révisions et les devoirs.</li>
+            <li>Encourager l'autonomie avec un planning d’études.</li>
+            <li>Favoriser la curiosité et l'envie d'apprendre.</li>
+        </ul>
+        <h3>🎯 Conseils pour une meilleure organisation</h3>
+        <ul>
+            <li>Utiliser la méthode Pomodoro pour mieux gérer les sessions de travail.</li>
+            <li>Créer un environnement calme et structuré pour étudier.</li>
+            <li>Éviter les distractions en instaurant des plages de concentration.</li>
+            <li>Utiliser des outils comme Trello ou Google Calendar pour planifier les tâches.</li>
+        </ul>`
+    },
+    { 
+        title: "Sécurité en ligne et réseaux sociaux 🔒", 
+        content: `<p>Les adolescents sont très actifs sur Internet. Voici comment les protéger :</p>
+        <ul>
+            <li>Comprendre les risques liés aux réseaux sociaux.</li>
+            <li>Comment surveiller sans être intrusif.</li>
+            <li>Éduquer aux dangers du cyberharcèlement et des fake news.</li>
+        </ul>
+        <h3>🛡️ Bonnes pratiques pour la sécurité numérique</h3>
+        <ul>
+            <li>Configurer les paramètres de confidentialité des réseaux sociaux.</li>
+            <li>Les sensibiliser aux dangers des arnaques et du phishing.</li>
+            <li>Fixer des règles pour l’utilisation des écrans.</li>
+            <li>Encourager la discussion sur les dangers en ligne.</li>
+        </ul>`
+    },
+    { 
+        title: "Santé et bien-être des adolescents 🏃‍♂️", 
+        content: `<p>Une bonne hygiène de vie est essentielle :</p>
+        <ul>
+            <li>L’importance du sommeil et de l’activité physique.</li>
+            <li>Conseils pour une alimentation saine et équilibrée.</li>
+            <li>Pourquoi éviter le stress et favoriser la détente.</li>
+        </ul>
+        <h3>🥦 Astuces pour une meilleure santé</h3>
+        <ul>
+            <li>Encourager des repas équilibrés et une hydratation suffisante.</li>
+            <li>Limiter la consommation de sucre et de caféine.</li>
+            <li>Promouvoir des activités physiques adaptées à leur âge.</li>
+            <li>Éduquer sur l’importance du sommeil pour la concentration.</li>
+        </ul>`
+    },
+    { 
+        title: "Activités éducatives et loisirs 🎨", 
+        content: `<p>Stimuler la créativité et la curiosité :</p>
+        <ul>
+            <li>Idées de projets éducatifs pour développer la réflexion.</li>
+            <li>Encourager la découverte de nouveaux sujets.</li>
+            <li>Favoriser les expériences en dehors de l’école.</li>
+        </ul>
+        <h3>🎨 Activités recommandées</h3>
+        <ul>
+            <li>Initiation au codage via Scratch ou Python.</li>
+            <li>Projets artistiques : dessin, musique, photographie.</li>
+            <li>Réalisation d’expériences scientifiques à la maison.</li>
+            <li>Participation à des clubs ou associations éducatives.</li>
+        </ul>`
+    },
+    { 
+        title: "Préparer l’avenir : orientation et projets 🚀", 
+        content: `<p>Entre 13 et 16 ans, les jeunes commencent à penser à leur avenir :</p>
+        <ul>
+            <li>Aider à explorer leurs passions et centres d’intérêt.</li>
+            <li>Discuter des différentes options de carrières et d’études.</li>
+            <li>Encourager les stages et expériences pratiques.</li>
+        </ul>
+        <h3>📢 Comment les aider à bien s’orienter ?</h3>
+        <ul>
+            <li>Organiser des visites dans les écoles ou entreprises.</li>
+            <li>Explorer les options de métiers et formations adaptées.</li>
+            <li>Encourager des rencontres avec des professionnels inspirants.</li>
+            <li>Les guider sans imposer un choix, en les laissant explorer.</li>
+        </ul>`
+    }
+];
+let currentLesson = 0;
+        function displayLesson() {
+            const container = document.getElementById("lesson-container");
+            container.innerHTML = `<h2>${lessons[currentLesson].title}</h2>${lessons[currentLesson].content}`;
+            document.getElementById("page-number").innerText = `Chapitre ${currentLesson + 1}`;
+        }
+        function previousLesson() {
+            if (currentLesson > 0) {
+                currentLesson--;
+                displayLesson();
+            }
+        }
+        function nextLesson() {
+            if (currentLesson < lessons.length - 1) {
+                currentLesson++;
+                displayLesson();
+            }
+        }
+        document.addEventListener("DOMContentLoaded", displayLesson);
+    </script>
+</body>
+</html>

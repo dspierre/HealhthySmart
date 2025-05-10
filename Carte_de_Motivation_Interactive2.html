@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POINTS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f4f4f4;
+    }
+    header {
+      width: 100%;
+      background-color:#70e0b6;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+    }
+    h2 {
+      text-align: center;
+      color: #70e0b6;
+      margin-top: 20px;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+      max-width: 1200px;
+      margin: 20px 0;
+    }
+    .badge-container, .points-table-container {
+      flex: 1;
+      max-width: 48%;
+    }
+    .badge-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px; /* Réduire l'espace entre les badges */
+      margin-top: 1px; /* Ajout d'une marge supérieure pour espacer les badges */
+      text-align: right;
+    }
+    .points-table-container {
+      margin-top: 7px; /* Ajout d'une marge supérieure pour espacer les badges */
+    }
+    .points-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .points-table th, .points-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      color: #003366;
+    }
+    .points-table th {
+      background-color: #f2f2f2;
+    }
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .pagination button {
+      background-color: #003366;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+    .pagination button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    footer {
+      width: 100%;
+      background-color: #000000;
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+      position: fixed;
+      bottom: 0;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover, .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    img {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 5px;
+      width: 100px;
+    }
+    .button-circle {
+      width: 50px;
+      height: 50px;
+      background-color: #70e0b6;
+      border-radius: 50%;
+      color: white;
+      font-size: 24px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dialog-box {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .dialog-box input {
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    .dialog-box button {
+      background-color: #70e0b6;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1 id="greeting"></h1>
+</header>
+<div class="container">
+  <div class="points-table-container">
+    <h2>Recompense</h2>
+    <p id="prenom">Prenom : </p>
+    <p id="nom">Nom : </p>
+    <p id="email">Email : </p>
+    <p id="badge">Badge : </p>
+    <h3>Points</h3>
+    <div id="pointsDisplay"></div>
+  </div>
+  <div class="points-table-container">
+    <h2>Niveau existant</h2>
+    <table class="points-table" id="pointsTable">
+      <thead>
+      <tr>
+        <th>Niveau</th>
+        <th>Points</th>
+      </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <div class="pagination" id="pagination">
+    </div>
+  </div>
+  <div class="badge-container">
+    <h2>Badge existant</h2>
+    <img src="badge_1400.jpeg" alt="Logo" class="logo">
+    <img src="badge_3000.jpeg" alt="Logo" class="logo">
+    <img src="badge_4500.jpeg" alt="Logo" class="logo">
+    <img src="badge_5800.jpeg" alt="Logo" class="logo">
+    <img src="badge_6800.jpeg" alt="Logo" class="logo">
+    <img src="badge_8000.jpeg" alt="Logo" class="logo">
+    <img src="badge_10000.jpeg" alt="Logo" class="logo">
+    <img src="badge11000.jpeg" alt="Logo" class="logo">
+    <img src="badge13000.jpeg" alt="Logo" class="logo">
+    <img src="badge_15000.jpeg" alt="Logo" class="logo">
+    <img src="badge20000.jpeg" alt="Logo" class="logo">
+    <img src="badge30000.jpeg" alt="Logo" class="logo">
+    <img src="badge45000.jpeg" alt="Logo" class="logo">
+    <img src="badge55000.jpeg" alt="Logo" class="logo">
+    <img src="badge70000.jpeg" alt="Logo" class="logo">
+  </div>
+</div>
+<section id="info-section" class="info-section">
+  <div class="info-box" id="remaining"></div>
+  <div class="info-box" id="salaryDisplay"></div>
+  <div class="info-box" id="totalExpenses"></div>
+</section>
+<footer>
+  © 2025 SAVEMONAY. All rights reserved.
+</footer>
+<div id="badgeModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeBadgeModal()">&times;</span>
+    <h2>Badges Possédés</h2>
+    <div id="allBadges"></div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    displayGreeting(); // Afficher le message de salutation
+    displayTablePage(currentPage); // Afficher la table des niveaux avec pagination
+    displayUserInfo(); // Afficher les informations utilisateur et points dynamiques
+
+    // Fonctionnalités de la modal
+    const modal = document.getElementById('badgeModal');
+    const span = document.getElementsByClassName('close')[0];
+    span.onclick = function () {
+      modal.style.display = 'none';
+    };
+    window.onclick = function (event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+  });
+
+  function displayGreeting() {
+    const greetingElement = document.getElementById('greeting');
+    const hours = new Date().getHours();
+    let greeting = hours < 12 ? "Bonjour" : hours < 18 ? "Bon après-midi" : "Bonsoir";
+    greetingElement.innerText = `${greeting} Prenez le contrôle de vos finances, où que vous soyez !`;
+  }
+
+  const pointsData = [
+    { niveau: 1, points: 1440 },
+    { niveau: 2, points: 3000 },
+    { niveau: 3, points: 3700 },
+    { niveau: 4, points: 4500 },
+    { niveau: 5, points: 5800 },
+    { niveau: 6, points: 6800 },
+    { niveau: 7, points: 8000 },
+    { niveau: 8, points: 10000 },
+    { niveau: 9, points: 11000 },
+    { niveau: 10, points: 13000 },
+    { niveau: 11, points: 15000 },
+    { niveau: 12, points: 20000 },
+    { niveau: 13, points: 30000 },
+    { niveau: 14, points: 45000 },
+    { niveau: 15, points: 47000 },
+    { niveau: 16, points: 50000 },
+    { niveau: 17, points: 55000 },
+    { niveau: 18, points: 60000 },
+    { niveau: 19, points: 65000 },
+    { niveau: 20, points: 70000 },
+    { niveau: 21, points: 75000 },
+    { niveau: 22, points: 100000 },
+    { niveau: 23, points: 120000 },
+    { niveau: 24, points: 150000 },
+    { niveau: 25, points: 200000 },
+    { niveau: 26, points: 300000 },
+    { niveau: 27, points: 350000 },
+    { niveau: 28, points: 400000 },
+    { niveau: 29, points: 450000 },
+    { niveau: 30, points: 470000 },
+    { niveau: 31, points: 500000 },
+    { niveau: 32, points: 1500000 },
+    { niveau: 33, points: 3000000 },
+    { niveau: 34, points: 15000000 },
+    { niveau: 35, points: 50000000 },
+  ];
+  const rowsPerPage = 5;
+  let currentPage = 1;
+  function displayTablePage(page) {
+    const tableBody = document.querySelector('#pointsTable tbody');
+    tableBody.innerHTML = '';
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const pageData = pointsData.slice(start, end);
+    pageData.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${row.niveau}</td><td>${row.points}</td>`;
+      tableBody.appendChild(tr);
+    });
+    updatePagination(page);
+  }
+  function updatePagination(page) {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = ''; // Effacer les boutons précédents
+    const totalPages = Math.ceil(pointsData.length / rowsPerPage);
+    for (let i = 1; i <= totalPages; i++) {
+      const button = document.createElement('button');
+      button.innerText = i;
+      button.disabled = i === page; // Désactiver le bouton de la page actuelle
+      button.addEventListener('click', () => displayTablePage(i));
+      pagination.appendChild(button);
+    }
+  }
+  function displayUserInfo() {
+    const prenom = "Jean"; // Remplacer par des données dynamiques
+    const nom = "Dupont"; // Remplacer par des données dynamiques
+    const email = "jean.dupont@example.com"; // Remplacer par des données dynamiques
+
+    document.getElementById('prenom').innerText = `Prenom : ${prenom}`;
+    document.getElementById('nom').innerText = `Nom : ${nom}`;
+    document.getElementById('email').innerText = `Email : ${email}`;
+
+    // Récupérer les points totaux depuis l'API backend
+    fetch('http://localhost:3000/points-sum')
+            .then(response => response.json())
+            .then(data => {
+              const points = data.totalPoints || 0;
+              document.getElementById('pointsDisplay').innerText = `Points : ${points}`;
+              displayBadge(points); // Afficher les badges correspondants
+            })
+            .catch(error => {
+              console.error('Erreur lors de la récupération des points:', error.message);
+              document.getElementById('pointsDisplay').innerText = `Points : Erreur`;
+            });
+  }
+
+  function displayBadge(points) {
+    const badgeDisplay = document.getElementById('badge');
+    let badgeHTML = '';
+    let highestBadge = '';
+    // Define badge levels with thresholds and corresponding images
+    const badgeLevels = [
+      { threshold: 500000, src: "badge_500000.jpeg", alt: "Badge 500000" },
+      { threshold: 470000, src: "badge_470000.jpeg", alt: "Badge 470000" },
+      { threshold: 450000, src: "badge_450000.jpeg", alt: "Badge 450000" },
+      { threshold: 400000, src: "badge_400000.jpeg", alt: "Badge 400000" },
+      { threshold: 350000, src: "badge_350000.jpeg", alt: "Badge 350000" },
+      { threshold: 300000, src: "badge_300000.jpeg", alt: "Badge 300000" },
+      { threshold: 200000, src: "badge_200000.jpeg", alt: "Badge 200000" },
+      { threshold: 150000, src: "badge_150000.jpeg", alt: "Badge 150000" },
+      { threshold: 120000, src: "badge_120000.jpeg", alt: "Badge 120000" },
+      { threshold: 100000, src: "badge_100000.jpeg", alt: "Badge 100000" },
+      { threshold: 75000, src: "badge_75000.jpeg", alt: "Badge 75000" },
+      { threshold: 70000, src: "badge_70000.jpeg", alt: "Badge 70000" },
+      { threshold: 65000, src: "badge_65000.jpeg", alt: "Badge 65000" },
+      { threshold: 60000, src: "badge_60000.jpeg", alt: "Badge 60000" },
+      { threshold: 55000, src: "badge_55000.jpeg", alt: "Badge 55000" },
+      { threshold: 50000, src: "badge_50000.jpeg", alt: "Badge 50000" },
+      { threshold: 45000, src: "badge_45000.jpeg", alt: "Badge 45000" },
+      { threshold: 40000, src: "badge_40000.jpeg", alt: "Badge 40000" },
+      { threshold: 35000, src: "badge_35000.jpeg", alt: "Badge 35000" },
+      { threshold: 30000, src: "badge_30000.jpeg", alt: "Badge 30000" },
+      { threshold: 20000, src: "badge_20000.jpeg", alt: "Badge 20000" },
+      { threshold: 15000, src: "badge_15000.jpeg", alt: "Badge 15000" },
+      { threshold: 10000, src: "badge_10000.jpeg", alt: "Badge 10000" },
+      { threshold: 7500, src: "badge_8000.jpeg", alt: "Badge 8000" },
+      { threshold: 6800, src: "badge_6800.jpeg", alt: "Badge 6800" },
+      { threshold: 5800, src: "badge_5800.jpeg", alt: "Badge 5800" },
+      { threshold: 4500, src: "badge_4500.jpeg", alt: "Badge 4500" },
+      { threshold: 3700, src: "badge_3700.jpeg", alt: "Badge 3700" },
+      { threshold: 3000, src: "badge_3000.jpeg", alt: "Badge 3000" },
+      { threshold: 1440, src: "badge_1440.jpeg", alt: "Badge 1440" },
+    ];
+    badgeLevels.forEach(level => {
+      if (points >= level.threshold) {
+        badgeHTML += `<img src="${level.src}" alt="${level.alt}" class="logo">`;
+        highestBadge = `<img src="${level.src}" alt="${level.alt}" class="logo">`;
+      }
+    });
+    // Affichage des badges
+    badgeDisplay.innerHTML = highestBadge || 'Pas de badge pour le moment';
+    document.getElementById('allBadges').innerHTML = badgeHTML; // Affiche tous les badges
+  }
+</script>
+</body>
+</html>
+

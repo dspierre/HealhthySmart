@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+        <title>Gestion des Grossesses</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background: #70e0b6;
+            color: #fff;
+            padding: 1em;
+            text-align: center;
+        }
+        main {
+            padding: 1em;
+        }
+        section {
+            margin-bottom: 2em;
+            padding: 1em;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        h1, h2 {
+            color: #70e0b6;
+        }
+        select {
+            padding: 0.5em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            background-color: #f9f9f9;
+            margin-bottom: 1em;
+        }
+        select:focus {
+            outline: none;
+            border-color: #70e0b6;
+        }
+        body {
+            font-family: 'Open Sans', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f8fb;
+            color: #333;
+        }
+        header {
+            background: #70e0b6;
+            color: #fff;
+            padding: 1.5em;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+        }
+        main {
+            padding: 2em 1em;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        section {
+            margin-bottom: 2em;
+            padding: 1.5em;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        section:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        h2 {
+            color: #70e0b6;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+            border-left: 4px solid#70e0b6;
+            padding-left: 0.5em;
+        }
+        select {
+            padding: 0.8em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            background-color: #f9f9f9;
+            margin-bottom: 1em;
+            transition: border-color 0.3s ease;
+            font-size: 1em;
+        }
+        select:focus {
+            outline: none;
+            border-color: #70e0b6;
+            box-shadow: 0 0 4px rgba(77, 182, 172, 0.5);
+        }
+        p {
+            margin: 0.5em 0;
+            font-size: 1em;
+            color: #555;
+        }
+        footer {
+            text-align: center;
+            padding: 1em 0;
+            background: #70e0b6;
+            color: #fff;
+            font-size: 0.9em;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 2em;
+        }
+        button, option {
+            font-family: inherit;
+        }
+        section {
+            margin-bottom: 2em;
+            padding: 1.5em;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        #calcul-dpa {
+            margin-top: 2em;
+            padding: 1.5em;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #dpa-form {
+            margin-bottom: 1em;
+        }
+
+        input[type="date"] {
+            padding: 0.5em;
+            margin-right: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 70%;
+        }
+        button {
+            background: #70e0b6;
+            color: white;
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #70e0b6;
+        }
+        #dpa-result {
+            color: #70e0b6;
+            font-weight: bold;
+        }
+        button#send-notifications {
+            background-color: #70e0b6;
+            color: #fff;
+            padding: 0.8em 1.5em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+        }
+        button#send-notifications:hover {
+            background-color: #70e0b6;
+        }
+        #notification-message {
+            margin-top: 1em;
+            color: #70e0b6;
+            font-weight: bold;
+        }
+        #health-tracking {
+            margin-top: 2em;
+            padding: 1.5em;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #health-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+            margin-bottom: 1em;
+        }
+        input[type="number"] {
+            padding: 0.5em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        canvas {
+            margin-top: 1em;
+            max-width: 100%;
+        }
+        #blood-pressure-tracking {
+            margin-top: 2em;
+            padding: 1.5em;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #menu {
+            text-align: center;
+            margin: 2em 0;
+            padding: 1em;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #menu-dropdown {
+            padding: 0.8em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 70%;
+            font-size: 1em;
+            margin-top: 1em;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+        #menu-dropdown:focus {
+            border-color: #4db6ac;
+            outline: none;
+            box-shadow: 0 0 4px rgba(77, 182, 172, 0.5);
+        }
+    </style>
+</head>
+<body>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<header>
+    <img src="pregnancy_image.jpg" alt="Illustration de grossesse" style="width: 100%; border-radius: 10px;">
+    <h1>Gestion des Grossesses</h1>
+</header>
+<main>
+    <section id="menu">
+        <h2>Choisissez une fonctionnalité</h2>
+        <select id="menu-dropdown">
+            <option value="" disabled selected>Sélectionnez une fonctionnalité</option>
+            <option value="semaines">Suivi des Semaines</option>
+            <option value="calcul-dpa">Calculateur de DPA</option>
+            <option value="health-tracking">Suivi de la Santé</option>
+            <option value="birth-plan">Plan d'Accouchement</option>
+            <option value="partner-mode">Mode Papa/Partenaire</option>
+        </select>
+    </section>
+    <section id="semaines">
+        <h2>Suivi des Semaines</h2>
+        <select id="week-selector"></select>
+        <p id="infos-semaine">Informations de la semaine sélectionnée...</p>
+        <p id="conseil-semaine">Conseil personnalisé pour cette semaine...</p>
+    </section>
+    <section id="calcul-dpa">
+        <h2>Calculateur de Date Prévue d'Accouchement</h2>
+        <form id="dpa-form">
+            <label for="last-period">Date des dernières règles :</label>
+            <input type="date" id="last-period" required>
+            <button type="submit">Calculer la DPA</button>
+        </form>
+        <p id="dpa-result">Votre DPA estimée apparaîtra ici.</p>
+    </section>
+    <section id="health-tracking">
+        <h2>Suivi de la Santé</h2>
+        <form id="health-form">
+            <label for="weight">Poids actuel (kg) :</label>
+            <input type="number" id="weight" step="0.1" required>
+            <label for="blood-pressure">Tension artérielle :</label>
+            <input type="text" id="blood-pressure" placeholder="120/80" required>
+            <button type="submit">Mettre à jour</button>
+        </form>
+        <div id="health-data">
+            <h3>Données Actuelles :</h3>
+            <p id="current-weight">Poids : Non défini</p>
+            <p id="current-pressure">Tension : Non définie</p>
+            <p id="health-alert" style="color: red; font-weight: bold;">Alertes santé : Aucun problème détecté</p>
+        </div>
+    </section>
+    </form>
+    <section id="partner-mode">
+        <h2>Mode Papa/Partenaire</h2>
+        <ul id="partner-tasks">
+            <li>Préparer la valise pour la maternité.</li>
+            <li>Aider à l’installation du siège-auto.</li>
+            <li>Soutenir la maman avec des massages et du repos.</li>
+        </ul>
+    </section>
+</main>
+<footer>
+    <p>© 2025 Gestion des Grossesses</p>
+</footer>
+<script>
+    // Cacher toutes les sections au départ
+    const sections = document.querySelectorAll("main > section");
+    sections.forEach(section => section.style.display = "none");
+    // Afficher la section sélectionnée
+    document.getElementById("menu-options").addEventListener("click", (e) => {
+        if (e.target.tagName === "BUTTON") {
+            const sectionId = e.target.getAttribute("data-section");
+            sections.forEach(section => {
+                section.style.display = section.id === sectionId ? "block" : "none";
+            });
+        }
+    });
+    // Par défaut, afficher le menu principal
+    document.querySelector("#menu").style.display = "block";
+    // Informations pour les 36 semaines
+    const weekInfo = document.getElementById("infos-semaine");
+    const conseilInfo = document.getElementById("conseil-semaine");
+    const weekSelector = document.getElementById("week-selector");
+    const totalWeeks = 36;
+    // Exemple d'informations par semaine
+    const weekData = [
+        "Semaine 1 : Début de la grossesse.",
+        "Semaine 2 : Préparation de l'implantation.",
+        "Semaine 3 : Développement embryonnaire initial.",
+        "Semaine 4 : Implantation complète.",
+        "Semaine 5 : Début de la formation du cœur.",
+        "Semaine 6 : Croissance des bras et jambes.",
+        "Semaine 7 : Développement du cerveau.",
+        "Semaine 8 : Formation des doigts.",
+        "Semaine 9 : Premiers mouvements du fœtus.",
+        "Semaine 10 : Début de la formation des organes vitaux.",
+        "Semaine 11 : Croissance rapide et développement musculaire.",
+        "Semaine 12 : Le fœtus peut bouger ses bras et jambes.",
+        "Semaine 13 : Traits faciaux distincts.",
+        "Semaine 14 : Formation des cheveux et des ongles.",
+        "Semaine 15 : Perception du son.",
+        "Semaine 16 : Premiers coups du bébé perceptibles.",
+        "Semaine 17 : Croissance rapide du poids.",
+        "Semaine 18 : Formation du système immunitaire.",
+        "Semaine 19 : Développement des poumons.",
+        "Semaine 20 : Demi-parcours de la grossesse.",
+        "Semaine 21 : Bébé commence à dormir et à se réveiller.",
+        "Semaine 22 : Développement des yeux.",
+        "Semaine 23 : Sensation de mouvements réguliers.",
+        "Semaine 24 : Développement des empreintes digitales.",
+        "Semaine 25 : Croissance rapide du cerveau.",
+        "Semaine 26 : Début de la coordination des mouvements.",
+        "Semaine 27 : Réactivité au toucher.",
+        "Semaine 28 : Bébé peut ouvrir et fermer les yeux.",
+        "Semaine 29 : Préparation pour la vie extérieure.",
+        "Semaine 30 : Début de la formation des muscles.",
+        "Semaine 31 : Croissance rapide des tissus adipeux.",
+        "Semaine 32 : Bébé commence à se retourner.",
+        "Semaine 33 : Renforcement des os.",
+        "Semaine 34 : Réglage des systèmes internes.",
+        "Semaine 35 : Bébé prend position pour l'accouchement.",
+        "Semaine 36 : Derniers préparatifs avant la naissance."
+    ];
+    // Conseils personnalisés par semaine
+    const conseilData = [
+        "Conseil Semaine 1 : Prenez des vitamines prénatales pour préparer votre corps.",
+        "Conseil Semaine 2 : Commencez une alimentation équilibrée avec des aliments riches en folates.",
+        "Conseil Semaine 3 : Évitez l'alcool et le tabac pour protéger le développement embryonnaire.",
+        "Conseil Semaine 4 : Prenez rendez-vous avec votre médecin pour confirmer la grossesse.",
+        "Conseil Semaine 5 : Reposez-vous bien, votre corps travaille dur.",
+        "Conseil Semaine 6 : Faites un point sur vos habitudes alimentaires avec un nutritionniste.",
+        "Conseil Semaine 7 : Hydratez-vous correctement, buvez au moins 1,5 litre d'eau par jour.",
+        "Conseil Semaine 8 : Évitez les aliments crus comme la viande ou le poisson pour limiter les risques d'infection.",
+        "Conseil Semaine 9 : Commencez un journal de grossesse pour suivre cette belle aventure.",
+        "Conseil Semaine 10 : Intégrez des exercices doux comme le yoga prénatal.",
+        "Conseil Semaine 11 : Pensez à déclarer votre grossesse à la sécurité sociale.",
+        "Conseil Semaine 12 : Préparez-vous pour la première échographie importante.",
+        "Conseil Semaine 13 : Portez des vêtements confortables adaptés à votre grossesse.",
+        "Conseil Semaine 14 : Surveillez votre posture pour réduire les douleurs au dos.",
+        "Conseil Semaine 15 : Apprenez à reconnaître les signes des premiers mouvements du bébé.",
+        "Conseil Semaine 16 : Échangez avec d'autres futures mamans pour partager vos expériences.",
+        "Conseil Semaine 17 : Introduisez plus de fruits et légumes dans votre alimentation.",
+        "Conseil Semaine 18 : Commencez à planifier votre congé maternité.",
+        "Conseil Semaine 19 : Prenez soin de votre peau avec des huiles naturelles pour limiter les vergetures.",
+        "Conseil Semaine 20 : Effectuez une échographie morphologique pour voir le développement du bébé.",
+        "Conseil Semaine 21 : Assurez-vous de bien dormir avec un oreiller de grossesse.",
+        "Conseil Semaine 22 : Pensez à un cours de préparation à l'accouchement.",
+        "Conseil Semaine 23 : Ralentissez votre rythme si vous vous sentez fatiguée.",
+        "Conseil Semaine 24 : Faites un point avec votre médecin sur vos besoins en fer.",
+        "Conseil Semaine 25 : Apprenez à reconnaître les contractions de Braxton Hicks.",
+        "Conseil Semaine 26 : Préparez une liste des produits essentiels pour le bébé.",
+        "Conseil Semaine 27 : Écoutez de la musique douce, votre bébé peut maintenant entendre.",
+        "Conseil Semaine 28 : Commencez à préparer votre valise pour la maternité.",
+        "Conseil Semaine 29 : Faites des exercices de respiration pour vous préparer à l'accouchement.",
+        "Conseil Semaine 30 : Réduisez votre consommation de sel pour éviter les gonflements.",
+        "Conseil Semaine 31 : Parlez à votre bébé, cela renforce votre lien.",
+        "Conseil Semaine 32 : Vérifiez les démarches administratives pour l’arrivée du bébé.",
+        "Conseil Semaine 33 : Installez un siège-auto pour préparer le premier trajet du bébé.",
+        "Conseil Semaine 34 : Entraînez-vous aux positions d’accouchement qui peuvent vous soulager.",
+        "Conseil Semaine 35 : Assurez-vous que votre domicile est prêt pour accueillir le bébé.",
+        "Conseil Semaine 36 : Détendez-vous et reposez-vous, vous êtes bientôt à la fin du parcours."
+    ];
+    // Remplir le menu déroulant
+    for (let i = 1; i <= totalWeeks; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = `Semaine ${i}`;
+        weekSelector.appendChild(option);
+    }
+    // Mettre à jour les informations en fonction de la sélection
+    function updateWeekDetails(week) {
+        weekInfo.textContent = weekData[week - 1] || "Informations indisponibles.";
+        conseilInfo.textContent = conseilData[week - 1] || "Conseil indisponible.";
+    }
+    // Écouteur pour changement de semaine
+    weekSelector.addEventListener("change", (e) => {
+        const selectedWeek = parseInt(e.target.value, 10);
+        updateWeekDetails(selectedWeek);
+    });
+    // Initialiser avec la première semaine
+    updateWeekDetails(1);
+    // Fonction pour calculer la DPA
+    document.getElementById("dpa-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const lastPeriodDate = document.getElementById("last-period").value;
+        if (lastPeriodDate) {
+            const lastPeriod = new Date(lastPeriodDate);
+            // Ajout de 40 semaines (280 jours) pour estimer la DPA
+            const dpa = new Date(lastPeriod.getTime() + 280 * 24 * 60 * 60 * 1000);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById("dpa-result").textContent = `Votre DPA estimée est le ${dpa.toLocaleDateString('fr-FR', options)}.`;
+        } else {
+            document.getElementById("dpa-result").textContent = "Veuillez entrer une date valide.";
+        }
+    });
+    document.getElementById("send-notifications").addEventListener("click", () => {
+        const currentWeek = weekSelector.value || 1; // Par défaut, semaine 1
+        const notificationMessage = `Rappel : Consultez les conseils pour la Semaine ${currentWeek}.`;
+        document.getElementById("notification-message").textContent = notificationMessage;
+        // Ajouter une notification pour les rendez-vous
+        const appointmentReminder = "Rendez-vous médical à venir : Pensez à vérifier votre calendrier.";
+        console.log(appointmentReminder); // Vous pouvez afficher ceci dans une alerte ou le stocker pour des push réels.
+    })
+    const weightData = [];
+    const weightChart = new Chart(document.getElementById("weight-chart"), {
+        type: "line",
+        data: {
+            labels: [], // Semaines ou dates
+            datasets: [{
+                label: "Poids (kg)",
+                data: weightData,
+                borderColor: "#4db6ac",
+                tension: 0.4,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: "Semaines" } },
+                y: { title: { display: true, text: "Poids (kg)" } }
+            }
+        }
+    });
+    document.getElementById("health-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const weight = parseFloat(document.getElementById("weight").value);
+        if (weight) {
+            const currentWeek = weightData.length + 1;
+            // Mettre à jour les données du graphique
+            weightData.push(weight);
+            weightChart.data.labels.push(`Semaine ${currentWeek}`);
+            weightChart.update();
+            // Vérifier les alertes sur le poids
+            const alertMessage = weight > 90 ? "Attention : poids élevé, consultez votre médecin." : "Aucun problème détecté.";
+            document.getElementById("weight-alert").textContent = alertMessage;
+        }
+    });
+    document.getElementById("pressure-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const bloodPressure = document.getElementById("blood-pressure").value;
+        const heartRate = parseInt(document.getElementById("heart-rate").value);
+        // Analyse de la tension
+        const [systolic, diastolic] = bloodPressure.split("/").map(Number);
+        let alertMessage = "Aucun problème détecté.";
+        if (systolic > 140 || diastolic > 90 || heartRate < 60 || heartRate > 100) {
+            alertMessage = "Attention : résultats inhabituels, consultez votre médecin.";
+        }
+        document.getElementById("pressure-alert").textContent = alertMessage;
+    });
+    // Cache toutes les sections au démarrage
+    const sections = document.querySelectorAll("main > section:not(#menu)");
+    sections.forEach(section => section.style.display = "none");
+
+    // Aficher la section sélectionnée depuis le menu déroulant
+    document.getElementById("menu-dropdown").addEventListener("change", (e) => {
+        const selectedSection = e.target.value;
+        sections.forEach(section => {
+            section.style.display = section.id === selectedSection ? "block" : "none";
+        });
+    });
+</script>
+</body>
+</html>

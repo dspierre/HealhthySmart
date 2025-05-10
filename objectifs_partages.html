@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Objectifs Partagés</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #70e0b6;
+        }
+        .feature-box {
+            margin-bottom: 30px;
+        }
+        .feature-box h2 {
+            color: #e74c3c;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        form input, form button {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        form button {
+            background-color: #70e0b6;
+            color: white;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #55c586;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f4f4f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .progress-container {
+            margin-top: 10px;
+            background-color: #ddd;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 20px;
+            width: 0%;
+            background-color: #70e0b6;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            border-radius: 8px;
+            transition: width 0.3s;
+        }
+        .feedback {
+            color: #70e0b6;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .sort-btn {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            margin-bottom: 20px;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .sort-btn:hover {
+            background-color: #2980b9;
+        }
+        body.dark {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+        input, select {
+            border: 1px solid #d1d1d1;
+        }
+        input:focus, select:focus {
+            border-color: #70e0b6;
+        }
+        button {
+            background-color:#70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #70e0b6;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .toggle {
+            margin-top: 15px;
+            cursor: pointer;
+            color: #70e0b6;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🎯 Objectifs Partagés</h1>
+        <p>Définissez des défis santé et atteignez vos objectifs ensemble.</p>
+        <span class="toggle" onclick="toggleDarkMode()">Mode sombre</span>
+    </header>
+    <main>
+        <section class="feature-box">
+            <h2>Créer un Objectif</h2>
+            <form id="goalForm">
+                <label for="goalName">Nom de l'Objectif :</label>
+                <input type="text" id="goalName" placeholder="Ex : Courir 100 km" required>
+                <label for="goalTarget">Cible (ex : km, minutes) :</label>
+                <input type="number" id="goalTarget" placeholder="100" min="1" required>
+                <label for="goalUnit">Unité :</label>
+                <input type="text" id="goalUnit" placeholder="km, minutes, etc." required>
+                <label for="participants">Participants (séparés par des virgules) :</label>
+                <input type="text" id="participants" placeholder="Ex : Alice, Bob, Charlie" required>
+                <button type="submit">Ajouter l'Objectif</button>
+            </form>
+            <p id="feedback" class="feedback"></p>
+        </section>
+        <section class="feature-box">
+            <h2>Progrès des Objectifs</h2>
+            <div>
+                <button class="sort-btn" onclick="sortGoals('name')">Trier par Nom</button>
+                <button class="sort-btn" onclick="sortGoals('target')">Trier par Cible</button>
+            </div>
+            <ul id="goalList"></ul>
+        </section>
+    </main>
+    <footer>
+        <p>🌟 Restez motivé et atteignez vos objectifs ensemble !</p>
+    </footer>
+    <script>
+        // Select elements
+        const goalForm = document.getElementById('goalForm');
+        const goalNameInput = document.getElementById('goalName');
+        const goalTargetInput = document.getElementById('goalTarget');
+        const goalUnitInput = document.getElementById('goalUnit');
+        const participantsInput = document.getElementById('participants');
+        const goalList = document.getElementById('goalList');
+        const feedback = document.getElementById('feedback');
+        // Array to store goals
+        let goals = JSON.parse(localStorage.getItem('sharedGoals')) || [];
+        // Save goals to localStorage
+        const saveGoals = () => localStorage.setItem('sharedGoals', JSON.stringify(goals));
+        // Render goals
+        const renderGoals = () => {
+            goalList.innerHTML = '';
+            goals.forEach((goal, goalIndex) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <h3>${goal.name}</h3>
+                    <p>Cible : ${goal.target} ${goal.unit}</p>
+                    <p>Participants : ${goal.participants.join(', ')}</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${goal.progress / goal.target * 100}%;"></div>
+                    </div>
+                    <p>${goal.progress} / ${goal.target} ${goal.unit}</p>
+                    <button onclick="updateProgress(${goalIndex})">Mettre à jour le progrès</button>
+                    <button onclick="deleteGoal(${goalIndex})">Supprimer l'Objectif</button>
+                `;
+                if (goal.progress >= goal.target) {
+                    const completionBadge = document.createElement('p');
+                    completionBadge.textContent = '✅ Objectif atteint !';
+                    completionBadge.style.color = 'green';
+                    listItem.appendChild(completionBadge);
+                }
+                goalList.appendChild(listItem);
+            });
+        };
+        // Add a new goal
+        goalForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const goal = {
+                name: goalNameInput.value.trim(),
+                target: parseInt(goalTargetInput.value.trim()),
+                unit: goalUnitInput.value.trim(),
+                participants: participantsInput.value.split(',').map(p => p.trim()),
+                progress: 0
+            };
+            if (!goal.name || isNaN(goal.target) || goal.target <= 0 || !goal.unit || goal.participants.length === 0) {
+                feedback.textContent = 'Veuillez remplir tous les champs correctement !';
+                setTimeout(() => feedback.textContent = '', 3000);
+                return;
+            }
+            goals.push(goal);
+            saveGoals();
+            renderGoals();
+            goalForm.reset();
+            feedback.textContent = 'Objectif ajouté avec succès !';
+            setTimeout(() => feedback.textContent = '', 3000);
+        });
+        // Update goal progress
+        const updateProgress = (index) => {
+            const progress = prompt('Entrez le nouveau progrès :');
+            const progressValue = parseInt(progress);
+            if (isNaN(progressValue) || progressValue < 0) {
+                alert('Veuillez entrer une valeur valide.');
+                return;
+            }
+            goals[index].progress = Math.min(progressValue, goals[index].target);
+            saveGoals();
+            renderGoals();
+        };
+        // Delete a goal
+        const deleteGoal = (index) => {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet objectif ?')) {
+                goals.splice(index, 1);
+                saveGoals();
+                renderGoals();
+            }
+        };
+        function toggleDarkMode() {
+            const body = document.body;
+            const container = document.getElementById("app");
+            body.classList.toggle("dark");
+            container.classList.toggle("dark");
+        }
+        // Sort goals
+        const sortGoals = (key) => {
+            goals.sort((a, b) => {
+                if (typeof a[key] === 'string' && typeof b[key] === 'string') {
+                    return a[key].localeCompare(b[key]);
+                }
+                return a[key] - b[key];
+            });
+            saveGoals(); // Save sorted data
+            renderGoals(); // Re-render the list
+            feedback.textContent = `Liste triée par ${key} !`;
+            setTimeout(() => feedback.textContent = '', 3000);
+        };
+        renderGoals();
+    </script>
+</div>
+</body>
+</html>

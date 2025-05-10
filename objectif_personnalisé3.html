@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objectifs de Bien-être Personnalisés</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h3 {
+            color: #70e0b6;
+        }
+        input, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #56c093;
+        }
+        .objective-list {
+            margin-top: 20px;
+        }
+        .objective-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+        }
+        .objective-item button {
+            margin-left: 10px;
+            background-color: #ff6b6b;
+            color: white;
+        }
+        .objective-item button:hover {
+            background-color: #e05a5a;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h3>Objectifs de Bien-être Personnalisés</h3>
+    <p>Ajoutez, recherchez ou triez vos objectifs :</p>
+    <label>Date :</label>
+    <input type="date" id="goalDate">
+    <label>Objectif de pas :</label>
+    <input type="number" id="stepsGoal" placeholder="Exemple : 10000 pas">
+    <label>Objectif de consommation d'eau (litres) :</label>
+    <input type="number" id="waterGoal" placeholder="Exemple : 2 litres">
+    <label>Objectif de sommeil (heures) :</label>
+    <input type="number" id="sleepGoal" placeholder="Exemple : 8 heures">
+    <label>Objectif d'humeur (note sur 10) :</label>
+    <input type="number" id="moodGoal" placeholder="Exemple : 8">
+    <button onclick="addGoal()">Enregistrer Objectif</button>
+    <input type="text" id="searchBar" placeholder="Rechercher par date ou catégorie">
+    <button onclick="sortGoals()">Trier par date</button>
+    <button onclick="exportGoals()">Exporter Objectifs</button>
+    <button onclick="importGoals()">Importer Objectifs</button>
+    <div class="objective-list" id="objectiveList">
+        <h4>Liste des Objectifs :</h4>
+    </div>
+</div>
+<script>
+    // API URL
+    const API_URL = 'http://localhost:3000';
+    // Fonction pour ajouter un objectif
+    function addGoal() {
+        const date = document.getElementById('goalDate').value;
+        const steps = document.getElementById('stepsGoal').value;
+        const water = document.getElementById('waterGoal').value;
+        const sleep = document.getElementById('sleepGoal').value;
+        const mood = document.getElementById('moodGoal').value;
+        if (!date || !steps || !water || !sleep || !mood) {
+            alert('Veuillez remplir tous les champs.');
+            return;
+        }
+        const goal = {
+            date,
+            steps: parseInt(steps),
+            water: parseFloat(water),
+            sleep: parseFloat(sleep),
+            mood: parseInt(mood)
+        };
+        fetch(`${API_URL}/add-goal`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(goal)
+        })
+            .then(response => response.json())
+            .then(() => {
+                alert('Objectif ajouté avec succès.');
+                fetchGoals();
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+    // Fonction pour récupérer tous les objectifs
+    function fetchGoals() {
+        fetch(`${API_URL}/goals`)
+            .then(response => response.json())
+            .then(data => renderGoals(data))
+            .catch(error => console.error('Erreur:', error));
+    }
+    // Fonction pour supprimer un objectif
+    function deleteGoal(id) {
+        fetch(`${API_URL}/delete-goal/${id}`, { method: 'DELETE' })
+            .then(() => {
+                alert('Objectif supprimé avec succès.');
+                fetchGoals();
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+    // Fonction pour afficher les objectifs
+    function renderGoals(goals) {
+        const objectiveList = document.getElementById('objectiveList');
+        objectiveList.innerHTML = '<h4>Liste des Objectifs :</h4>';
+        goals.forEach(goal => {
+            const goalItem = document.createElement('div');
+            goalItem.className = 'objective-item';
+            goalItem.innerHTML = `
+        <strong>Date :</strong> ${goal.date} <br>
+        <strong>Pas :</strong> ${goal.steps} pas <br>
+        <strong>Eau :</strong> ${goal.water} litres <br>
+        <strong>Sommeil :</strong> ${goal.sleep} heures <br>
+        <strong>Humeur :</strong> ${goal.mood}/10
+        <button onclick="deleteGoal(${goal.id})">Supprimer</button>
+      `;
+            objectiveList.appendChild(goalItem);
+        });
+    }
+    // Fonction pour trier les objectifs
+    function sortGoals() {
+        fetch(`${API_URL}/goals`)
+            .then(response => response.json())
+            .then(data => {
+                const sortedGoals = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+                renderGoals(sortedGoals);
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+    // Fonction pour exporter les objectifs
+    function exportGoals() {
+        fetch(`${API_URL}/goals`)
+            .then(response => response.json())
+            .then(data => {
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'objectifs.json';
+                link.click();
+                alert('Objectifs exportés avec succès.');
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+    // Fonction pour importer des objectifs
+    function importGoals() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = event => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const importedGoals = JSON.parse(reader.result);
+                    importedGoals.forEach(goal => {
+                        fetch(`${API_URL}/add-goal`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(goal)
+                        });
+                    });
+                    alert('Objectifs importés avec succès.');
+                    fetchGoals();
+                } catch (error) {
+                    alert('Erreur lors de l’importation. Vérifiez le fichier.');
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+    // Charger les objectifs au démarrage
+    window.onload = () => fetchGoals();
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="titrePage">Journal des Souvenirs Familiaux - Mois 1</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #eaf7eb;
+    transition: background 0.5s ease-in-out;
+}
+h1 {
+    color: #70e0b6;
+}
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px;
+}
+input, select, button {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 2px solid #70e0b6;
+}
+button {
+    background: linear-gradient(45deg, #70e0b6, #70e0b6);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s ease-in-out;
+}
+button:hover {
+    background: linear-gradient(45deg,#70e0b6, #70e0b6);
+}
+#galerie {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+.photo-container {
+    position: relative;
+    padding: 10px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.5s ease, transform 0.3s ease;
+}
+.photo-container.show {
+    opacity: 1;
+    transform: scale(1);
+}
+img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+.delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    padding: 7px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.delete-btn:hover {
+    background: darkred;
+}
+.progress-bar {
+    width: 100%;
+    height: 5px;
+    background: #ccc;
+    display: none;
+}
+.progress-bar span {
+    display: block;
+    width: 0%;
+    height: 100%;
+    background: #70e0b6;
+    transition: width 0.5s;
+}
+.dark-mode {
+    background-color: #333;
+    color: white;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.1.1/compressor.min.js"></script>
+</head>
+<body>
+    <h1 id="titrePage">Journal des Souvenirs Familiaux - Mois 1</h1>
+    <div class="controls">
+        <button onclick="toggleTheme()">🌙 Mode Sombre</button>
+        <button onclick="changeMois(-1)">◀ Mois Précédent</button>
+        <select id="moisSelect"></select>
+        <button onclick="changeMois(1)">Mois Suivant ▶</button>
+    </div>
+    <input type="file" id="photoInput" multiple>
+    <button onclick="ajouterPhotos()">📸 Ajouter Photos</button>
+    <div class="progress-bar"><span></span></div>
+    <p><strong>Total Photos :</strong> <span id="photoCount">0</span></p>
+    <div id="galerie"></div>
+    <script>
+      let moisActuel = 1;
+const moisSelect = document.getElementById('moisSelect');
+for (let i = 1; i <= 18; i++) {
+    let option = document.createElement('option');
+    option.value = i;
+    option.textContent = `${i}ème Mois`;
+    moisSelect.appendChild(option);
+}
+moisSelect.value = moisActuel;
+function updateTitle() {
+    document.getElementById("titrePage").textContent = `Journal des Souvenirs Familiaux - Mois ${moisActuel}`;
+}
+function changeMois(direction) {
+    moisActuel += direction;
+    if (moisActuel < 1) moisActuel = 1;
+    if (moisActuel > 18) moisActuel = 18;
+    moisSelect.value = moisActuel;
+    updateTitle();
+    chargerPhotos();
+}
+moisSelect.addEventListener('change', function () {
+    moisActuel = parseInt(this.value);
+    updateTitle();
+    chargerPhotos();
+});
+function ajouterPhotos() {
+    const files = document.getElementById('photoInput').files;
+    if (files.length === 0) return;
+    document.querySelector(".progress-bar").style.display = "block";
+    [...files].forEach(file => {
+        new Compressor(file, {
+            quality: 0.6,
+            success(result) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    let photos = JSON.parse(localStorage.getItem(`mois_${moisActuel}`)) || [];
+                    photos.push({ src: event.target.result, date: new Date().toLocaleDateString() });
+                    localStorage.setItem(`mois_${moisActuel}`, JSON.stringify(photos));
+                    chargerPhotos();
+                    document.querySelector(".progress-bar span").style.width = "100%";
+                    setTimeout(() => document.querySelector(".progress-bar").style.display = "none", 500);
+                };
+                reader.readAsDataURL(result);
+            }
+        });
+    });
+}
+function supprimerPhoto(index) {
+            if (confirm("Voulez-vous vraiment supprimer cette photo ?")) {
+                let photos = JSON.parse(localStorage.getItem(`mois_${moisActuel}`)) || [];
+                photos.splice(index, 1);
+                localStorage.setItem(`mois_${moisActuel}`, JSON.stringify(photos));
+                chargerPhotos();
+            }
+        }
+
+function chargerPhotos() {
+    const galerie = document.getElementById('galerie');
+    galerie.innerHTML = "";
+    let photos = JSON.parse(localStorage.getItem(`mois_${moisActuel}`)) || [];
+    document.getElementById("photoCount").textContent = photos.length;
+    photos.forEach((photo, index) => {
+        const photoContainer = document.createElement('div');
+        photoContainer.className = "photo-container show";
+        const img = document.createElement('img');
+        img.src = photo.src;
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = "delete-btn";
+        deleteBtn.textContent = "X";
+        deleteBtn.onclick = () => supprimerPhoto(index);
+        photoContainer.appendChild(img);
+        photoContainer.appendChild(deleteBtn);
+        galerie.appendChild(photoContainer);
+    });
+}
+function toggleTheme() {
+    document.body.classList.toggle("dark-mode");
+}
+updateTitle();
+window.onload = chargerPhotos;
+</script>
+</body>
+</html>

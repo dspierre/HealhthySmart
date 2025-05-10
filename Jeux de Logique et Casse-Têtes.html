@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeux de Logique et Casse-Têtes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #70e0b6;
+            color: white;
+            padding: 20px;
+        }
+        button {
+            margin: 10px;
+            padding: 12px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #70e0b6;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #enigme {
+            font-size: 20px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #reponse {
+            display: none;
+            font-size: 18px;
+            margin-top: 10px;
+            color: darkblue;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        #progress {
+            font-size: 16px;
+            margin-top: 15px;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Jeux de Logique et Casse-Têtes</h1>
+    </header>
+    <img src="enigmatic puzzles.png" alt="Espace de Partage Éducatif" style="width: 30%; height: auto;">
+    <p id="progress"></p>
+    <p id="enigme"></p>
+    <button onclick="afficherReponse()">Voir la réponse</button>
+    <p id="reponse"></p>
+
+    <button onclick="precedent()">← Précédent</button>
+    <button onclick="suivant()">Suivant →</button>
+
+    <script>
+        const enigmes = [
+    {question: "Je suis rond et j’ai des chiffres, mais je ne suis pas un livre. Que suis-je ?", reponse: "Une horloge"},
+    {question: "Plus on me retire, plus je grandis. Que suis-je ?", reponse: "Un trou"},
+    {question: "Quelle lettre est entourée d’eau ?", reponse: "La lettre 'O' (Océan)"},
+    {question: "J’ai un cou mais pas de tête. Que suis-je ?", reponse: "Une bouteille"},
+    {question: "Quel est l’animal qui a le plus de dents ?", reponse: "Le requin"},
+    {question: "Que peut-on entendre mais jamais voir ni toucher ?", reponse: "Une voix"},
+    {question: "Plus je suis chaud, plus je suis léger. Que suis-je ?", reponse: "L’air"},
+    {question: "Je peux voler sans ailes et pleurer sans yeux. Que suis-je ?", reponse: "Un nuage"},
+    {question: "Tu me prends avant de dormir mais tu ne peux pas me manger. Que suis-je ?", reponse: "Un livre"},
+    {question: "Quel mot commence toujours par la fin ?", reponse: "Fin"},
+    {question: "Quel est l’endroit où le vent passe mais où il n’y a pas de porte ?", reponse: "Une fenêtre"},
+    {question: "J’ai des clés mais je n’ouvre pas de porte. Que suis-je ?", reponse: "Un piano"},
+    {question: "Je peux être haute ou basse et pourtant je ne fais aucun bruit. Que suis-je ?", reponse: "Une température"},
+    {question: "Un homme lit et ne peut jamais écrire. Qui est-il ?", reponse: "Un aveugle qui lit en braille"},
+    {question: "Je monte toujours mais ne redescends jamais. Que suis-je ?", reponse: "L’âge"},
+    {question: "Je suis invisible mais te fais toujours bouger. Que suis-je ?", reponse: "Le vent"},
+    {question: "Plus je suis grand, moins tu me vois. Que suis-je ?", reponse: "L’obscurité"},
+    {question: "Je suis long quand je suis jeune et je deviens court quand je vieillis. Que suis-je ?", reponse: "Une bougie"},
+    {question: "Qu’est-ce qui a un visage mais ne parle jamais ?", reponse: "Une montre"},
+    {question: "Je peux être doux ou dur, mais quand je tombe, je fais mal. Que suis-je ?", reponse: "La grêle"},
+    {question: "Je suis plus grand quand je suis plus petit. Que suis-je ?", reponse: "Un chiffre négatif"},
+    {question: "Je peux être rempli d’eau, mais je ne pèse rien. Que suis-je ?", reponse: "Un nuage"},
+    {question: "Qu’est-ce qui commence la nuit et finit le matin, mais n’est pas une personne ?", reponse: "Le rêve"},
+    {question: "J’ai des mains mais je ne peux pas applaudir. Que suis-je ?", reponse: "Une horloge"},
+    {question: "Plus on me coupe, plus je grandis. Que suis-je ?", reponse: "Les cheveux"},
+    {question: "Je suis un animal et pourtant on me trouve souvent sur un bureau. Que suis-je ?", reponse: "Une souris d’ordinateur"},
+    {question: "Je suis parfois cassé sans être réellement endommagé. Que suis-je ?", reponse: "Un record"},
+    {question: "Je peux être vu le jour comme la nuit, mais je ne peux pas briller tout seul. Que suis-je ?", reponse: "La lune"},
+    {question: "Je peux être lourd mais j’aide à porter des objets plus lourds. Que suis-je ?", reponse: "Un levier"},
+    {question: "Je suis un triangle mais je n’ai pas d’angles. Que suis-je ?", reponse: "Un panneau de signalisation rond"},
+    {question: "On me lance, mais jamais je ne tombe. Que suis-je ?", reponse: "Un défi"},
+    {question: "Je suis invisible mais je peux tout voir. Que suis-je ?", reponse: "L’esprit"},
+    {question: "Tout le monde me connaît sans jamais m’avoir rencontré. Qui suis-je ?", reponse: "Demain"},
+    {question: "Je peux couper sans être tranchant. Que suis-je ?", reponse: "Une coupure de courant"},
+    {question: "Je peux exister sous forme liquide, solide ou gazeuse. Que suis-je ?", reponse: "L’eau"}
+];
+let index = 0;
+
+        function afficherEnigme() {
+            document.getElementById("enigme").innerText = enigmes[index].question;
+            document.getElementById("reponse").innerText = enigmes[index].reponse;
+            document.getElementById("reponse").style.opacity = "0";
+            document.getElementById("reponse").style.display = "none";
+            document.getElementById("progress").innerText = `Énigme ${index + 1} / ${enigmes.length}`;
+            document.getElementById("btnPrecedent").disabled = index === 0;
+            document.getElementById("btnSuivant").disabled = index === enigmes.length - 1;
+        }
+        function afficherReponse() {
+            let reponseElement = document.getElementById("reponse");
+            reponseElement.style.display = "block";
+            setTimeout(() => reponseElement.style.opacity = "1", 100);
+        }
+        function suivant() {
+            if (index < enigmes.length - 1) {
+                index++;
+                afficherEnigme();
+            }
+        }
+        function precedent() {
+            if (index > 0) {
+                index--;
+                afficherEnigme();
+            }
+        }
+        afficherEnigme();
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Habitudes de Santé</title>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f9fafc;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+        body.dark {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        .container.dark {
+            background-color: #34495e;
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        input, select {
+            border: 1px solid #d1d1d1;
+        }
+        input:focus, select:focus {
+            border-color: #70e0b6;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #56c29c;
+        }
+        .result, .history {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .result {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        canvas {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Suivi des Habitudes de Santé</h1>
+            <h3>Indiquez vos habitudes quotidiennes pour savoir si vous êtes en bonne santé.</h3>
+            <form id="health-form">
+                <label for="sleep">Durée de sommeil (heures) :</label>
+                <input type="number" id="sleep" min="0" step="0.5" placeholder="Entrez la durée de votre sommeil">
+                <label for="activity">Durée d'activité physique (minutes) :</label>
+                <input type="number" id="activity" min="0" placeholder="Entrez la durée de votre activité physique">
+                <label for="water">Consommation d'eau (litres) :</label>
+                <input type="number" id="water" min="0" step="0.1" placeholder="Entrez votre consommation d'eau">
+                <label for="diet">Qualité de l'alimentation :</label>
+                <select id="diet">
+                    <option value="excellente">Excellente</option>
+                    <option value="bonne">Bonne</option>
+                    <option value="moyenne">Moyenne</option>
+                    <option value="mauvaise">Mauvaise</option>
+                </select>
+                <label for="stress">Niveau de stress :</label>
+                <select id="stress">
+                    <option value="faible">Faible</option>
+                    <option value="modéré">Modéré</option>
+                    <option value="élevé">Élevé</option>
+                    <option value="critique">Critique</option>
+                </select>
+                <button type="button" id="analyze-button">Analyser</button>
+                <button type="button" id="toggle-theme">Mode sombre</button>
+                <button type="button" id="export-csv">Exporter (CSV)</button>
+            </form>
+        </div>
+        <div class="card">
+            <h2>Résultat de l'évaluation</h2>
+            <p id="health-result">Vos résultats s'afficheront ici.</p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const API_URL = 'http://localhost:3000'; // URL du backend
+        // Fonction pour soumettre le formulaire et enregistrer les données
+        document.getElementById('submit-button').addEventListener('click', () => {
+            const customDate = document.getElementById('customDate').value;
+            const sleep = document.getElementById('sleep').value;
+            const water = document.getElementById('water').value;
+            const steps = document.getElementById('steps').value;
+            const quality = document.getElementById('quality').value;
+            const heartRate = document.getElementById('heartRate').value;
+            // Validation des champs
+            if (!customDate || !sleep || !water || !steps || !quality || !heartRate) {
+                alert("Veuillez remplir tous les champs avant d'enregistrer !");
+                return;
+            }
+            const wellnessData = {
+                date: customDate,
+                sleep: parseFloat(sleep),
+                water: parseFloat(water),
+                steps: parseInt(steps),
+                quality,
+                heartRate: parseInt(heartRate)
+            };
+            // Envoyer les données au backend
+            fetch(`${API_URL}/add-wellness`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(wellnessData)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.message || "Données enregistrées avec succès !");
+                    fetchWellnessData(); // Rafraîchir le tableau
+                })
+                .catch(error => console.error("Erreur lors de l'enregistrement :", error));
+            // Réinitialiser le formulaire
+            document.getElementById('customDate').value = '';
+            document.getElementById('sleep').value = '';
+            document.getElementById('water').value = '';
+            document.getElementById('steps').value = '';
+            document.getElementById('quality').value = '';
+            document.getElementById('heartRate').value = '';
+        });
+        // Fonction pour récupérer les données et les afficher dans le tableau
+        function fetchWellnessData() {
+            fetch(`${API_URL}/wellness`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('wellness-table').querySelector('tbody');
+                    tableBody.innerHTML = ''; // Vider le tableau
+                    let totalPoints = 0;
+                    data.forEach((entry, index) => {
+                        const row = tableBody.insertRow();
+                        row.insertCell(0).textContent = entry.date;
+                        row.insertCell(1).textContent = `${entry.sleep} h`;
+                        row.insertCell(2).textContent = `${entry.water} L`;
+                        row.insertCell(3).textContent = entry.steps;
+                        row.insertCell(4).textContent = entry.quality;
+                        row.insertCell(5).textContent = `${entry.heartRate} bpm`;
+                        // Calculer les points pour chaque ligne
+                        const points = calculatePoints(entry);
+                        totalPoints += points;
+                        row.insertCell(6).textContent = `${points} pts`;
+                        const actionsCell = row.insertCell(7);
+                        actionsCell.innerHTML = `
+                    <button class="edit-button" onclick="editEntry(${index})">Modifier</button>
+                    <button class="delete-button" onclick="deleteEntry(${index})">Supprimer</button>
+                `;
+                    });
+                    // Afficher les points totaux via une alerte
+                    alert(`Félicitations ! Vous avez gagné un total de ${totalPoints} points !`);
+                })
+                .catch(error => console.error("Erreur lors de la récupération des données :", error));
+        }
+        // Fonction pour modifier une entrée
+        function editEntry(index) {
+            alert("Modification non implémentée !");
+        }
+        // Fonction pour supprimer une entrée
+        function deleteEntry(index) {
+            alert("Suppression non implémentée !");
+        }
+        // Charger les données existantes au démarrage
+        document.addEventListener('DOMContentLoaded', fetchWellnessData);
+        const moodChartCanvas = document.getElementById('moodChart')?.getContext('2d');
+        const barChartCanvas = document.getElementById('barChart')?.getContext('2d');
+        let lineChartInstance = null;
+        let barChartInstance = null;
+        // Fonction pour calculer les points
+        function calculatePoints(entry) {
+            let points = 0;
+            if (entry.sleep >= 7) points += 150;       // Objectif sommeil
+            if (entry.water >= 2) points += 150;      // Objectif consommation d'eau
+            if (entry.steps >= 10000) points += 150;  // Objectif pas
+            if (entry.heartRate >= 50 && entry.heartRate <= 90) points += 150; // Fréquence cardiaque normale
+            return points;
+        }
+        // Fonction pour afficher les graphiques
+        function renderCharts() {
+            fetch(`${API_URL}/wellness`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.length) {
+                        alert("Pas de données à afficher.");
+                        return;
+                    }
+                    const dates = data.map(d => d.date);
+                    const sleepValues = data.map(d => parseFloat(d.sleep));
+                    const stepValues = data.map(d => parseInt(d.steps));
+                    // Graphique linéaire (Durée de sommeil)
+                    if (lineChartInstance) lineChartInstance.destroy();
+                    lineChartInstance = new Chart(moodChartCanvas, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: 'Durée de sommeil (h)',
+                                data: sleepValues,
+                                borderColor: 'rgb(75, 192, 192)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                    // Graphique en barres (Nombre de pas)
+                    if (barChartInstance) barChartInstance.destroy();
+                    barChartInstance = new Chart(barChartCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: 'Nombre de pas',
+                                data: stepValues,
+                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: { y: { beginAtZero: true } },
+                            maintainAspectRatio: false
+                        }
+                    });
+                })
+                .catch(error => console.error("Erreur lors de l'affichage des graphiques :", error));
+        }
+        // Charger les graphiques au démarrage
+        document.addEventListener('DOMContentLoaded', renderCharts);
+    </script>
+</body>
+</html>

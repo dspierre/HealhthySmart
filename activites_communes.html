@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏞️ Activités Bien-être Communes</title>
+    <style>
+        /* Style général */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafc;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #70e0b6;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+        }
+        main {
+            width: 70%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .activity-section {
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #58c6a2;
+        }
+        select, input[type="date"] {
+            padding: 10px;
+            font-size: 16px;
+            color: #333;
+            background-color: #f9fafc;
+            border: 2px solid #70e0b6;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 80%;
+            transition: all 0.3s ease;
+        }
+        select:hover, input[type="date"]:hover {
+            border-color: #58c6a2;
+            background-color: #e8f6f1;
+        }
+        select:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: #3aa88f;
+            background-color: #dff2eb;
+        }
+        .suggestion-box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px dashed #70e0b6;
+            border-radius: 10px;
+            background-color: #e8f6f1;
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            min-height: 50px;
+        }
+        #activityIcon {
+            font-size: 50px;
+            margin-top: 20px;
+            color: #70e0b6;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>🏞️ Activités Bien-être Communes</h1>
+</header>
+<main>
+    <section class="activity-section">
+        <h2>Planifiez une Activité</h2>
+        <label for="activityDropdown">Activités :</label>
+        <select id="activityDropdown">
+            <option value="Yoga en plein air">Yoga en plein air</option>
+            <option value="Randonnées en forêt">Randonnées en forêt</option>
+            <option value="Pique-nique familial">Pique-nique familial</option>
+            <option value="Atelier de méditation">Atelier de méditation</option>
+            <option value="Course à pied en groupe">Course à pied en groupe</option>
+            <option value="Jeux de société en plein air">Jeux de société en plein air</option>
+            <option value="Cours de danse collective">Cours de danse collective</option>
+            <option value="Observation des étoiles">Observation des étoiles</option>
+            <option value="Activités artistiques comme la peinture">Activités artistiques comme la peinture</option>
+        </select>
+        <label for="activityDate">Date prévue :</label>
+        <input type="date" id="activityDate">
+        <button id="selectActivity">💡 Planifier l'Activité</button>
+        <div id="selectedActivity" class="suggestion-box"></div>
+        <div id="selectedActivityDescription" class="suggestion-box"></div>
+        <div id="activityIcon"></div>
+        <div id="activityLocations" class="suggestion-box"></div>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2025 Activités Communes pour la Santé et le Bien-être</p>
+</footer>
+<script>
+    // Tableaux des descriptions, icônes, et lieux réels des activités
+    const activityDescriptions = {
+        "Yoga en plein air": "Pratiquez des postures de yoga tout en profitant de la nature.",
+        "Randonnées en forêt": "Explorez les forêts à votre rythme, idéal pour se ressourcer.",
+        "Pique-nique familial": "Partagez un repas en plein air avec votre famille dans un lieu agréable.",
+        "Atelier de méditation": "Apprenez des techniques de méditation pour apaiser l'esprit.",
+        "Course à pied en groupe": "Faites du jogging avec vos proches ou amis pour rester actif.",
+        "Jeux de société en plein air": "Amusez-vous avec des jeux adaptés pour le plein air.",
+        "Cours de danse collective": "Apprenez des danses amusantes tout en renforçant votre cohésion.",
+        "Observation des étoiles": "Admirez le ciel nocturne et identifiez les constellations.",
+        "Activités artistiques comme la peinture": "Exprimez votre créativité en plein air avec des ateliers de peinture."
+    };
+    const activityIcons = {
+        "Yoga en plein air": "🧘",
+        "Randonnées en forêt": "🌲",
+        "Pique-nique familial": "🍉",
+        "Atelier de méditation": "🧠",
+        "Course à pied en groupe": "🏃",
+        "Jeux de société en plein air": "🎲",
+        "Cours de danse collective": "💃",
+        "Observation des étoiles": "✨",
+        "Activités artistiques comme la peinture": "🎨"
+    };
+    const activityLocations = {
+        "Yoga en plein air": [
+            "Parc des Buttes-Chaumont, Paris",
+            "Plage de la Côte des Basques, Biarritz",
+            "Forêt de Fontainebleau, Île-de-France",
+            "Jardin des Plantes, Montpellier"
+        ],
+        "Randonnées en forêt": [
+            "Forêt de Brocéliande, Bretagne",
+            "Sentier des Ocres, Roussillon",
+            "Parc national des Écrins, Alpes",
+            "Chemin des Cascades, Pyrénées"
+        ],
+        "Pique-nique familial": [
+            "Lac d'Annecy, Haute-Savoie",
+            "Parc de la Tête d'Or, Lyon",
+            "Prairie du Mont Saint-Michel, Normandie",
+            "Parc de Sceaux, Île-de-France"
+        ],
+        "Atelier de méditation": [
+            "Centre de méditation Kadampa, Paris",
+            "Jardin japonais de Toulouse",
+            "Temple bouddhiste de Lérab Ling, Hérault",
+            "Forêt de Rambouillet, Île-de-France"
+        ],
+        "Course à pied en groupe": [
+            "Bois de Vincennes, Paris",
+            "Promenade des Anglais, Nice",
+            "Parc de la Citadelle, Lille",
+            "Berges de la Garonne, Bordeaux"
+        ],
+        "Jeux de société en plein air": [
+            "Esplanade du Champ de Mars, Paris",
+            "Place Bellecour, Lyon",
+            "Parc du Thabor, Rennes",
+            "Jardin des Doms, Avignon"
+        ],
+        "Cours de danse collective": [
+            "Place du Capitole, Toulouse",
+            "Amphithéâtre de plein air, Marseille",
+            "Studio Harmonic, Paris",
+            "Salle municipale de danse, Strasbourg"
+        ],
+        "Observation des étoiles": [
+            "Observatoire de Haute-Provence, Alpes-de-Haute-Provence",
+            "Pic du Midi, Pyrénées",
+            "Plage de l'Espiguette, Camargue",
+            "Plateau de Valensole, Provence"
+        ],
+        "Activités artistiques comme la peinture": [
+            "Montmartre, Paris",
+            "Bord de la Loire, Tours",
+            "Place des Lices, Rennes",
+            "Jardin des Tuileries, Paris"
+        ]
+    };
+    // Récupération des éléments HTML
+    const activityDropdown = document.getElementById("activityDropdown");
+    const activityDateInput = document.getElementById("activityDate");
+    const selectActivityButton = document.getElementById("selectActivity");
+    const selectedActivityBox = document.getElementById("selectedActivity");
+    const selectedActivityDescriptionBox = document.getElementById("selectedActivityDescription");
+    const activityIconBox = document.getElementById("activityIcon");
+    const activityLocationsBox = document.getElementById("activityLocations");
+    // Sauvegarde des données dans LocalStorage
+    function saveActivityToLocalStorage(activity, description, icon, date) {
+        localStorage.setItem("selectedActivity", JSON.stringify({ activity, description, icon, date }));
+    }
+    // Chargement des données depuis LocalStorage
+    function loadActivityFromLocalStorage() {
+        const savedActivity = JSON.parse(localStorage.getItem("selectedActivity"));
+        if (savedActivity) {
+            activityDropdown.value = savedActivity.activity;
+            selectedActivityBox.textContent = `🌟 Vous avez planifié : ${savedActivity.activity} pour le ${savedActivity.date}`;
+            selectedActivityDescriptionBox.textContent = `Description : ${savedActivity.description}`;
+            activityIconBox.textContent = savedActivity.icon;
+            displayActivityLocations(savedActivity.activity);
+        }
+    }
+    // Affiche les lieux associés à une activité
+    function displayActivityLocations(activity) {
+        const locations = activityLocations[activity] || [];
+        activityLocationsBox.innerHTML = "<strong>Propositions de lieux :</strong><br>" +
+            locations.map(loc => `<a href="https://www.google.com/maps/search/${encodeURIComponent(loc)}" target="_blank">${loc}</a>`).join("<br>");
+    }
+    // Affiche l'activité sélectionnée et les lieux, et la sauvegarde
+    function displaySelectedActivity() {
+        const selectedActivity = activityDropdown.value;
+        const selectedDate = activityDateInput.value;
+        const description = activityDescriptions[selectedActivity];
+        const icon = activityIcons[selectedActivity];
+        if (!selectedDate) {
+            alert("Veuillez choisir une date pour planifier cette activité.");
+            return;
+        }
+        selectedActivityBox.textContent = `🌟 Vous avez planifié : ${selectedActivity} pour le ${selectedDate}`;
+        selectedActivityDescriptionBox.textContent = `Description : ${description}`;
+        activityIconBox.textContent = icon;
+        saveActivityToLocalStorage(selectedActivity, description, icon, selectedDate);
+        displayActivityLocations(selectedActivity); // Affiche les lieux associés
+    }
+    // Charger les données au démarrage
+    window.onload = loadActivityFromLocalStorage;
+    // Ajout d'un événement au bouton
+    selectActivityButton.addEventListener("click", displaySelectedActivity);
+</script>
+</body>
+</html>

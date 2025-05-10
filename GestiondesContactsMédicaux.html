@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Contacts Médicaux</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+  font-family: 'Arial', sans-serif;
+  margin: 20px;
+  padding: 0;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+}
+h1 {
+  color: #34495e;
+  text-align: center;
+  font-size: 2.5rem;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 500px;
+  margin: 20px auto;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+form input, form button {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #bdc3c7;
+  border-radius: 5px;
+}
+form button {
+  background-color: #70e0b6;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+form button:hover {
+  background-color: #70e0b6;
+}
+#search {
+  display: block;
+  margin: 20px auto;
+  padding: 10px;
+  width: 50%;
+  border: 1px solid #bdc3c7;
+  border-radius: 5px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+  font-size: 16px;
+}
+table th {
+  background-color: #70e0b6;
+  color: #fff;
+}
+table tr:hover {
+  background-color: #f4f4f4;
+}
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color:  #70e0b6;
+  color: #fff;
+  font-size: 14px;
+}
+button:hover {
+  background-color:  #70e0b6;
+}
+  </style>
+</head>
+<body>
+  <h1>Gestion des Contacts Médicaux</h1>
+  <form id="contact-form">
+    <input type="text" id="name" placeholder="Nom du médecin" required>
+    <input type="text" id="specialty" placeholder="Spécialité" required>
+    <input type="text" id="phone" placeholder="Téléphone" required>
+    <input type="text" id="address" placeholder="Adresse" required>
+    <button type="submit">Ajouter</button>
+  </form>
+  <input type="text" id="search" placeholder="Rechercher un contact...">
+  <table id="contact-table">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Spécialité</th>
+        <th>Téléphone</th>
+        <th>Adresse</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script>
+   const form = document.getElementById('contact-form');
+const tableBody = document.querySelector('#contact-table tbody');
+const searchInput = document.getElementById('search');
+let contacts = JSON.parse(localStorage.getItem('contacts')) || []; // Charger les contacts depuis le local storage
+// Fonction pour sauvegarder les contacts dans le local storage
+function sauvegarderContacts() {
+  localStorage.setItem('contacts', JSON.stringify(contacts));
+}
+// Ajouter un contact
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const specialty = document.getElementById('specialty').value;
+  const phone = document.getElementById('phone').value;
+  const address = document.getElementById('address').value;
+  const contact = { name, specialty, phone, address };
+  contacts.push(contact);
+  sauvegarderContacts(); // Sauvegarde dans le local storage
+  form.reset();
+  afficherContacts();
+});
+// Afficher tous les contacts
+function afficherContacts(filteredContacts = contacts) {
+  tableBody.innerHTML = '';
+  filteredContacts.forEach((contact, index) => {
+    const row = `
+      <tr>
+        <td>${contact.name}</td>
+        <td>${contact.specialty}</td>
+        <td>${contact.phone}</td>
+        <td>${contact.address}</td>
+        <td>
+          <button onclick="modifierContact(${index})"><i class="fas fa-edit"></i> Modifier</button>
+          <button onclick="supprimerContact(${index})"><i class="fas fa-trash-alt"></i> Supprimer</button>
+        </td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+}
+// Rechercher un contact
+searchInput.addEventListener('input', () => {
+  const query = searchInput.value.toLowerCase();
+  const filtered = contacts.filter(contact => 
+    contact.name.toLowerCase().includes(query) ||
+    contact.specialty.toLowerCase().includes(query) ||
+    contact.phone.includes(query) ||
+    contact.address.toLowerCase().includes(query)
+  );
+  afficherContacts(filtered);
+});
+// Supprimer un contact
+function supprimerContact(index) {
+  contacts.splice(index, 1);
+  sauvegarderContacts(); // Mise à jour du local storage
+  afficherContacts();
+}
+// Modifier un contact
+function modifierContact(index) {
+  const contact = contacts[index];
+  document.getElementById('name').value = contact.name;
+  document.getElementById('specialty').value = contact.specialty;
+  document.getElementById('phone').value = contact.phone;
+  document.getElementById('address').value = contact.address;
+  supprimerContact(index); // Supprimer l'ancien avant modification
+}
+// Afficher les contacts au chargement de la page
+afficherContacts();
+  </script>
+</body>
+</html>
+

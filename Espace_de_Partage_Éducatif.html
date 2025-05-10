@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace de Partage Éducatif</title>
+   <style>
+    body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+header {
+    background-color: #70e0b6;
+    color: white;
+    padding: 20px;
+}
+section {
+    margin: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+button {
+    margin: 10px;
+    padding: 10px;
+    background-color: #70e0b6;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+img {
+    width: 30%; /* Réduit la taille de 20 % */
+    height: auto; /* Maintient les proportions */
+}
+
+</style>
+<body>
+    <header>
+        <h1>📚 Espace de Partage Éducatif</h1>
+    </header>    
+    <img src="Espace de Partage Éducatif avec des parents.png" alt="Espace de Partage Éducatif" style="width: 30%; height: auto;">
+    <section id="categories">
+        <h2>Choisis une catégorie :</h2>
+
+        <button onclick="afficherRessources('0-3')">0-3 ans</button>
+        <button onclick="afficherRessources('4-6')">4-6 ans</button>
+        <button onclick="afficherRessources('7-12')">7-12 ans</button>
+        <button onclick="afficherRessources('13+')">13 ans et +</button>
+    </section>
+    <section id="ressources">
+        <h2>Ressources disponibles</h2>
+        <ul id="listeRessources">
+            <!-- Les ressources seront affichées ici dynamiquement -->
+        </ul>
+    </section>
+    <script>
+        const ressources = {
+            "0-3": [
+                { nom: "Jeu des formes et couleurs", lien: "Jeu_des_Formes_et_Couleurs.html" },
+                { nom: "puzzles", lien: "puzzle.html" }
+            ],
+            "4-6": [
+                { nom: "Application apprentissage alphabet", lien: "Application_apprentissage_alphabet.html" },
+                { nom: "Jeux éducatifs numériques", lien: "jeu_éducatif_numérique.html" },
+                { nom: "Fiches coloriages", lien: "Fiches_coloriages.html" }
+            ],
+            "7-12": [
+                { nom: "Cours interactifs en math", lien: "Cours_interactifs_en_math.html" },
+                { nom: "Expériences scientifiques à faire à la maison", lien: "experiences.html" },
+                { nom: "Jeux de logique et casse-têtes", lien: "Jeux de Logique et Casse-Têtes.html" }
+            ],
+            "13+": [
+                { nom: "Documents pédagogiques avancés", lien: "Guide_pour_les_Parents.html" },
+                { nom: "Activités en Extérieur", lien: "Activités_en_Extérieur.html" },
+                { nom: "Projets DIY en Carton ", lien: "ProjetsDIY_enCarton.html" }
+            ]
+        };
+        
+        function afficherRessources(age) {
+            let liste = document.getElementById("listeRessources");
+            liste.innerHTML = "";
+            ressources[age].forEach(item => {
+                let li = document.createElement("li");
+                let a = document.createElement("a");
+                a.textContent = item.nom;
+                a.href = item.lien;
+                a.target = "_blank"; // Ouvre dans un nouvel onglet
+                li.appendChild(a);
+                liste.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>

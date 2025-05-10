@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Contacts Médicaux</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(17, 24, 31);
+        }
+        h1 {
+            color: #70e0b6;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input, button, select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #5ac9a0;
+        }
+        .contact-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .contact-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+        }
+        .contact-item button {
+            margin-left: 10px;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            gap: 10px;
+        }
+        .pagination button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: #70e0b6;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Gestion des Contacts Médicaux</h1>
+    <!-- Formulaire pour ajouter un contact -->
+    <form id="contactForm">
+        <input type="text" id="name" placeholder="Nom du contact" required>
+        <input type="text" id="speciality" placeholder="Spécialité médicale" required>
+        <input type="tel" id="phone" placeholder="Téléphone" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <button type="submit">Ajouter Contact</button>
+    </form>
+    <!-- Champ de recherche -->
+    <input type="text" id="search" placeholder="Rechercher un contact...">
+    <!-- Actions supplémentaires -->
+    <div class="actions">
+        <button id="exportCSV">Exporter en CSV</button>
+        <button id="exportJSON">Exporter en JSON</button>
+        <button id="importCSV">Importer depuis CSV</button>
+        <button onclick="sortContacts('name')">Trier par nom</button>
+        <button onclick="sortContacts('speciality')">Trier par spécialité</button>
+    </div>
+    <!-- Liste des contacts -->
+    <div class="contact-list" id="contactList">
+        <h2>Liste des Contacts</h2>
+    </div>
+    <!-- Thème personnalisé -->
+    <select id="themeSelector">
+        <option value="light">Clair</option>
+        <option value="dark">Sombre</option>
+    </select>
+</div>
+<script>
+    // Sélection des éléments du DOM
+    const contactForm = document.getElementById('contactForm');
+    const contactList = document.getElementById('contactList');
+    const searchInput = document.getElementById('search');
+    const exportCSVButton = document.getElementById('exportCSV');
+    const exportJSONButton = document.getElementById('exportJSON');
+    const importCSVButton = document.getElementById('importCSV');
+    const themeSelector = document.getElementById('themeSelector');
+    let contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+    let currentPage = 1;
+    const contactsPerPage = 10;
+    // Fonction de validation
+    function validateContact(name, speciality, phone, email) {
+        const phoneRegex = /^\d{10}$/; // Exemple pour un numéro français
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!phoneRegex.test(phone)) {
+            alert("Le numéro de téléphone doit contenir exactement 10 chiffres.");
+            return false;
+        }
+        if (!emailRegex.test(email)) {
+            alert("L'adresse email est invalide.");
+            return false;
+        }
+        return true;
+    }
+    // Fonction pour ajouter un contact
+    function addContact(name, speciality, phone, email) {
+        if (!validateContact(name, speciality, phone, email)) {
+            return;
+        }
+        if (contacts.some(contact => contact.phone === phone)) {
+            alert("Le contact avec ce numéro existe déjà.");
+            return;
+        }
+        contacts.push({ id: Date.now(), name, speciality, phone, email });
+        saveContacts();
+        renderContacts();
+    }
+    // Fonction pour modifier un contact
+    function editContact(id) {
+        const contact = contacts.find(contact => contact.id === id);
+        const newName = prompt("Modifier le nom :", contact.name);
+        const newSpeciality = prompt("Modifier la spécialité :", contact.speciality);
+        const newPhone = prompt("Modifier le téléphone :", contact.phone);
+        const newEmail = prompt("Modifier l'email :", contact.email);
+        if (newName && newSpeciality && newPhone && newEmail) {
+            contact.name = newName;
+            contact.speciality = newSpeciality;
+            contact.phone = newPhone;
+            contact.email = newEmail;
+            saveContacts();
+            renderContacts();
+            alert("Contact modifié avec succès !");
+        }
+    }
+    // Fonction pour supprimer un contact
+    function deleteContact(id) {
+        contacts = contacts.filter(contact => contact.id !== id);
+        saveContacts();
+        renderContacts();
+        alert("Contact supprimé !");
+    }
+    // Fonction pour sauvegarder les contacts dans le localStorage
+    function saveContacts() {
+        localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
+    // Fonction pour afficher les contacts avec pagination
+    function renderContacts(filteredContacts = contacts) {
+        const totalPages = Math.ceil(filteredContacts.length / contactsPerPage);
+        const startIndex = (currentPage - 1) * contactsPerPage;
+        const endIndex = startIndex + contactsPerPage;
+        contactList.innerHTML = '<h2>Liste des Contacts</h2>';
+        filteredContacts.slice(startIndex, endIndex).forEach(contact => {
+            const contactItem = document.createElement('div');
+            contactItem.className = 'contact-item';
+            contactItem.innerHTML = `
+                <span><strong>${contact.name}</strong> - ${contact.speciality} | ${contact.phone} | ${contact.email}</span>
+                <div>
+                    <button onclick="editContact(${contact.id})">Modifier</button>
+                    <button onclick="deleteContact(${contact.id})">Supprimer</button>
+                </div>
+            `;
+            contactList.appendChild(contactItem);
+        });
+        // Ajout des boutons de navigation
+        contactList.innerHTML += `
+            <div class="pagination">
+                <button ${currentPage === 1 ? "disabled" : ""} onclick="navigatePage(-1)">Précédent</button>
+                <span>Page ${currentPage} / ${totalPages}</span>
+                <button ${currentPage === totalPages ? "disabled" : ""} onclick="navigatePage(1)">Suivant</button>
+            </div>
+        `;
+    }
+    function navigatePage(direction) {
+        currentPage += direction;
+        renderContacts();
+    }
+    // Fonction pour trier les contacts
+    function sortContacts(key) {
+        contacts.sort((a, b) => a[key].localeCompare(b[key]));
+        renderContacts();
+    }
+    // Fonction pour rechercher des contacts
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        const filteredContacts = contacts.filter(contact =>
+            contact.name.toLowerCase().includes(query) ||
+            contact.speciality.toLowerCase().includes(query) ||
+            contact.phone.includes(query) ||
+            contact.email.toLowerCase().includes(query)
+        );
+        renderContacts(filteredContacts);
+    });
+    // Fonction pour exporter les contacts en CSV
+    exportCSVButton.addEventListener('click', () => {
+        let csvContent = "Nom,Spécialité,Téléphone,Email\n";
+        contacts.forEach(contact => {
+            csvContent += `${contact.name},${contact.speciality},${contact.phone},${contact.email}\n`;
+        });
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = "contacts.csv";
+        link.click();
+        alert("Contacts exportés en CSV !");
+    });
+    // Fonction pour exporter les contacts en JSON
+    exportJSONButton.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(contacts, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = "contacts.json";
+        link.click();
+        alert("Contacts exportés en JSON !");
+    });
+    // Fonction pour importer des contacts depuis un fichier CSV
+    importCSVButton.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.csv';
+        input.onchange = (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                const rows = reader.result.split('\n').slice(1); // Ignore l'en-tête
+                rows.forEach(row => {
+                    const [name, speciality, phone, email] = row.split(',');
+                    if (name && speciality && phone && email) {
+                        addContact(name.trim(), speciality.trim(), phone.trim(), email.trim());
+                    }
+                });
+                alert("Contacts importés avec succès !");
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    });
+    // Fonction pour appliquer un thème personnalisé
+    themeSelector.addEventListener("change", (event) => {
+        const theme = event.target.value;
+        if (theme === "dark") {
+            document.body.style.backgroundColor = "#333";
+            document.body.style.color = "#fff";
+        } else {
+            document.body.style.backgroundColor = "#f5f5f5";
+            document.body.style.color = "#333";
+        }
+    });
+    // Gestionnaire d'événement pour le formulaire
+    contactForm.addEventListener('submit', event => {
+        event.preventDefault(); // Empêche le rechargement de la page
+        const name = document.getElementById('name').value;
+        const speciality = document.getElementById('speciality').value;
+        const phone = document.getElementById('phone').value;
+        const email = document.getElementById('email').value;
+        addContact(name, speciality, phone, email);
+        // Réinitialise le formulaire
+        contactForm.reset();
+        alert("Contact ajouté avec succès !");
+    });
+    // Afficher les contacts au démarrage
+    renderContacts();
+</script>
+</body>
+</html>
+

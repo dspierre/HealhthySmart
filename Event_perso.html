@@ -1,0 +1,324 @@
+<head>
+    <meta charset="UTF-8">
+    <title>AnniversaireSmart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #hero {
+            background: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?crop=entropy&cs=tinysrgb&w=1920&fit=max') no-repeat center center/cover;
+            color: #fff;
+            padding: 100px 20px;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        form input, form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        form button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1e90ff;
+            color: #fff;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #1c86ee;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            font-size: 0.9em;
+        }
+        .feature-grid .feature {
+            background-color: #ffffff;
+            padding: 17px; /* Reduced from 20px to approximately 85% */
+            border-radius: 8.5px; /* Proportional adjustment from 10px */
+            box-shadow: 0 1.7px 3.4px rgba(0, 0, 0, 0.085); /* Slightly reduced for consistency */
+            width: 230px; /* Reduced from 300px (15%) */
+            text-align: center;
+            margin: 17px; /* Adjusted for spacing consistency */
+        }
+        .feature-grid {
+            gap: 8.5px; /* Reduced the spacing between features by 15% */
+        }
+        .feature-grid img {
+            width: 25.5%; /* Reduced image size from 30% */
+            height: auto;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #FFDEAD, #ffffff); /* Dégradé vert clair */
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        header nav ul li {
+            display: inline;
+            position: relative;
+        }
+        header nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        header nav ul li:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 10px;
+        }
+        .dropdown-content a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            white-space: nowrap;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        header nav .profile {
+            display: flex;
+            align-items: center;
+        }
+        header nav .profile .login, .inscription-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            background-color: #fff;
+            border: 2px solid #333;
+            margin-left: 10px;
+        }
+        header nav .profile .login:hover, .inscription-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+        header nav .logo {
+            width: 80px; /* Ajustez cette valeur pour réduire la taille du logo */
+            height: auto;
+        }
+        /* Section Hero */
+        #hero .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        #hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        #hero p {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        #features, #pricing, #testimonials, #contact {
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .feature-grid, .pricing-grid, .testimonial-grid {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .feature, .pricing-plan, .testimonial {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .feature .icon {
+            font-size: 2.5em; /* Augmentez la taille des icônes */
+            display: block;
+            margin-bottom: 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        form label {
+            text-align: left;
+        }
+        form input, form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1e90ff;
+            color: #fff;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #1c86ee;
+        }
+        /* Media Queries for Responsive Design */
+        @media (max-width: 768px) {
+            .feature, .pricing-plan, .testimonial {
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            header nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+            #hero h1 {
+                font-size: 2em;
+            }
+            #hero p {
+                font-size: 1em;
+            }
+        }
+
+        button, .blue-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #1e90ff;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        button:hover, .blue-button:hover {
+            background-color: #1c86ee;
+            transform: scale(1.05);
+        }
+        .feature-grid .feature {
+            background-color: #ffffff;
+            padding: 10px; /* Réduit l'espace interne */
+            border-radius: 6px; /* Réduction de l'arrondi */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Ajustement de l'ombre */
+            width: 180px; /* Taille réduite à 180px au lieu de 230px */
+            text-align: center;
+            margin: 10px; /* Espace externe réduit */
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <img src="spendsmart.png" alt="Logo SpendSmart" class="logo">
+        <ul>
+            <li><a href="#features">Fonctionnalités</a></li>
+            <li><a href="#pricing">Tarifs</a></li>
+            <li><a href="#testimonials">Témoignages</a></li>
+            <li class="dropdown">
+                <a href="#outil" class="dropbtn">Outil</a>
+                <div class="dropdown-content">
+                    <a href="EventSmart.html">wedding Planer</a>
+                    <a href="Event_perso.html">Event Personnel</a>
+                    <a href="Event_perso.html">Event Professionnelle</a>
+                </div>
+            </li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="profile">
+            <a href="login.html" class="login"><span class="icon">🔑</span>Login</a>
+            <a href="register3.html" class="inscription-button">Inscription</a>
+        </div>
+    </nav>
+</header>
+<section id="hero">
+    <h1>Organisez l'anniversaire parfait !</h1>
+    <p>Créez des souvenirs inoubliables avec des outils simples et puissants.</p>
+    <a href="#features" class="blue-button">Découvrez nos outils</a>
+</section>
+<main>
+    <section id="features">
+        <h2>Fonctionnalités</h2>
+        <div class="feature-grid">
+            <div class="feature">
+                <span class="icon">🍰</span>
+                <h3>Gestion du Gâteau</h3>
+                <p>Choisissez et personnalisez un gâteau unique.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">🎈</span>
+                <h3>Décoration</h3>
+                <p>Planifiez une décoration mémorable avec des thèmes uniques.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">📋</span>
+                <h3>Liste des Invités</h3>
+                <p>Gérez vos invitations et confirmations de manière efficace.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">⏳</span>
+                <h3>Agenda</h3>
+                <p>Planifiez chaque moment clé avec des rappels automatiques.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">🌟</span>
+                <h3>Gestion de la Soirée</h3>
+                <p>Coordonnez les activités et assurez le bon déroulement.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">🎭</span>
+                <h3>Organisation des Thèmes</h3>
+                <p>Créez des soirées avec des thèmes originaux et engageants.</p>
+            </div>
+        </div>
+    </section>
+</main>
+<section id="pricing">
+    <h2>Tarifs</h2>
+    <div class="pricing-grid">
+        <div class="pricing-plan">
+            <h3>personnel</h3>
+            <p>Prix : 6,99€/mois</p>
+            <p>Le stockage sécurisé des données médicales</p>
+            <p>Les rappels santé</p>
+            <p>et le suivi des habitudes.</p>
+        </div>
+</section>
+<footer>
+    <p>&copy; 2025 AnniversaireSmart. Tous droits réservés.</p>
+</footer>
+</body>

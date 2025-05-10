@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi de la Santé</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background: #70e0b6;
+            color: #fff;
+            padding: 1em;
+            text-align: center;
+        }
+        main {
+            padding: 1em;
+        }
+        section {
+            margin-bottom: 2em;
+            padding: 1em;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        h1, h2 {
+            color: #70e0b6;
+        }
+        select {
+            padding: 0.5em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            background-color: #f9f9f9;
+            margin-bottom: 1em;
+        }
+        select:focus {
+            outline: none;
+            border-color: #70e0b6;
+        }
+        body {
+            font-family: 'Open Sans', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f8fb;
+            color: #333;
+        }
+        header {
+            background: #70e0b6;
+            color: #fff;
+            padding: 1.5em;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+        }
+        main {
+            padding: 2em 1em;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        section {
+            margin-bottom: 2em;
+            padding: 1.5em;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        section:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        h2 {
+            color: black;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+            padding-left: 0.5em;
+        }
+        h1 {
+            color: black;
+            margin-bottom: 1em;
+            font-size: 1.5em;
+            padding-left: 0.5em;
+        }
+        select {
+            padding: 0.8em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            background-color: #f9f9f9;
+            margin-bottom: 1em;
+            transition: border-color 0.3s ease;
+            font-size: 1em;
+        }
+        select:focus {
+            outline: none;
+            border-color: #70e0b6;
+            box-shadow: 0 0 4px rgba(77, 182, 172, 0.5);
+        }
+        p {
+            margin: 0.5em 0;
+            font-size: 1em;
+            color: #555;
+        }
+        footer {
+            text-align: center;
+            padding: 1em 0;
+            background: #70e0b6;
+            color: #fff;
+            font-size: 0.9em;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 2em;
+        }
+        button, option {
+            font-family: inherit;
+        }
+        section {
+            margin-bottom: 2em;
+            padding: 1.5em;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        input[type="date"] {
+            padding: 0.5em;
+            margin-right: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 70%;
+        }
+        button {
+            background: #70e0b6;
+            color: white;
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #70e0b6;
+        }
+        #dpa-result {
+            color: #70e0b6;
+            font-weight: bold;
+        }
+        button#send-notifications {
+            background-color: #70e0b6;
+            color: #fff;
+            padding: 0.8em 1.5em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+        }
+        button#send-notifications:hover {
+            background-color: #70e0b6;
+        }
+        #health-tracking {
+            margin-top: 2em;
+            padding: 1.5em;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #health-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+            margin-bottom: 1em;
+        }
+        input[type="number"] {
+            padding: 0.5em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        canvas {
+            margin-top: 1em;
+            max-width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <h1>Gestion des Grossesses</h1>
+</header>
+<main>
+    <section id="health-tracking">
+        <h2>Suivi de la Santé</h2>
+        <form id="health-form">
+            <label for="long">Taille (cm) :</label>
+            <input type="number" id="long" step="0.1" required>
+            <label for="weight">Poids actuel (kg) :</label>
+            <input type="number" id="weight" step="0.1" required>
+            <label for="blood-pressure">Tension artérielle :</label>
+            <input type="text" id="blood-pressure" placeholder="120/80" required>
+            <button type="submit">Mettre à jour</button>
+        </form>
+        <p id="weight-alert" style="color: red; font-weight: bold;">Aucun problème détecté.</p>
+        <canvas id="weight-chart"></canvas>
+    </section>
+</main>
+<footer>
+    <p>© 2025 Gestion des Grossesses</p>
+</footer>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const weightData = [];
+        const weightChart = new Chart(document.getElementById("weight-chart").getContext("2d"), {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Poids (kg)",
+                    data: weightData,
+                    borderColor: "#4db6ac",
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: "Semaines" } },
+                    y: { title: { display: true, text: "Poids (kg)" } }
+                }
+            }
+        });
+        document.getElementById("health-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const weight = parseFloat(document.getElementById("weight").value);
+            const height = parseFloat(document.getElementById("long").value);
+            const bloodPressure = document.getElementById("blood-pressure").value;
+
+            if (!weight || !height || !bloodPressure) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            // Mettre à jour les données du graphique
+            const currentWeek = weightData.length + 1;
+            weightData.push(weight);
+            weightChart.data.labels.push(`Semaine ${currentWeek}`);
+            weightChart.update();
+
+            // Vérifier les alertes
+            const alertMessage = weight > 90 ? "Attention : poids élevé, consultez votre médecin." : "Aucun problème détecté.";
+            document.getElementById("weight-alert").textContent = alertMessage;
+
+            // Analyse de la tension
+            const [systolic, diastolic] = bloodPressure.split("/").map(Number);
+            if (systolic > 140 || diastolic > 90) {
+                alert("Attention : tension artérielle élevée, consultez votre médecin.");
+            }
+        });
+    });
+</script>
+</body>
+</html>

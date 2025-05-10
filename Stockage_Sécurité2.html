@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stockage Sécurisé</title>
+  <style>
+    .thumbnail {
+      width: 100px;
+      height: auto;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .thumbnail:hover {
+      transform: scale(1.1);
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border: 5px solid white;
+      border-radius: 10px;
+    }
+    .modal:hover {
+      cursor: pointer;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fafc;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background-color: #70e0b6;
+      color: white;
+    }
+    h1 {
+      font-size: 26px;
+      margin: 0;
+    }
+    main {
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+    }
+    .feature-section {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 20px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .feature-box {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+    }
+    .feature-box:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateY(-5px);
+    }
+    .icon {
+      font-size: 50px;
+      color: #70e0b6;
+      margin-bottom: 10px;
+    }
+    h3 {
+      font-size: 20px;
+      margin: 10px 0;
+      color: #333;
+    }
+    p {
+      font-size: 14px;
+      color: #555;
+    }
+    footer {
+      background-color: #70e0b6;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+    }
+    .modal-content h3 {
+      color: #70e0b6;
+      margin-bottom: 20px;
+    }
+    .close-btn {
+      background-color: #70e0b6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      background-color: #5cc7a3;
+    }
+    .upload-field {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Bienvenue sur votre espace Stockage Sécurisé</h1>
+</header>
+<main>
+  <section class="feature-section">
+    <!-- Card : Stockage Sécurisé -->
+    <div class="feature-box" onclick="requestPassword()">
+      <div class="icon">📂</div>
+      <h3>Stockage Sécurisé</h3>
+      <p>Enregistrez vos cartes vitale, ordonnances et rapports sous clé.</p>
+    </div>
+  </section>
+</main>
+<footer>
+  <p>&copy; 2025 Stockage Sécurisé - Protégez vos données en toute sérénité</p>
+</footer>
+<!-- Modal for File Upload -->
+<div class="modal" id="uploadModal">
+  <div class="modal-content">
+    <h3>Sauvegardez vos documents</h3>
+    <form id="uploadForm" onsubmit="submitFiles(event)">
+      <div class="upload-field">
+        <label for="carte-vitale-recto">Carte Vitale (recto) :</label><br>
+        <input type="file" id="carte-vitale-recto" accept=".png, .jpeg, .jpg, .pdf" required>
+      </div>
+      <div class="upload-field">
+        <label for="carte-vitale-verso">Carte Vitale (verso) :</label><br>
+        <input type="file" id="carte-vitale-verso" accept=".png, .jpeg, .jpg, .pdf" required>
+      </div>
+      <div class="upload-field">
+        <label for="carte-identite">Carte d'Identité :</label><br>
+        <input type="file" id="carte-identite" accept=".png, .jpeg, .jpg, .pdf" required>
+      </div>
+      <button type="submit" class="close-btn">Téléverser</button>
+    </form>
+  </div>
+</div>
+<!-- Section pour la galerie -->
+<div id="previewGallery" class="preview-gallery"></div>
+<!-- Modal pour afficher l'image en grand format -->
+<div class="modal" id="imageModal" onclick="closeModal()">
+  <img id="modalImage" src="" alt="Image agrandie">
+</div>
+<script>
+  // Fonction pour demander un mot de passe
+  function requestPassword() {
+    const correctPassword = "secure123"; // Mot de passe défini
+    const userPassword = prompt("Veuillez entrer votre mot de passe pour accéder au stockage sécurisé :");
+    if (userPassword === correctPassword) {
+      openModal(); // Ouvre la boîte de dialogue si le mot de passe est correct
+    } else {
+      alert("Mot de passe incorrect. Veuillez réessayer.");
+    }
+  }
+  // Fonction pour ouvrir le modal
+  function openModal() {
+    const modal = document.getElementById('uploadModal');
+    modal.style.display = "flex";
+  }
+  // Fonction pour soumettre les fichiers
+  function submitFiles(event) {
+    event.preventDefault(); // Empêche le rechargement de la page
+    const modal = document.getElementById('uploadModal');
+    modal.style.display = "none"; // Ferme la boîte modale
+    alert("Vos documents ont été téléchargés avec succès !");
+  }
+  // Fonction pour gérer l'upload des fichiers
+  function handleUpload(event) {
+    event.preventDefault(); // Empêche le rechargement de la page
+
+    const files = [
+      document.getElementById('carte-vitale-recto').files[0],
+      document.getElementById('carte-vitale-verso').files[0],
+      document.getElementById('carte-identite').files[0]
+    ];
+
+    // Vérifie si des fichiers ont été sélectionnés
+    if (files.every(file => file !== undefined)) {
+      const previewGallery = document.getElementById('previewGallery');
+      previewGallery.innerHTML = ""; // Réinitialise la galerie avant d'ajouter les nouvelles images
+
+      // Parcours des fichiers et création des miniatures
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = document.createElement('img');
+          img.src = e.target.result; // Contenu de l'image en base64
+          img.className = "thumbnail";
+          img.onclick = () => showModal(e.target.result); // Ajoute un événement onclick pour afficher en grand
+          previewGallery.appendChild(img); // Ajoute l'image dans la galerie
+        };
+        reader.readAsDataURL(file); // Lit le contenu du fichier
+      });
+
+      alert("Vos documents ont été téléchargés avec succès !");
+    } else {
+      alert("Veuillez sélectionner des fichiers avant de téléverser.");
+    }
+  }
+  // Fonction pour afficher une image en grand format
+  function showModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    modalImage.src = imageSrc; // Définit la source de l'image agrandie
+    modal.style.display = "flex"; // Affiche le modal
+  }
+  // Fonction pour fermer le modal
+  function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = "none";
+  }
+</script>
+</body>
+</html>

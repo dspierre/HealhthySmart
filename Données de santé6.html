@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Dossiers et Fichiers PDF</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Style Global */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    .container {
+      width: 80%;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    /* Barre de Recherche */
+    #searchBar {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    /* Formulaire */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      color: #555;
+    }
+    button {
+      background: linear-gradient(90deg, #007BFF, #0056b3);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    /* Dossiers */
+    .folder {
+      margin: 15px 0;
+      padding: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, background-color 0.3s;
+    }
+    .folder:hover {
+      transform: translateY(-6px);
+    }
+    .folder i {
+      font-size: 28px;
+      color: #007BFF;
+    }
+    .folder span {
+      font-weight: bold;
+      color: #333;
+      flex-grow: 1;
+    }
+    /* Bouton de Suppression */
+    .delete-button {
+      background: linear-gradient(90deg, #FF4B2B, #FF416C);
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .delete-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(255, 65, 108, 0.4);
+    }
+    /* Liens de Fichiers */
+    .file-links {
+      display: none;
+      margin-top: 10px;
+      list-style: none;
+      padding: 0;
+    }
+    .file-links li {
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 8px 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+    .file-links li:hover {
+      transform: scale(1.03);
+      background-color: #f4f4ff;
+    }
+    .file-links li a {
+      text-decoration: none;
+      color: #007BFF;
+      font-weight: bold;
+    }
+    /* Prévisualisation */
+    #previewContainer {
+      display: none;
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    #previewContainer iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    #closePreviewButton {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      background-color: #FF4B2B;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    body.dark-mode {
+      background-color: #121212;
+      color: #ffffff;
+    }
+    .container.dark-mode {
+      background-color: #222;
+      box-shadow: 0 6px 12px rgba(255, 255, 255, 0.1);
+    }
+    button.dark-mode {
+      background: linear-gradient(90deg, #575fcf, #4bcffa);
+    }
+    .folder {
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .folder:hover {
+      transform: scale(1.05);
+      background-color: #eef2ff;
+    }
+    body {
+      background: linear-gradient(to bottom, #f8f9fa, #e7e9ee);
+    }
+    button {
+      background: linear-gradient(to right, #007BFF, #00C6FF);
+    }
+    @media (max-width: 768px) {
+      .container {
+        width: 95%;
+      }
+      button {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+    .folder {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .folder:hover {
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    button {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    button:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    button:hover {
+      background: linear-gradient(to right, #0056b3, #007BFF);
+      transform: translateY(-2px);
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #333;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Gestion des Dossiers et Fichiers PDF</h1>
+  <input type="text" id="searchBar" placeholder="Rechercher des dossiers ou des fichiers...">
+  <form id="fileForm">
+    <label for="fileInput">Choisissez un fichier PDF :</label>
+    <input type="file" id="fileInput" accept=".pdf" required>
+    <label for="fileTitle">Nom du Fichier :</label>
+    <input type="text" id="fileTitle" placeholder="Entrez un nom ou une description" required>
+    <button type="submit">Ajouter</button>
+  </form>
+  <div id="folderContainer"></div>
+</div>
+<div id="previewContainer">
+  <iframe id="previewFrame"></iframe>
+  <i class="fas fa-file-pdf"></i> <!-- Icône pour les fichiers PDF -->
+  <button id="closePreviewButton">Fermer la prévisualisation</button>
+</div>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script>
+  const fileForm = document.getElementById('fileForm');
+  const folderContainer = document.getElementById('folderContainer');
+  const searchBar = document.getElementById('searchBar');
+  const previewContainer = document.getElementById('previewContainer');
+  const previewFrame = document.getElementById('previewFrame');
+  const closePreviewButton = document.getElementById('closePreviewButton');
+  const folders = JSON.parse(localStorage.getItem('folders')) || {};
+  const PASSWORD = "admin123";
+  function generateRandomColor() {
+    const hue = Math.floor(Math.random() * 360);
+    return `hsl(${hue}, 70%, 85%)`;
+  }
+  async function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
+  }
+  fileForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const fileInput = document.getElementById('fileInput').files[0];
+    const fileTitle = document.getElementById('fileTitle').value;
+    if (fileInput && fileTitle) {
+      const folderName = prompt('Entrez le nom du dossier pour ce fichier :');
+      if (!folderName) return alert('Le nom du dossier est requis.');
+      if (!folders[folderName]) {
+        folders[folderName] = { files: [], color: generateRandomColor() };
+        createFolder(folderName, folders[folderName].color);
+      }
+      try {
+        const fileBase64 = await fileToBase64(fileInput);
+        folders[folderName].files.push({ name: fileTitle, data: fileBase64 });
+        localStorage.setItem('folders', JSON.stringify(folders));
+        alert(`Fichier ajouté au dossier "${folderName}"`);
+        fileForm.reset();
+      } catch (error) {
+        console.error("Erreur lors de la conversion du fichier en Base64 :", error);
+        alert("Une erreur est survenue lors de l'ajout du fichier.");
+      }
+    } else {
+      alert('Veuillez sélectionner un fichier PDF et entrer un nom.');
+    }
+  });
+  function createFolder(folderName, folderColor) {
+    if (document.querySelector(`[data-folder-name="${folderName}"]`)) return;
+    const folderDiv = document.createElement('div');
+    folderDiv.className = 'folder';
+    folderDiv.style.backgroundColor = folderColor;
+    folderDiv.setAttribute('data-folder-name', folderName);
+    const folderIcon = document.createElement('i');
+    folderIcon.className = 'fas fa-folder';
+    const folderNameSpan = document.createElement('span');
+    folderNameSpan.textContent = folderName;
+
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-button';
+    deleteButton.textContent = 'Supprimer';
+    deleteButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const password = prompt('Veuillez entrer le mot de passe pour supprimer ce dossier :');
+      if (password === PASSWORD) {
+        deleteFolder(folderName, folderDiv);
+        alert(`Le dossier "${folderName}" a été supprimé.`);
+      } else {
+        alert('Mot de passe incorrect. Suppression annulée.');
+      }
+    });
+    const fileLinks = document.createElement('ul');
+    fileLinks.className = 'file-links';
+    folderDiv.appendChild(folderIcon);
+    folderDiv.appendChild(folderNameSpan);
+    folderDiv.appendChild(deleteButton);
+    folderDiv.appendChild(fileLinks);
+    folderDiv.addEventListener('click', () => {
+      toggleFileLinks(folderName, fileLinks);
+    });
+    folderContainer.appendChild(folderDiv);
+  }
+  function toggleFileLinks(folderName, fileLinks) {
+    fileLinks.innerHTML = ''; // Réinitialiser le contenu des liens de fichiers
+    if (fileLinks.style.display === 'none' || fileLinks.style.display === '') {
+      folders[folderName].files.forEach((file, index) => {
+        const listItem = document.createElement('li');
+
+        // Créer un lien pour ouvrir le fichier
+        const fileLink = document.createElement('a');
+        fileLink.textContent = file.name;
+        fileLink.href = '#';
+        fileLink.style.cursor = 'pointer';
+        fileLink.addEventListener('click', (event) => {
+          event.preventDefault();
+          previewFile(file.data);
+        });
+
+        // Créer un bouton de suppression pour le fichier
+        const deleteFileButton = document.createElement('button');
+        deleteFileButton.textContent = 'Supprimer';
+        deleteFileButton.style.marginLeft = '10px';
+        deleteFileButton.style.backgroundColor = '#FF4B2B';
+        deleteFileButton.style.color = 'white';
+        deleteFileButton.style.border = 'none';
+        deleteFileButton.style.borderRadius = '5px';
+        deleteFileButton.style.padding = '5px 10px';
+        deleteFileButton.style.cursor = 'pointer';
+
+        // Ajouter un événement au bouton de suppression
+        deleteFileButton.addEventListener('click', () => {
+          deleteFile(folderName, index); // Supprimer le fichier en fonction de son index
+        });
+        listItem.appendChild(fileLink);
+        listItem.appendChild(deleteFileButton);
+        fileLinks.appendChild(listItem);
+      });
+      fileLinks.style.display = 'block';
+    } else {
+      fileLinks.style.display = 'none';
+    }
+  }
+  // Fonction pour supprimer un fichier d'un dossier
+  function deleteFile(folderName, fileIndex) {
+    // Supprimer le fichier de la liste des fichiers du dossier
+    folders[folderName].files.splice(fileIndex, 1);
+    // Mettre à jour le localStorage
+    localStorage.setItem('folders', JSON.stringify(folders));
+    // Actualiser les liens de fichiers pour refléter les changements
+    const fileLinks = document.querySelector(`[data-folder-name="${folderName}"] .file-links`);
+    toggleFileLinks(folderName, fileLinks);
+    alert('Fichier supprimé avec succès.');
+  }
+  // Fonction pour modifier le nom d’un fichier
+  function editFileName(folderName, fileIndex, newFileName) {
+    // Modifier le nom du fichier dans le tableau
+    folders[folderName].files[fileIndex].name = newFileName;
+    // Mettre à jour le localStorage
+    localStorage.setItem('folders', JSON.stringify(folders));
+    // Actualiser les liens de fichiers pour refléter les changements
+    const fileLinks = document.querySelector(`[data-folder-name="${folderName}"] .file-links`);
+    toggleFileLinks(folderName, fileLinks);
+    alert('Nom du fichier modifié avec succès.');
+  }
+  // Fonction pour supprimer un fichier d'un dossier
+  function deleteFile(folderName, fileIndex) {
+    // Supprimer le fichier de la liste des fichiers du dossier
+    folders[folderName].files.splice(fileIndex, 1);
+    // Mettre à jour le localStorage
+    localStorage.setItem('folders', JSON.stringify(folders));
+    // Actualiser les liens de fichiers pour refléter les changements
+    const fileLinks = document.querySelector(`[data-folder-name="${folderName}"] .file-links`);
+    toggleFileLinks(folderName, fileLinks);
+    alert('Fichier supprimé avec succès.');
+  }
+  // Fonction pour afficher un fichier en grand dans un conteneur dédié
+  function previewFile(fileBase64) {
+    previewFrame.src = fileBase64;
+    previewContainer.style.display = 'block';
+  }
+  // Fermeture de la prévisualisation
+  closePreviewButton.addEventListener('click', () => {
+    previewContainer.style.display = 'none';
+  });
+  // Recherche dynamique dans les dossiers
+  searchBar.addEventListener('input', (event) => {
+    const query = event.target.value.toLowerCase();
+    document.querySelectorAll('.folder').forEach(folder => {
+      const folderName = folder.querySelector('span').textContent.toLowerCase();
+      folder.style.display = folderName.includes(query) ? 'block' : 'none';
+    });
+  });
+  // Suppression d'un dossier
+  function deleteFolder(folderName, folderElement) {
+    delete folders[folderName];
+    localStorage.setItem('folders', JSON.stringify(folders));
+    folderContainer.removeChild(folderElement);
+  }
+  // Chargement des dossiers depuis le localStorage
+  function loadFolders() {
+    for (const folderName in folders) {
+      createFolder(folderName, folders[folderName].color);
+    }
+  }
+  // Appel initial pour charger toutes les données sauvegardées
+  loadFolders();
+</script>

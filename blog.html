@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Santé - Vivez Mieux</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    header {
+      background: #70e0b6;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav {
+      background: #34495e;
+      color: white;
+      padding: 10px 20px;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav ul li {
+      margin: 0 15px;
+    }
+
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    nav ul li a:hover {
+      color: #70e0b6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .article {
+      background: white;
+      margin: 20px 0;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .article h3 {
+      color: #34495e;
+    }
+
+    .article p {
+      color: #555;
+    }
+
+    .article button {
+      background: #70e0b6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .article button:hover {
+      background: #56c093;
+    }
+
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 600px;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 2000;
+    }
+
+    .modal h3 {
+      color: #34495e;
+    }
+
+    .modal p {
+      color: #555;
+    }
+
+    .modal button {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Blog Santé - Vivez Mieux</h1>
+  <p>Conseils et articles pour améliorer votre bien-être.</p>
+</header>
+<nav>
+  <ul>
+    <li><a href="#" onclick="showCategory('nutrition')">Nutrition</a></li>
+    <li><a href="#" onclick="showCategory('fitness')">Fitness</a></li>
+    <li><a href="#" onclick="showCategory('mental')">Santé mentale</a></li>
+  </ul>
+</nav>
+<div class="container" id="articlesContainer">
+  <!-- Les articles s'afficheront ici dynamiquement -->
+</div>
+
+<!-- Fenêtre modale -->
+<div class="overlay" id="overlay"></div>
+<div class="modal" id="modal">
+  <h3 id="modalTitle"></h3>
+  <p id="modalContent"></p>
+  <button onclick="closeModal()">Fermer</button>
+</div>
+
+<footer>
+  <p>© 2025 Blog Santé - Vivez Mieux. Tous droits réservés.</p>
+</footer>
+<script>
+  const articles = {
+    nutrition: [
+      { title: "L'importance de l'hydratation quotidienne", content: "L'eau est un élément vital de notre quotidien. Elle transporte les nutriments essentiels à travers le corps, régule la température corporelle et aide à éliminer les toxines. Saviez-vous que vous devriez consommer au moins 1,5 à 2 litres d'eau par jour ? Découvrez des astuces simples pour rester hydraté : ajoutez des tranches de citron ou de concombre pour une touche de fraîcheur !" },
+      { title: "Super-aliments : Boostez votre énergie", content: "Les super-aliments comme les baies d'açaï, les graines de chia et les amandes offrent une concentration exceptionnelle de nutriments. Par exemple, les graines de chia sont riches en oméga-3 et aident à réguler le cholestérol. Intégrez ces aliments dans vos smoothies ou vos salades pour un boost naturel d'énergie." },
+      { title: "Éviter les carences en vitamines", content: "Les carences en vitamine D, fer ou magnésium peuvent provoquer fatigue, irritabilité et faiblesse musculaire. Adoptez une alimentation variée comprenant des œufs, des légumes verts et du poisson gras. En hiver, envisagez une supplémentation en vitamine D après consultation médicale." },
+      { title: "Manger équilibré au travail", content: "Un repas équilibré au bureau est possible avec un peu de préparation. Privilégiez les lunch-box contenant des légumes, une source de protéines (œufs, poulet, tofu) et une portion de céréales complètes. Évitez les fast-foods riches en gras saturés et sucre." },
+      { title: "Les bienfaits des repas faits maison", content: "Cuisiner chez soi permet de contrôler les ingrédients et les portions. Essayez de préparer des plats simples avec des produits frais : légumes de saison, herbes aromatiques et huiles végétales. Vous économiserez tout en mangeant plus sainement." },
+      { title: "L'impact des boissons sucrées sur la santé", content: "Les sodas et jus industriels contiennent des quantités excessives de sucre, ce qui augmente le risque de diabète et de prise de poids. Préférez l'eau infusée ou le thé glacé maison sans sucre ajouté." },
+      { title: "Le rôle des fibres dans votre alimentation", content: "Les fibres améliorent la digestion et préviennent les troubles intestinaux. Intégrez des aliments comme les légumineuses, les fruits frais et les céréales complètes pour bénéficier de ces avantages." },
+      { title: "Bien choisir ses produits au supermarché", content: "Lisez attentivement les étiquettes nutritionnelles des produits. Évitez ceux riches en sucres ajoutés, graisses saturées ou additifs chimiques. Privilégiez les produits locaux et bio." },
+      { title: "Les mythes sur les régimes miracles", content: "Les régimes rapides peuvent nuire à votre métabolisme. Une perte de poids durable passe par une alimentation équilibrée, une activité physique régulière et une bonne hydratation." },
+      { title: "L'importance des collations saines", content: "Une collation équilibrée peut prévenir les fringales. Optez pour des fruits secs, du yaourt nature ou une poignée de noix plutôt que des snacks industriels." }
+    ],
+    fitness: [
+      {
+        title: "L'importance de l'échauffement avant l'effort",
+        content: "Un bon échauffement est crucial avant toute activité sportive pour préparer vos muscles, vos articulations et votre système cardiovasculaire. Cela réduit considérablement le risque de blessures comme les entorses ou les déchirures musculaires. Commencez par des mouvements dynamiques tels que des squats légers, des rotations des bras ou une marche rapide. Ces exercices augmentent le flux sanguin et améliorent la mobilité. L'échauffement doit durer entre 5 et 10 minutes selon l'intensité de votre entraînement."
+      },
+      {
+        title: "10 exercices simples à faire chez soi",
+        content: "Pas besoin de matériel sophistiqué pour rester en forme ! Les squats renforcent vos jambes, tandis que les pompes sollicitent vos bras et votre poitrine. Essayez la planche pour travailler les abdominaux et améliorer la stabilité du tronc. Ajoutez des fentes pour renforcer vos cuisses et vos fessiers. Avec une routine de 30 minutes combinant ces exercices, vous pouvez construire une base solide pour votre santé physique, sans quitter votre maison."
+      },
+      {
+        title: "Yoga pour débutants : Comment se lancer",
+        content: "Le yoga est une pratique parfaite pour améliorer la souplesse, la force et réduire le stress. Les postures simples comme la position de l'arbre, le chien tête en bas et le cobra sont idéales pour débuter. Elles aident à étirer les muscles tout en apaisant l'esprit. Commencez par des séances de 15 à 30 minutes chaque jour et augmentez progressivement. N'oubliez pas de synchroniser vos mouvements avec une respiration profonde pour maximiser les bienfaits."
+      },
+      {
+        title: "Les bienfaits de la course à pied",
+        content: "Courir régulièrement améliore la santé cardiovasculaire, renforce l'endurance et stimule la production d'endorphines, les hormones du bonheur. Que vous soyez débutant ou confirmé, commencez par des sessions courtes de 15 minutes en alternant course et marche. Investissez dans des chaussures de course adaptées pour éviter les blessures. En plus d'être un excellent exercice physique, la course vous aide à déconnecter mentalement et à réduire le stress."
+      },
+      {
+        title: "Fitness en extérieur : Profitez de la nature",
+        content: "L'entraînement en plein air est une excellente façon de combiner activité physique et moments de détente. Essayez des exercices comme des sprints sur la plage, des pompes sur des bancs au parc ou des randonnées en forêt. Ces activités stimulent vos muscles tout en vous permettant de profiter des bienfaits de la nature. De plus, l'air frais et le soleil augmentent les niveaux de vitamine D, essentielle pour la santé osseuse."
+      },
+      {
+        title: "Techniques pour améliorer votre posture",
+        content: "Une posture correcte est essentielle pour éviter les douleurs chroniques au niveau du dos, des épaules et du cou. Intégrez des exercices comme le pont pour renforcer vos fessiers, et des étirements pour ouvrir les épaules. Adoptez une chaise ergonomique si vous travaillez longtemps assis. Pensez également à vous lever toutes les heures pour marcher ou faire quelques exercices légers."
+      },
+      {
+        title: "HIIT : Entraînement intensif pour résultats rapides",
+        content: "Le HIIT (High Intensity Interval Training) alterne des phases d'effort intense et des phases de récupération courte. Par exemple, courez à pleine vitesse pendant 30 secondes, puis marchez pendant 15 secondes, et répétez. Ce type d'entraînement booste le métabolisme, améliore l'endurance et brûle des calories même après la séance. Une session de 15 à 20 minutes suffit pour des résultats efficaces."
+      },
+      {
+        title: "Comment rester motivé pour faire du sport",
+        content: "La clé pour maintenir une routine sportive est de définir des objectifs réalistes et mesurables. Faites appel à un partenaire d'entraînement pour vous encourager. Créez une playlist motivante et essayez de varier vos activités pour ne pas vous ennuyer. Souvenez-vous que la régularité prime sur l'intensité : mieux vaut une session de 15 minutes chaque jour que deux heures d'entraînement irrégulier."
+      },
+      {
+        title: "Stretching : Étirements indispensables après l’effort",
+        content: "Après une séance de sport, le stretching est essentiel pour favoriser la récupération musculaire et réduire les tensions. Concentrez-vous sur les muscles sollicités : jambes après une course, bras et épaules après des pompes, etc. Maintenez chaque étirement pendant 20 à 30 secondes sans rebondir. Cela aide à prévenir les courbatures et à améliorer la souplesse."
+      },
+      {
+        title: "La musculation à domicile pour débutants",
+        content: "La musculation chez soi est accessible à tous avec des objets du quotidien comme des bouteilles d'eau pour remplacer les haltères. Commencez par des exercices simples comme les squats, les pompes et les fentes. Augmentez progressivement la difficulté en ajoutant des séries ou des poids plus lourds. Assurez-vous de maintenir une posture correcte pour éviter les blessures."
+      }
+    ],
+    mental: [
+      {
+        title: "Gestion du stress : Techniques simples pour se relaxer",
+        content: "Le stress est une réponse naturelle face aux défis de la vie quotidienne, mais un excès peut nuire à votre santé physique et mentale. Pour vous relaxer, essayez des techniques simples comme la respiration diaphragmatique : inspirez profondément en comptant jusqu'à 4, retenez votre souffle pendant 4 secondes, puis expirez en comptant jusqu'à 6. De plus, la méditation guidée, même pendant 5 minutes, peut réinitialiser votre esprit et réduire l'anxiété."
+      },
+      {
+        title: "Les bienfaits du sommeil réparateur",
+        content: "Un sommeil de qualité est vital pour régénérer votre corps et votre esprit. Pendant le sommeil profond, votre cerveau consolide les souvenirs et élimine les toxines accumulées. Pour mieux dormir, créez une routine de coucher, éteignez les écrans au moins une heure avant de dormir et assurez-vous que votre chambre est fraîche et sombre. Les tisanes apaisantes comme la camomille peuvent aussi favoriser un endormissement rapide."
+      },
+      {
+        title: "L'art de la gratitude : Positiver au quotidien",
+        content: "Cultiver la gratitude peut transformer votre perception de la vie. Prenez quelques minutes chaque jour pour noter trois choses pour lesquelles vous êtes reconnaissant, qu'il s'agisse de moments simples comme un coucher de soleil ou d'interactions significatives. La gratitude aide à réduire le stress, améliore votre humeur et renforce les relations positives autour de vous."
+      },
+      {
+        title: "Comment se déconnecter des écrans",
+        content: "La dépendance aux écrans peut générer de la fatigue mentale, des troubles du sommeil et des tensions sociales. Fixez des plages horaires sans écrans, et privilégiez des activités déconnectées comme la lecture ou une promenade en plein air. Utilisez la règle du 20-20-20 pour soulager vos yeux : toutes les 20 minutes, regardez un objet situé à au moins 20 pieds (6 mètres) pendant 20 secondes."
+      },
+      {
+        title: "L'importance de la cohérence cardiaque",
+        content: "La cohérence cardiaque est une pratique de respiration qui équilibre votre système nerveux. Essayez une séance de 5 minutes en inspirant pendant 5 secondes et en expirant pendant 5 secondes. Cette technique réduit la fréquence cardiaque et agit sur le cortisol, l'hormone du stress. Intégrez-la dans votre routine quotidienne, par exemple avant une réunion ou juste avant de dormir."
+      },
+      {
+        title: "Activités créatives pour apaiser l'esprit",
+        content: "Exprimer votre créativité est une excellente manière de détendre votre esprit. Peinture, écriture, musique ou jardinage, choisissez ce qui résonne avec vous. Ces activités réduisent le stress et favorisent un état de flow, où le temps semble suspendu et votre concentration est optimale. Essayez d'intégrer une session créative hebdomadaire pour un bien-être durable."
+      },
+      {
+        title: "Reconnaître et surmonter l'épuisement mental",
+        content: "Le burn-out se manifeste par une fatigue extrême, une perte de motivation et un sentiment d'impuissance. Prenez des pauses régulières, fixez des limites claires et déléguez les tâches lorsque nécessaire. Pensez aussi à vous reconnecter avec vos passions et à planifier des moments de détente pour éviter la surcharge émotionnelle."
+      },
+      {
+        title: "Construire des relations positives",
+        content: "Les relations solides sont un pilier de la santé mentale. Investissez dans vos relations en prenant le temps de dialoguer ouvertement, d'écouter activement et de montrer de l'empathie. Les interactions sociales enrichissantes renforcent votre sentiment d'appartenance et réduisent le stress lié à la solitude."
+      },
+      {
+        title: "Pratiquer la pleine conscience au quotidien",
+        content: "La pleine conscience, ou mindfulness, est l'art de vivre pleinement le moment présent. Essayez des exercices simples comme la méditation en pleine conscience ou la pratique du scan corporel. Ces techniques aident à calmer votre esprit, réduire le stress et améliorer votre concentration."
+      },
+      {
+        title: "Les bienfaits des pauses en pleine nature",
+        content: "Passer du temps à l'extérieur, entouré de nature, est bénéfique pour le moral et la santé mentale. Une promenade dans un parc ou une forêt réduit les niveaux de cortisol et stimule la créativité. Envisagez de pratiquer une activité en plein air, comme le yoga ou la marche, pour maximiser ces bienfaits."
+      }
+    ]
+  };
+
+  // Fonction pour afficher les articles d'une catégorie
+  function showCategory(category) {
+    const container = document.getElementById("articlesContainer");
+    container.innerHTML = ""; // Efface les articles précédemment affichés
+    articles[category].forEach((article, index) => {
+      const articleDiv = document.createElement("div");
+      articleDiv.classList.add("article");
+      articleDiv.innerHTML = `
+                <h3>${article.title}</h3>
+                <p>${article.content.substring(0, 100)}...</p>
+                <button onclick="showModal('${category}', ${index})">En savoir plus</button>
+            `;
+      container.appendChild(articleDiv);
+    });
+  }
+  // Fonction pour afficher le contenu détaillé d'un article dans une modale
+  function showModal(category, index) {
+    const modal = document.getElementById("modal");
+    const overlay = document.getElementById("overlay");
+    const article = articles[category][index];
+    document.getElementById("modalTitle").textContent = article.title;
+    document.getElementById("modalContent").textContent = article.content;
+    modal.style.display = "block";
+    overlay.style.display = "block";
+  }
+  // Fonction pour fermer la modale
+  function closeModal() {
+    const modal = document.getElementById("modal");
+    const overlay = document.getElementById("overlay");
+    modal.style.display = "none";
+    overlay.style.display = "none";
+  }
+  // Afficher la catégorie par défaut au chargement de la page (exemple: "nutrition")
+  document.addEventListener("DOMContentLoaded", () => showCategory("nutrition"));
+</script>
+</body>
+</html>

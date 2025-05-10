@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petites Victoires</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+        .container {
+            margin: auto;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        body.dark .container {
+            background: #34495e;
+        }
+        h1 {
+            color: #70e0b6;
+        }
+        textarea, select, button {
+            width: 80%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            text-align: left;
+            background: #f4f4f9;
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 5px solid #70e0b6;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        body.dark ul li {
+            background: #2c3e50;
+            border-left: 5px solid #1abc9c;
+        }
+        .delete-btn, .edit-btn {
+            background-color: #70e0b6;
+            border: none;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #e74c3c;
+        }
+        .progress-container {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 20px;
+            width: 0;
+            background-color: #70e0b6;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            transition: width 0.3s;
+        }
+        .dark-mode-toggle {
+            background-color: #95a5a6;
+            border: none;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .dark-mode-toggle:hover {
+            background-color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🎉 Petites Victoires 🎉</h1>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Activer/Désactiver Mode Sombre</button>
+    <textarea id="victoryInput" placeholder="Quelle est votre petite victoire ?"></textarea>
+    <select id="categoryInput">
+        <option value="Personnel">Personnel</option>
+        <option value="Professionnel">Professionnel</option>
+    </select>
+    <button id="addVictoryButton">Ajouter une Victoire</button>
+    <h3 id="totalPoints">Points Totaux : 0</h3>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <ul id="victoryList"></ul>
+</div>
+<script>
+    // Variables DOM
+    const victoryInput = document.getElementById('victoryInput');
+    const categoryInput = document.getElementById('categoryInput');
+    const addVictoryButton = document.getElementById('addVictoryButton');
+    const victoryList = document.getElementById('victoryList');
+    const totalPoints = document.getElementById('totalPoints');
+    const progressBar = document.getElementById('progressBar');
+
+    let totalPointsCounter = 0; // Points totaux
+
+    // Fonction pour ajouter une victoire
+    const addVictory = async () => {
+        const text = victoryInput.value.trim();
+        const category = categoryInput.value;
+        const date = new Date().toISOString().split('T')[0];
+        const points = 50;
+
+        if (!text) {
+            alert('Veuillez entrer une victoire.');
+            return;
+        }
+
+        const victoryData = { text, category, date, points };
+        try {
+            const response = await fetch('http://localhost:3000/victories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(victoryData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur serveur (${response.status}): ${response.statusText}`);
+            }
+
+            const savedVictory = await response.json();
+            displayVictory(savedVictory);
+            updateTotalPoints(savedVictory.points);
+            updateProgressBar();
+            victoryInput.value = '';
+        } catch (error) {
+            alert('Erreur lors de l\'ajout : ' + error.message);
+        }
+    };
+
+    // Fonction pour afficher une victoire avec bouton Supprimer
+    const displayVictory = (victory) => {
+        if (!victory.text || !victory.category || !victory.date || typeof victory.id === 'undefined') {
+            console.error('Données invalides :', victory);
+            return;
+        }
+
+        const li = document.createElement('li');
+        li.setAttribute('data-id', victory.id);
+        li.innerHTML = `
+      [${victory.category}] ${victory.text} (${victory.date})
+      <button class="delete-btn" onclick="deleteVictory(${victory.id}, ${victory.points})">Supprimer</button>`;
+        victoryList.appendChild(li);
+    };
+
+    // Fonction pour supprimer une victoire
+    const deleteVictory = async (id, points) => {
+        try {
+            const response = await fetch(`http://localhost:3000/victories/${id}`, { method: 'DELETE' });
+            if (!response.ok) {
+                throw new Error(`Erreur serveur (${response.status}): ${response.statusText}`);
+            }
+
+            const liToDelete = document.querySelector(`li[data-id="${id}"]`);
+            if (liToDelete) {
+                victoryList.removeChild(liToDelete);
+            }
+
+            totalPointsCounter -= points;
+            totalPoints.textContent = `Points Totaux : ${totalPointsCounter}`;
+            updateProgressBar();
+        } catch (error) {
+            alert('Erreur lors de la suppression : ' + error.message);
+        }
+    };
+
+    // Fonction pour mettre à jour les points
+    const updateTotalPoints = (points) => {
+        totalPointsCounter += points;
+        totalPoints.textContent = `Points Totaux : ${totalPointsCounter}`;
+    };
+
+    // Fonction pour mettre à jour la barre de progression
+    const updateProgressBar = () => {
+        const totalVictories = victoryList.children.length;
+        const percentage = Math.min((totalVictories / 10) * 100, 100);
+        progressBar.style.width = `${percentage}%`;
+    };
+
+    // Mode sombre
+    const toggleDarkMode = () => {
+        document.body.classList.toggle('dark');
+    };
+
+    // Récupérer et afficher les victoires
+    const fetchVictories = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/victories');
+            if (!response.ok) {
+                throw new Error(`Erreur serveur (${response.status}): ${response.statusText}`);
+            }
+
+            const victories = await response.json();
+            victories.forEach((victory) => {
+                displayVictory(victory);
+                updateTotalPoints(victory.points);
+            });
+        } catch (error) {
+            alert('Erreur lors du chargement : ' + error.message);
+        }
+    };
+
+    // Charger les victoires au démarrage
+    fetchVictories();
+    addVictoryButton.addEventListener('click', addVictory);
+</script>
+</body>
+</html>

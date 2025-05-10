@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+      <html lang="en">
+      <head>
+      <meta charset="UTF-8">
+      <title><!DOCTYPE html>
+      <html lang="fr">
+      <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Chatbot Santé IA</title>
+  <style>
+    .chat-container {
+      width: 350px;
+      height: 500px;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background: #f8fafb;
+      border-bottom: 2px solid #dfe4ea;
+    }
+    #chat-box div {
+      margin: 10px 0;
+      padding: 10px;
+      max-width: 70%;
+      border-radius: 10px;
+    }
+    #chat-box .user {
+      background-color: #d1ecf1;
+      align-self: flex-end;
+    }
+    #chat-box .bot {
+      background-color: #f8d7da;
+      align-self: flex-start;
+    }
+    #user-input {
+      border: none;
+      padding: 15px;
+      width: calc(100% - 75px);
+      border-radius: 15px 0 0 15px;
+      outline: none;
+      font-size: 16px;
+    }
+    #send-btn {
+      border: none;
+      padding: 15px;
+      background: #70e0b6;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 0 15px 15px 0;
+      transition: background 0.3s ease;
+    }
+    #send-btn:hover {
+      background: #70e0b6;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #70e0b6, #70e0b6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .chat-container {
+      width: 400px;
+      height: 600px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #chat-box div {
+      margin: 10px 0;
+      padding: 12px;
+      max-width: 70%;
+      border-radius: 15px;
+    }
+
+    #chat-box .user {
+      background-color: #d1e7dd;
+      align-self: flex-end;
+      color: #0f5132;
+    }
+
+    #chat-box .bot {
+      background-color: #f8d7da;
+      align-self: flex-start;
+      color: #842029;
+    }
+    #chat-box div {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    #send-btn {
+      background: linear-gradient(135deg, #ff7eb3, #ff758c);
+      color: white;
+      border: none;
+      padding: 15px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 20px;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    #send-btn:hover {
+      transform: scale(1.1);
+      background: linear-gradient(135deg, #ff477e, #ff5a97);
+    }
+    #user-input {
+      border: none;
+      padding: 15px;
+      width: calc(100% - 80px);
+      border-radius: 20px;
+      outline: none;
+      font-size: 16px;
+      background: #f1f1f1;
+      color: #333;
+    }
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+  </style>
+  <div class="chat-container">
+    <div id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="Tapez votre question ou un numéro..." />
+    <button id="send-btn">Envoyer</button>
+  </div>
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    let activeReminders = []; // Stockage des rappels actifs
+    // Données pour les réponses santé
+    const healthResponses = {
+      "mal de tête": "Les maux de tête peuvent être causés par le stress, la fatigue ou la déshydratation. Essayez de boire de l'eau et de vous reposer.",
+      "fièvre": "Une fièvre peut être le signe d'une infection. Si elle dépasse 39°C ou dure plus de deux jours, consultez un médecin.",
+      "toux": "La toux peut être due à un rhume ou des allergies. Si elle persiste, il est conseillé de consulter un professionnel de santé.",
+      "fatigue": "La fatigue peut être causée par un manque de sommeil ou des carences en vitamines. Consultez un médecin si elle persiste."
+    };
+    // Données pour les conseils de mode de vie
+    const lifestyleTips = {
+      "stress": "Pour réduire le stress, essayez la méditation ou des exercices de respiration profonde.",
+      "sommeil": "Un bon sommeil nécessite un environnement calme et des horaires réguliers.",
+      "hydration": "Buvez au moins 1.5 à 2 litres d'eau par jour pour rester bien hydraté.",
+      "sport": "Faire du sport régulièrement est excellent pour votre santé mentale et physique."
+    };
+    // Ressources santé associées à des numéros
+    const healthResources = {
+      "5": "Pour des informations sur la COVID-19, visitez https://www.who.int/",
+      "6": "Pour des conseils nutritionnels, consultez https://www.eatwellguide.org/",
+      "7": "Pour trouver un médecin près de chez vous, utilisez https://www.doctolib.fr/",
+      "8": "Entrez 'rappel complexe [nom du médicament] [AAAA-MM-JJTHH:mm]' pour programmer un rappel à une heure précise."
+    };
+    // Fonction principale pour envoyer un message
+    function sendMessage() {
+      const userText = userInput.value.toLowerCase();
+      if (userText) {
+        appendMessage("Vous", userText);
+        userInput.value = "";
+        const botResponse = handleMenuOptions(userText);
+        setTimeout(() => appendMessage("Chatbot", botResponse), 500);
+      }
+    }
+    // Ajouter un message dans la boîte de discussion
+    function appendMessage(sender, message) {
+      const messageElement = document.createElement("div");
+      messageElement.classList.add("message", sender === "Vous" ? "user" : "bot");
+      const text = document.createElement("span");
+      text.textContent = message;
+      text.classList.add("text");
+      messageElement.appendChild(text);
+      chatBox.appendChild(messageElement);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    // Menu interactif et gestion des numéros
+    function handleMenuOptions(message) {
+      if (message === "1") {
+        return "Entrez 'imc [poids en kg] [taille en mètres]' pour calculer votre IMC.";
+      }
+      if (message === "2") {
+        return "Entrez 'rappel [nom du médicament] [temps en minutes]' pour programmer un rappel.";
+      }
+      if (message === "3") {
+        return "Voici quelques conseils : Tapez 'stress', 'sommeil', 'hydration', ou 'sport' pour obtenir des astuces.";
+      }
+      if (message === "4") {
+        return "Tapez '5', '6', ou '7' pour accéder aux ressources santé ou '8' pour configurer un rappel complexe.";
+      }
+      if (message === "rappels actifs") {
+        return listActiveReminders();
+      }
+      return getBotResponse(message);
+    }
+    // Gestion des réponses santé, conseils, et ressources
+    function getBotResponse(message) {
+      // Ajouter une réponse spécifique à "bonjour"
+      if (message === "bonjour" || message === "salut" || message === "coucou") {
+        return "Bonjour ! Qu'est-ce que je peux faire pour vous ?";
+      }
+      if (healthResponses[message]) return healthResponses[message];
+      if (lifestyleTips[message]) return lifestyleTips[message];
+      if (healthResources[message]) return healthResources[message];
+      if (message.includes("imc")) {
+        const [_, poids, taille] = message.match(/imc (\d+) (\d\.\d+)/) || [];
+        if (poids && taille) return calculateBMI(poids, taille);
+        return "Pour calculer l'IMC, entrez 'imc [poids en kg] [taille en mètres]'.";
+      }
+      if (message.includes("rappel")) {
+        const [_, medName, time] = message.match(/rappel (.+) (\d+)/) || [];
+        if (medName && time) {
+          setMedicationReminder(medName, time);
+          return `Un rappel pour le médicament '${medName}' a été programmé dans ${time} minute(s).`;
+        }
+        return "Veuillez entrer 'rappel [nom du médicament] [temps en minutes]'.";
+      }
+      if (message.includes("rappel complexe")) {
+        const [_, name, dateTime] = message.match(/rappel complexe (.+) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/) || [];
+        if (name && dateTime) {
+          return setComplexMedicationReminder(name, dateTime);
+        }
+        return "Format : 'rappel complexe [nom du médicament] [AAAA-MM-JJTHH:mm]'.";
+      }
+      return "Je ne comprends pas votre demande. Essayez de taper un numéro (1, 2, 3, 4, 5, 6, 7 ou 8) ou posez une question sur la santé.";
+    }
+    // Calcul de l'IMC
+    function calculateBMI(weight, height) {
+      if (weight <= 0 || height <= 0) return "Veuillez entrer des valeurs valides pour le poids et la taille.";
+      const bmi = (weight / (height * height)).toFixed(2);
+      if (bmi < 18.5) return `Votre IMC est de ${bmi}, ce qui indique une insuffisance pondérale.`;
+      if (bmi < 25) return `Votre IMC est de ${bmi}, ce qui est considéré comme normal.`;
+      return `Votre IMC est de ${bmi}, ce qui indique un surpoids.`;
+    }
+    // Rappel standard
+    function setMedicationReminder(name, timeInMinutes) {
+      const timeInSeconds = timeInMinutes * 60;
+      activeReminders.push({ name, timeInMinutes });
+      setTimeout(() => {
+        alert(`Rappel : Prenez votre médicament '${name}' maintenant.`);
+        removeReminder(name);
+      }, timeInSeconds * 1000);
+    }
+    // Rappel complexe
+    function setComplexMedicationReminder(name, dateTime) {
+      const reminderTime = new Date(dateTime).getTime();
+      const now = new Date().getTime();
+      const delay = reminderTime - now;
+      if (delay > 0) {
+        activeReminders.push({ name, dateTime });
+        setTimeout(() => {
+          alert(`Rappel : Prenez votre médicament '${name}' maintenant.`);
+          removeReminder(name);
+        }, delay);
+        return `Rappel programmé pour '${name}' le ${dateTime}.`;
+      }
+      return "L'heure spécifiée est déjà passée.";
+    }
+    // Afficher les rappels actifs
+    function listActiveReminders() {
+      if (activeReminders.length === 0) return "Aucun rappel actif.";
+      return activeReminders.map((reminder, index) =>
+              `${index + 1}. Médicament : ${reminder.name}, Temps : ${reminder.timeInMinutes || reminder.dateTime}`
+      ).join("\n");
+    }
+    // Supprimer un rappel de la liste
+    function removeReminder(name) {
+      activeReminders = activeReminders.filter(reminder => reminder.name !== name);
+    }
+    // Gestion des événements
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+  </body>
+</html>
+
+

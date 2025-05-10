@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Médical</title>
+    <style>
+       body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+        }
+        th {
+            background-color: #70e0b6;
+            color: white;
+        }
+        .popup-menu {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #70e0b6;
+        }
+        .popup-menu {
+    display: none;
+    position: fixed;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+/* Couleurs spécifiques par catégorie */
+.appointment-prevention { background-color: #28a745; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-specialistes { background-color: #007bff; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-problemes { background-color: #dc3545; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-urgence { background-color: #ffc107; color: black; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-enfants { background-color: #6f42c1; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-aged { background-color: #17a2b8; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+td div {
+    display: inline-block;
+    margin: 2px;
+    text-align: center;
+}
+.appointment {
+            padding: 2px;
+            border-radius: 4px;
+            font-size: 0.75em;
+        }
+        .appointment-prevention { background-color: #28a745; color: white; }
+        .appointment-specialistes { background-color: #007bff; color: white; }
+        .appointment-problemes { background-color: #dc3545; color: white; }
+        .appointment-urgence { background-color: #ffc107; color: black; }
+        .appointment-enfants { background-color: #6f42c1; color: white; }
+        .appointment-aged { background-color: #17a2b8; color: white; }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0057a0; }
+    </style>
+</head>
+<body>
+    <h1>Agenda Médical</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Heures</th>
+                <th>Dimanche</th>
+                <th>Lundi</th>
+                <th>Mardi</th>
+                <th>Mercredi</th>
+                <th>Jeudi</th>
+                <th>Vendredi</th>
+                <th>Samedi</th>
+            </tr>
+        </thead>
+        <tbody id="schedule"></tbody>
+    </table>
+
+    <div id="popupMenu" class="popup-menu">
+        <p>Choisissez un créneau :</p>
+        <select id="exactTimeSelect"></select>
+        <p>Choisissez une catégorie :</p>
+        <select id="categorySelect" onchange="displaySubMenu()"></select>
+        <p>Choisissez un sous-type :</p>
+        <select id="subAppointmentType"></select>
+        <p>Ajoutez une note :</p>
+        <input type="text" id="appointmentNotes">
+        <br>
+        <button onclick="saveAppointment()">Sauvegarder</button>
+        <button onclick="editAppointment()">Modifier</button>
+        <button onclick="deleteAppointment()">Supprimer</button>
+        <button onclick="closePopup()">Annuler</button>
+    </div>
+    <script>
+        const submenuData = {
+            prevention: ["Médecin généraliste", "Vaccinations"],
+            specialistes: ["Cardiologue", "Dermatologue"],
+            problemes: ["Nutritionniste", "Allergologue"],
+            urgence: ["Urgences médicales", "Imagerie (IRM, scanner)"],
+            enfants: ["Pédiatre", "Orthophoniste"],
+            aged: ["Gériatre", "Audioprothésiste"]
+        };
+        document.addEventListener('DOMContentLoaded', () => {
+            const schedule = document.getElementById('schedule');
+            for (let i = 0; i < 24; i++) {
+                const row = document.createElement('tr');
+                const hourCell = document.createElement('td');
+                hourCell.textContent = `${i}:00`;
+                row.appendChild(hourCell);
+                for (let j = 0; j < 7; j++) {
+                    const dayCell = document.createElement('td');
+                    dayCell.onclick = (event) => showPopupMenu(event, i, j);
+                    row.appendChild(dayCell);
+                }
+                schedule.appendChild(row);
+            }
+            loadAppointments();
+        });
+        function showPopupMenu(event, hour, day) {
+            const popupMenu = document.getElementById('popupMenu');
+            popupMenu.style.display = 'block';
+            popupMenu.style.top = `${event.clientY}px`;
+            popupMenu.style.left = `${event.clientX}px`;
+            popupMenu.dataset.hour = hour;
+            popupMenu.dataset.day = day;
+            document.getElementById('exactTimeSelect').innerHTML = `
+                <option value="${hour}h15">${hour}h15</option>
+                <option value="${hour}h30">${hour}h30</option>
+            `;
+            document.getElementById('categorySelect').innerHTML = Object.keys(submenuData)
+                .map(key => `<option value="${key}">${key}</option>`).join('');
+        }
+        function displaySubMenu() {
+            const categorySelect = document.getElementById('categorySelect').value;
+            document.getElementById('subAppointmentType').innerHTML = submenuData[categorySelect]
+                .map(item => `<option value="${item}">${item}</option>`).join('');
+        }
+        function saveAppointment() {
+            const popupMenu = document.getElementById('popupMenu');
+            const hour = popupMenu.dataset.hour;
+            const day = popupMenu.dataset.day;
+            const notes = document.getElementById('appointmentNotes').value;
+            const exactTime = document.getElementById('exactTimeSelect').value;
+            const categorySelect = document.getElementById('categorySelect').value;
+            const subAppointmentType = document.getElementById('subAppointmentType').value;
+            const cell = document.getElementById('schedule').children[hour].children[parseInt(day) + 1];
+            cell.innerHTML = `<div>${exactTime} - ${categorySelect} - ${subAppointmentType}</div><p>Note : ${notes}</p>`;
+            localStorage.setItem(`appointment-${hour}-${day}`, cell.innerHTML);
+        }
+        function editAppointment() {
+            const popupMenu = document.getElementById('popupMenu');
+            const hour = popupMenu.dataset.hour;
+            const day = popupMenu.dataset.day;
+            showPopupMenu(null, hour, day);
+        }
+        function deleteAppointment() {
+            const popupMenu = document.getElementById('popupMenu');
+            const hour = popupMenu.dataset.hour;
+            const day = popupMenu.dataset.day;
+            document.getElementById('schedule').children[hour].children[parseInt(day) + 1].innerHTML = "";
+            localStorage.removeItem(`appointment-${hour}-${day}`);
+            closePopup();
+        }
+        function closePopup() {
+            document.getElementById('popupMenu').style.display = 'none';
+        }
+        function loadAppointments() {
+            const schedule = document.getElementById('schedule');
+            for (let i = 0; i < 24; i++) {
+                for (let j = 0; j < 7; j++) {
+                    const savedData = localStorage.getItem(`appointment-${i}-${j}`);
+                    if (savedData) {
+                        schedule.children[i].children[j + 1].innerHTML = savedData;
+                    }
+                }
+            }
+        }
+    </script>
+    </body>
+    </html>
+    

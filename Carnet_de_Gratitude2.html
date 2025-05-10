@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnet de Gratitude</title>
+    <style>
+        :root {
+            --background-color: #f3f3f3;
+            --text-color: #000;
+            --header-color: #70e0b6;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        header {
+            text-align: center;
+            background-color: var(--header-color);
+            color: white;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+        h1 {
+            margin: 0;
+        }
+        .gratitude-section {
+            max-width: 400px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        textarea, input {
+            width: 70%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            display: inline-block;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #60d0a6;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            animation: fadeIn 0.5s ease;
+        }
+        .streak, .graph-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        canvas {
+            max-width: 90%;
+            height: 300px;
+        }
+        .theme-toggle {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Carnet de Gratitude</h1>
+    <p>Notez chaque jour trois choses qui vous rendent reconnaissant.</p>
+    <button class="theme-toggle" aria-label="Changer de thème">Changer de Thème</button>
+</header>
+<section class="gratitude-section">
+    <form id="gratitude-form">
+        <label for="entry">Que voulez-vous noter aujourd'hui ?</label>
+        <textarea id="entry" placeholder="Écrivez ici..." required aria-label="Champ pour écrire une gratitude"></textarea>
+        <button type="submit">Ajouter</button>
+        <button type="button" id="voice-button" aria-label="Dictée vocale">Dicter</button>
+    </form>
+    <div>
+        <button id="sort-entries" aria-label="Trier les gratitudes">Trier les entrées</button>
+        <input type="date" id="filter-date" aria-label="Filtrer par date">
+        <input type="text" id="filter-entries" placeholder="Rechercher..." aria-label="Rechercher une gratitude">
+    </div>
+    <h2>Vos Gratitudes</h2>
+    <ul id="gratitude-list"></ul>
+    <div class="streak">
+        <h3>Votre Streak :</h3>
+        <p id="streak-count">0 jour(s) consécutif(s)</p>
+    </div>
+    <div id="points-display">Points : 0</div>
+    <div class="graph-section">
+        <h3>Graphique des Gratitudes</h3>
+        <canvas id="gratitude-chart"></canvas>
+    </div>
+    <button id="export-data" aria-label="Exporter les données">Exporter</button>
+    <input type="file" id="import-data" class="hidden" aria-label="Importer les données">
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gestion des Gratitudes et du Streak
+    const form = document.getElementById('gratitude-form');
+    const entryField = document.getElementById('entry');
+    const gratitudeList = document.getElementById('gratitude-list');
+    const streakCount = document.getElementById('streak-count');
+    const chartCanvas = document.getElementById('gratitude-chart');
+    const sortButton = document.getElementById('sort-entries');
+    const filterDate = document.getElementById('filter-date');
+    const filterText = document.getElementById('filter-entries');
+    const exportData = document.getElementById('export-data');
+    const importData = document.getElementById('import-data');
+    let streak = 0;
+    // Fonction pour calculer le streak
+    const calculateStreak = () => {
+        const today = new Date().toLocaleDateString();
+        const lastDate = localStorage.getItem('lastDate');
+        if (lastDate === today) return streak;
+        const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString();
+        streak = (lastDate === yesterday) ? streak + 1 : 1;
+        localStorage.setItem('lastDate', today);
+        return streak;
+    };
+    // Charger les Gratitudes
+    const loadGratitudes = () => {
+        const data = JSON.parse(localStorage.getItem('gratitudes')) || [];
+        data.forEach(item => addGratitude(item.text, item.date));
+        streakCount.textContent = `${calculateStreak()} jour(s) consécutif(s)`;
+        updateChart(data);
+    };
+    // Ajouter une Gratitude
+    const addGratitude = (text, date = new Date().toLocaleDateString(), save = true) => {
+        const item = document.createElement('li');gdf
+        item.innerHTML = `
+        <span class="text">${text}</span><br>
+        <small class="date">${date}</small><br>
+        <button class="edit-btn" aria-label="Modifier la gratitude">Modifier</button>
+    `;
+        gratitudeList.appendChild(item);
+        // Gestion du bouton Modifier
+        const editButton = item.querySelector('.edit-btn');
+        editButton.addEventListener('click', () => {
+            editGratitude(item);
+        });
+        if (save) saveGratitudes();
+    };
+    // Éditer une Gratitude
+    const editGratitude = (item) => {
+        const currentText = item.querySelector('.text').textContent;
+        const currentDate = item.querySelector('.date').textContent;
+        const editForm = document.createElement('div');
+        editForm.innerHTML = `
+        <textarea class="edit-text" aria-label="Modifier le contenu">${currentText}</textarea>
+        <input type="date" class="edit-date" value="${formatDateForInput(currentDate)}" aria-label="Modifier la date">
+        <button class="save-btn">Enregistrer</button>
+        <button class="cancel-btn">Annuler</button>
+    `;
+        item.style.display = 'none';
+        item.insertAdjacentElement('afterend', editForm);
+        editForm.querySelector('.save-btn').addEventListener('click', () => {
+            const updatedText = editForm.querySelector('.edit-text').value;
+            const updatedDate = editForm.querySelector('.edit-date').value;
+            item.querySelector('.text').textContent = updatedText;
+            item.querySelector('.date').textContent = formatDateForDisplay(updatedDate);
+            item.style.display = '';
+            editForm.remove();
+            saveGratitudes();
+        });
+        editForm.querySelector('.cancel-btn').addEventListener('click', () => {
+            item.style.display = '';
+            editForm.remove();
+        });
+    };
+    // Formater la date pour l'élément input date
+    const formatDateForInput = (date) => {
+        const [day, month, year] = date.split('/');
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    };
+    // Formater la date pour l'affichage
+    const formatDateForDisplay = (date) => {
+        const [year, month, day] = date.split('-');
+        return `${day}/${month}/${year}`;
+    };
+    // Sauvegarder les Gratitudes
+    const saveGratitudes = () => {
+        const data = Array.from(gratitudeList.children).map(li => ({
+            text: li.querySelector('.text').textContent,
+            date: li.querySelector('.date').textContent
+        }));
+        localStorage.setItem('gratitudes', JSON.stringify(data));
+    };
+    // Mettre à jour le graphique des Gratitudes
+    const updateChart = (data) => {
+        const dates = data.map(d => d.date);
+        const counts = dates.reduce((acc, date) => {
+            acc[date] = (acc[date] || 0) + 1;
+            return acc;
+        }, {});
+        new Chart(chartCanvas, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(counts),
+                datasets: [{
+                    label: 'Nombre de Gratitudes',
+                    data: Object.values(counts),
+                    backgroundColor: '#70e0b6'
+                }]
+            }
+        });
+    };
+    // Soumettre une nouvelle Gratitude via le formulaire
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const entry = entryField.value.trim();
+        if (entry === '') {
+            alert("Veuillez écrire quelque chose !");
+            return;
+        }
+        addGratitude(entry);
+        entryField.value = ''; // Réinitialiser le champ
+    });
+    // Trier les Gratitudes par ordre alphabétique
+    sortButton.addEventListener('click', () => {
+        const items = Array.from(gratitudeList.children).sort((a, b) =>
+            a.querySelector('.text').textContent.localeCompare(b.querySelector('.text').textContent)
+        );
+        gratitudeList.innerHTML = '';
+        items.forEach(item => gratitudeList.appendChild(item));
+        saveGratitudes();
+    });
+    // Filtrer les Gratitudes par Date
+    filterDate.addEventListener('input', () => {
+        const selectedDate = filterDate.value;
+        Array.from(gratitudeList.children).forEach(li => {
+            const itemDate = li.querySelector('.date').textContent;
+            li.style.display = (itemDate === selectedDate) ? '' : 'none';
+        });
+    });
+    // Filtrer les Gratitudes par Texte
+    filterText.addEventListener('input', () => {
+        const query = filterText.value.toLowerCase();
+        Array.from(gratitudeList.children).forEach(li => {
+            const itemText = li.querySelector('.text').textContent.toLowerCase();
+            li.style.display = (itemText.includes(query)) ? '' : 'none';
+        });
+    });
+    // Charger les données initiales au démarrage
+    loadGratitudes();
+    // Notifications pour les rappels
+    if (Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+            if (permission !== 'granted') {
+                alert("Les notifications sont désactivées ! Activez-les pour recevoir des rappels.");
+            }
+        });
+    }
+    // Fonction pour envoyer une notification
+    const sendNotification = () => {
+        if (Notification.permission === 'granted') {
+            new Notification("N'oubliez pas d'ajouter une gratitude aujourd'hui !");
+        }
+    };
+    // Configurer un rappel quotidien pour envoyer des notifications
+    const setupDailyReminder = () => {
+        sendNotification(); // Envoyer une notification immédiatement au démarrage
+        setInterval(sendNotification, 24 * 60 * 60 * 1000); // Toutes les 24 heures
+    };
+    setupDailyReminder();
+    // Reconnaissance vocale pour la dictée des gratitudes
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "fr-FR"; // Configurer la langue sur le français
+    recognition.interimResults = false; // Désactiver les résultats intermédiaires
+    recognition.maxAlternatives = 1; // Autoriser une seule alternative
+    // Écouter le bouton de dictée
+    document.getElementById('voice-button').addEventListener('click', () => {
+        recognition.start(); // Démarrer la reconnaissance vocale
+    });
+    // Gérer les résultats de la reconnaissance vocale
+    recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript; // Texte dicté
+        entryField.value = spokenText; // Remplir le champ avec le texte dicté
+    };
+    // Gérer les erreurs de la reconnaissance vocale
+    recognition.onerror = (event) => {
+        console.error("Erreur de reconnaissance vocale :", event.error);
+        alert("Une erreur s'est produite pendant la dictée. Veuillez réessayer.");
+    };
+    // Gestion du changement de thème
+    const themeToggle = document.querySelector('.theme-toggle');
+    // Fonction pour changer le thème entre clair et sombre
+    themeToggle.addEventListener('click', () => {
+        const currentBg = getComputedStyle(document.body).getPropertyValue('--background-color');
+        const isLightTheme = currentBg.includes('#f3f3f3'); // Vérifier si le thème actuel est clair
+        document.body.style.setProperty('--background-color', isLightTheme ? '#2c3e50' : '#f3f3f3');
+        document.body.style.setProperty('--text-color', isLightTheme ? '#fff' : '#70e0b6');
+        document.body.style.setProperty('--header-color', isLightTheme ? '#2c3e50' : '#2c3e50');
+        localStorage.setItem('theme', isLightTheme ? 'dark' : 'light'); // Sauvegarder le choix du thème
+    });
+    // Fonction pour charger le thème sauvegardé
+    const loadTheme = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {document.body.style.setProperty('--background-color', '#333');
+            document.body.style.setProperty('--text-color', '#fff');
+            document.body.style.setProperty('--header-color', '#555');
+        }
+    };
+    // Charger le thème au démarrage
+    loadTheme();
+</script>
+</body>
+</html>

@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestions Culinaires et Notation</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9fafc;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        select, button {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #56c29c;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            text-align: left;
+            font-size: 16px;
+            margin: 10px 0;
+            border-bottom: 1px solid #ececec;
+            padding-bottom: 10px;
+        }
+        #recipe-details {
+            display: none;
+            margin-top: 20px;
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        #pagination-controls button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Suggestions Culinaires et Notation</h1>
+    <form id="allergy-form">
+        <label for="allergies">Types d'allergies ou intolérances :</label>
+        <select id="allergies" multiple>
+            <option value="pollens">🌾 Pollens</option>
+            <option value="gluten">🍞 Gluten</option>
+            <option value="lactose">🥛 Lactose</option>
+            <option value="arachides">🥜 Arachides</option>
+            <option value="fruits_de_mer">🦐 Fruits de mer</option>
+            <option value="celeri">🥕 Céleri</option>
+            <option value="cerealesSansGluten">🌾 Céréales sans Gluten</option>
+            <option value="fruitsCoques">🌰 Fruits à coque</option>
+            <option value="oeuf">🍳 Œuf</option>
+            <option value="moutarde">🌿 Moutarde</option>
+            <option value="sesame">🥒 Sésame</option>
+            <option value="soja">🥦 Soja</option>
+            <option value="sulfites">🍇 Sulfites</option>
+        </select>
+        <button id="searchButton">Afficher toutes les recettes</button>
+
+    </form>
+    <div id="recipe-results">
+        <ul id="recipe-list"></ul> <!-- Liste des recettes -->
+    </div>
+    <div id="recipe-details">
+        <h3 id="recipe-title"></h3>
+        <p id="recipe-ingredients"></p>
+        <p id="recipe-instructions"></p>
+        <button id="close-details">Fermer</button>
+    </div>
+    <div id="pagination-controls"></div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const recipeList = document.getElementById("recipe-list");
+    const recipeDetails = document.getElementById("recipe-details");
+    const paginationControls = document.getElementById("pagination-controls");
+        const allergyRecipes = {
+            gluten: [
+                {
+                    name: "Soufflé au fromage sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "50g" },
+                        { item: "Beurre sans lactose", quantity: "50g" },
+                        { item: "Lait sans lactose", quantity: "250ml" },
+                        { item: "Fromage râpé", quantity: "100g" },
+                        { item: "Œufs", quantity: "4" }
+                    ],
+                    instructions: "Préparez une béchamel avec la farine, le beurre et le lait. Incorporez le fromage et les jaunes d'œufs. Montez les blancs en neige et incorporez-les délicatement. Faites cuire à 180°C pendant 25 minutes."
+                },
+                {
+                    name: "Pizza sans gluten",
+                    ingredients: [
+                        { item: "Farine sans gluten", quantity: "300g" },
+                        { item: "Eau tiède", quantity: "200ml" },
+                        { item: "Levure sèche", quantity: "1 sachet" },
+                        { item: "Huile d'olive", quantity: "2 cuillères à soupe" },
+                        { item: "Garnitures au choix", quantity: "Selon votre goût" }
+                    ],
+                    instructions: "Préparez la pâte avec les ingrédients. Laissez lever 1 heure. Étalez la pâte, ajoutez les garnitures, et faites cuire au four à 200°C pendant 15-20 minutes."
+                },
+                {
+                    name: "Quiche sans gluten aux légumes",
+                    ingredients: [
+                        { item: "Farine sans gluten", quantity: "200g" },
+                        { item: "Beurre sans lactose", quantity: "100g" },
+                        { item: "Eau froide", quantity: "2 cuillères à soupe" },
+                        { item: "Légumes variés", quantity: "300g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Lait sans lactose", quantity: "150ml" }
+                    ],
+                    instructions: "Préparez la pâte et foncez un moule à tarte. Ajoutez les légumes pré-cuits. Mélangez les œufs avec le lait, versez sur les légumes, et faites cuire à 180°C pendant 40 minutes."
+                },
+                {
+                    name: "Biscuits à la cannelle sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Beurre sans lactose", quantity: "100g" },
+                        { item: "Sucre", quantity: "80g" },
+                        { item: "Œufs", quantity: "1" },
+                        { item: "Cannelle", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Mélangez les ingrédients pour former une pâte. Étalez, découpez des formes et faites cuire au four à 180°C pendant 10-12 minutes."
+                },
+                {
+                    name: "Fondant au chocolat sans gluten",
+                    ingredients: [
+                        { item: "Chocolat noir", quantity: "200g" },
+                        { item: "Beurre sans lactose", quantity: "150g" },
+                        { item: "Sucre", quantity: "150g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Farine de riz", quantity: "50g" }
+                    ],
+                    instructions: "Faites fondre le chocolat et le beurre. Incorporez le sucre, les œufs et la farine. Versez dans un moule et faites cuire à 180°C pendant 15 minutes."
+                },
+                {
+                    name: "Gaufres sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Lait sans lactose", quantity: "250ml" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Sucre", quantity: "2 cuillères à soupe" },
+                        { item: "Beurre sans lactose fondu", quantity: "50g" }
+                    ],
+                    instructions: "Mélangez les ingrédients jusqu'à obtenir une pâte lisse. Faites cuire dans un gaufrier préchauffé jusqu'à ce qu'elles soient dorées."
+                },
+                {
+                    name: "Gâteau au chocolat sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "150g" },
+                        { item: "Cacao en poudre", quantity: "50g" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Beurre sans lactose", quantity: "100g" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients. Versez dans un moule. Faites cuire au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Crêpes sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Lait sans lactose", quantity: "500ml" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Sucre", quantity: "2 cuillères à soupe" },
+                        { item: "Huile", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Mélangez les ingrédients. Faites cuire la pâte dans une poêle chaude, en formant des crêpes fines."
+                },
+                {
+                    name: "Pain à la banane sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Bananes mûres", quantity: "2 grandes" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Levure chimique", quantity: "1 sachet" }
+                    ],
+                    instructions: "Écrasez les bananes, ajoutez les autres ingrédients. Versez dans un moule et faites cuire au four à 180°C pendant 40 minutes."
+                },
+                {
+                    name: "Muffins aux myrtilles sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Myrtilles", quantity: "150g" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Levure chimique", quantity: "1 sachet" }
+                    ],
+                    instructions: "Mélangez les ingrédients. Répartissez dans des moules à muffins. Faites cuire au four à 180°C pendant 20 minutes."
+                },
+                {
+                    name: "Galettes de pommes de terre sans gluten",
+                    ingredients: [
+                        { item: "Pommes de terre râpées", quantity: "300g" },
+                        { item: "Farine de riz", quantity: "50g" },
+                        { item: "Œufs", quantity: "1" },
+                        { item: "Sel", quantity: "1 cuillère à café" },
+                        { item: "Huile", quantity: "2 cuillères à soupe" }
+                    ],
+                    instructions: "Mélangez les ingrédients. Faites cuire des petites galettes dans une poêle chaude avec un peu d'huile."
+                },
+                {
+                    name: "Pancakes sans gluten",
+                    ingredients: [
+                        { item: "Farine de riz", quantity: "200g" },
+                        { item: "Lait végétal", quantity: "250ml" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Sucre", quantity: "2 cuillères à soupe" },
+                        { item: "Levure chimique", quantity: "1 sachet" }
+                    ],
+                    instructions: "Mélangez les ingrédients jusqu'à obtenir une pâte homogène. Faites cuire des petites portions dans une poêle chaude légèrement huilée."
+                },
+                {
+                    name: "Lasagnes sans gluten aux légumes",
+                    ingredients: [
+                        { item: "Pâtes à lasagnes sans gluten", quantity: "200g" },
+                        { item: "Légumes variés", quantity: "400g" },
+                        { item: "Sauce tomate", quantity: "300ml" },
+                        { item: "Fromage râpé sans lactose", quantity: "100g" },
+                        { item: "Herbes de Provence", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Alternez les couches de pâtes, légumes, et sauce tomate. Terminez avec du fromage râpé et faites cuire au four à 180°C pendant 40 minutes."
+                },
+                {
+                    name: "Tarte aux fruits rouges sans gluten",
+                    ingredients: [
+                        { item: "Farine sans gluten", quantity: "200g" },
+                        { item: "Beurre sans lactose", quantity: "100g" },
+                        { item: "Sucre", quantity: "80g" },
+                        { item: "Œufs", quantity: "1" },
+                        { item: "Fruits rouges", quantity: "300g" }
+                    ],
+                    instructions: "Préparez la pâte et foncez un moule. Disposez les fruits rouges sur la pâte et saupoudrez de sucre. Faites cuire au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Soupe de carottes au lait de coco sans gluten",
+                    ingredients: [
+                        {item: "Carottes", quantity: "500g"},
+                        {item: "Lait de coco", quantity: "200ml"},
+                        {item: "Oignons", quantity: "1"},
+                        {item: "Gingembre frais", quantity: "1 cuillère à soupe"},
+                        {item: "Huile d'olive", quantity: "1 cuillère à soupe"}
+                    ],
+                    instructions: "Faites revenir les oignons et le gingembre dans l'huile. Ajoutez les carottes et de l'eau pour couvrir. Faites cuire jusqu'à ce que les carottes soient tendres, mixez avec le lait de coco."
+                }
+            ],
+            lactose: [
+                {
+                    name: "Smoothie aux fruits rouges et lait d'amande",
+                    ingredients: [
+                        { item: "Fruits rouges", quantity: "200g" },
+                        { item: "Lait d'amande", quantity: "300ml" },
+                        { item: "Banane", quantity: "1" },
+                        { item: "Miel", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients dans un mixeur jusqu'à obtenir une consistance lisse. Servez frais."
+                },
+                {
+                    name: "Quiche aux légumes avec crème de soja",
+                    ingredients: [
+                        { item: "Pâte brisée sans lactose", quantity: "1" },
+                        { item: "Légumes variés", quantity: "300g" },
+                        { item: "Crème de soja", quantity: "150ml" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Herbes fraîches", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Disposez les légumes sur la pâte. Mélangez les œufs avec la crème de soja et les herbes. Versez sur les légumes et faites cuire au four à 180°C pendant 40 minutes."
+                },
+                {
+                    name: "Porridge au lait de coco et fruits frais",
+                    ingredients: [
+                        { item: "Flocons d'avoine sans gluten", quantity: "200g" },
+                        { item: "Lait de coco", quantity: "300ml" },
+                        { item: "Fruits frais coupés", quantity: "150g" },
+                        { item: "Graines de chia", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Faites chauffer les flocons d'avoine avec le lait de coco jusqu'à épaississement. Ajoutez les fruits et les graines de chia avant de servir."
+                },
+                {
+                    name: "Curry de légumes au lait de coco",
+                    ingredients: [
+                        { item: "Légumes variés", quantity: "500g" },
+                        { item: "Lait de coco", quantity: "300ml" },
+                        { item: "Pâte de curry", quantity: "2 cuillères à soupe" },
+                        { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Faites chauffer l'huile, ajoutez la pâte de curry et mélangez. Ajoutez les légumes et le lait de coco. Laissez mijoter pendant 20 minutes."
+                },
+                {
+                    name: "Cake au citron sans lactose",
+                    ingredients: [
+                        { item: "Farine", quantity: "200g" },
+                        { item: "Sucre", quantity: "150g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Jus de citron", quantity: "100ml" },
+                        { item: "Huile végétale", quantity: "100ml" }
+                    ],
+                    instructions: "Mélangez les ingrédients. Versez dans un moule et faites cuire au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Muffins banane et chocolat sans lactose",
+                    ingredients: [
+                        { item: "Farine", quantity: "200g" },
+                        { item: "Banane mûre", quantity: "2" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Pépites de chocolat", quantity: "50g" },
+                        { item: "Lait végétal", quantity: "100ml" }
+                    ],
+                    instructions: "Écrasez les bananes, mélangez avec les autres ingrédients. Répartissez dans des moules à muffins et faites cuire au four à 180°C pendant 20 minutes."
+                },
+                {
+                    name: "Soupe de courgettes au lait de coco",
+                    ingredients: [
+                        { item: "Courgettes", quantity: "500g" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Oignon", quantity: "1" },
+                        { item: "Ail", quantity: "1 gousse" },
+                        { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Faites revenir l'oignon et l'ail dans l'huile. Ajoutez les courgettes et de l'eau pour couvrir. Faites cuire, puis mixez avec le lait de coco."
+                },
+                {
+                    name: "Brownies sans lactose",
+                    ingredients: [
+                        { item: "Farine", quantity: "100g" },
+                        { item: "Chocolat noir", quantity: "200g" },
+                        { item: "Sucre", quantity: "150g" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Huile végétale", quantity: "100ml" }
+                    ],
+                    instructions: "Faites fondre le chocolat, mélangez avec les autres ingrédients. Versez dans un moule et faites cuire au four à 180°C pendant 25 minutes."
+                },
+                {
+                    name: "Curry de pois chiches au lait de coco",
+                    ingredients: [
+                        { item: "Pois chiches cuits", quantity: "400g" },
+                        { item: "Lait de coco", quantity: "300ml" },
+                        { item: "Tomates", quantity: "200g" },
+                        { item: "Épices pour curry", quantity: "1 cuillère à soupe" },
+                        { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Faites chauffer l'huile, ajoutez les épices, les pois chiches et les tomates. Versez le lait de coco et laissez mijoter 15 minutes."
+                },
+                {
+                    name: "Pain perdu au lait d'amande",
+                    ingredients: [
+                        { item: "Tranches de pain", quantity: "4" },
+                        { item: "Lait d'amande", quantity: "200ml" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Sucre", quantity: "2 cuillères à soupe" },
+                        { item: "Cannelle", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Trempez le pain dans le mélange lait, œufs, sucre et cannelle. Faites cuire dans une poêle chaude jusqu'à ce que le pain soit doré."
+                },
+                {
+                    name: "Risotto aux champignons sans lactose",
+                    ingredients: [
+                        { item: "Riz Arborio", quantity: "200g" },
+                        { item: "Champignons", quantity: "300g" },
+                        { item: "Bouillon de légumes", quantity: "500ml" },
+                        { item: "Oignon", quantity: "1" },
+                        { item: "Huile d'olive", quantity: "2 cuillères à soupe" }
+                    ],
+                    instructions: "Faites revenir l'oignon dans l'huile, ajoutez les champignons, puis le riz. Versez le bouillon progressivement en remuant jusqu'à cuisson complète."
+                },
+                {
+                    name: "Flan au lait de soja",
+                    ingredients: [
+                        { item: "Lait de soja", quantity: "500ml" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Extrait de vanille", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Mélangez les ingrédients, versez dans des ramequins et faites cuire au bain-marie au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Salade de lentilles au lait de coco",
+                    ingredients: [
+                        { item: "Lentilles cuites", quantity: "400g" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Carottes râpées", quantity: "100g" },
+                        { item: "Coriandre fraîche", quantity: "1 cuillère à soupe" },
+                        { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients dans un bol. Servez frais."
+                },
+                {
+                    name: "Clafoutis aux fruits sans lactose",
+                    ingredients: [
+                        { item: "Fruits de saison", quantity: "300g" },
+                        { item: "Farine", quantity: "100g" },
+                        { item: "Lait d'amande", quantity: "200ml" },
+                        { item: "Œufs", quantity: "3" },
+                        { item: "Sucre", quantity: "80g" }
+                    ],
+                    instructions: "Disposez les fruits dans un plat. Mélangez les autres ingrédients, versez sur les fruits, et faites cuire au four à 180°C pendant 35 minutes."
+                }
+            ],
+            arachides: [
+                {
+                    name: "Poulet sauce graines de tournesol",
+                    ingredients: [
+                        { item: "Poulet", quantity: "500g" },
+                        { item: "Beurre de graines de tournesol", quantity: "3 cuillères à soupe" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Tomates", quantity: "2" },
+                        { item: "Oignon", quantity: "1" },
+                        { item: "Ail", quantity: "2 gousses" },
+                        { item: "Gingembre", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Faites revenir l'oignon, l'ail et le gingembre. Ajoutez les tomates, le beurre de graines de tournesol et le lait de coco. Laissez mijoter, puis ajoutez le poulet. Cuisez jusqu'à tendreté."
+                },
+                {
+                    name: "Biscuits au tahini",
+                    ingredients: [
+                        { item: "Tahini (pâte de sésame)", quantity: "200g" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Œuf", quantity: "1" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients, formez des boules, aplatissez-les et cuisez au four à 180°C pendant 10 minutes."
+                },
+                {
+                    name: "Salade croquante aux graines de courge",
+                    ingredients: [
+                        { item: "Chou rouge", quantity: "100g" },
+                        { item: "Carottes râpées", quantity: "100g" },
+                        { item: "Graines de courge grillées", quantity: "50g" },
+                        { item: "Vinaigrette au citron", quantity: "Au goût" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients et servez frais."
+                },
+                {
+                    name: "Sauce au tahini et miel",
+                    ingredients: [
+                        { item: "Tahini (pâte de sésame)", quantity: "3 cuillères à soupe" },
+                        { item: "Sauce soja", quantity: "1 cuillère à soupe" },
+                        { item: "Miel", quantity: "1 cuillère à café" },
+                        { item: "Eau", quantity: "50ml" }
+                    ],
+                    instructions: "Mélangez tous les ingrédients jusqu'à obtenir une consistance lisse."
+                },
+                {
+                    name: "Curry de légumes au beurre de graines de tournesol",
+                    ingredients: [
+                        { item: "Légumes variés", quantity: "500g" },
+                        { item: "Beurre de graines de tournesol", quantity: "2 cuillères à soupe" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Épices au choix", quantity: "Au goût" }
+                    ],
+                    instructions: "Faites mijoter les légumes avec le beurre de graines de tournesol, le lait de coco et les épices."
+                },
+                {
+                    name: "Nouilles sautées au beurre de graines de sésame",
+                    ingredients: [
+                        { item: "Nouilles", quantity: "200g" },
+                        { item: "Beurre de graines de sésame", quantity: "2 cuillères à soupe" },
+                        { item: "Sauce soja", quantity: "2 cuillères à soupe" },
+                        { item: "Ail", quantity: "1 gousse" },
+                        { item: "Légumes sautés", quantity: "Au choix" }
+                    ],
+                    instructions: "Mélangez le beurre de graines de sésame avec la sauce soja. Faites sauter les légumes et les nouilles, puis ajoutez la sauce."
+                },
+                {
+                    name: "Barres énergétiques aux graines de tournesol",
+                    ingredients: [
+                        { item: "Flocons d'avoine", quantity: "200g" },
+                        { item: "Beurre de graines de tournesol", quantity: "100g" },
+                        { item: "Miel", quantity: "50g" },
+                        { item: "Fruits secs", quantity: "Au choix" }
+                    ],
+                    instructions: "Mélangez les ingrédients, tassez dans un moule et laissez refroidir."
+                },
+                {
+                    name: "Riz sauté aux graines de courge",
+                    ingredients: [
+                        { item: "Riz cuit", quantity: "200g" },
+                        { item: "Graines de courge grillées", quantity: "50g" },
+                        { item: "Légumes sautés", quantity: "Au choix" },
+                        { item: "Sauce soja", quantity: "Au goût" }
+                    ],
+                    instructions: "Faites sauter le riz avec les légumes et les graines de courge, puis ajoutez la sauce soja."
+                },
+                {
+                    name: "Gâteau au tahini",
+                    ingredients: [
+                        { item: "Farine", quantity: "200g" },
+                        { item: "Sucre", quantity: "100g" },
+                        { item: "Tahini (pâte de sésame)", quantity: "100g" },
+                        { item: "Œufs", quantity: "2" },
+                        { item: "Lait", quantity: "100ml" }
+                    ],
+                    instructions: "Mélangez les ingrédients, versez dans un moule et cuisez au four à 180°C pendant 30 minutes."
+                },
+                {
+                    name: "Smoothie banane et graines de chanvre",
+                    ingredients: [
+                        { item: "Banane", quantity: "1" },
+                        { item: "Lait", quantity: "200ml" },
+                        { item: "Graines de chanvre", quantity: "1 cuillère à soupe" },
+                        { item: "Miel", quantity: "1 cuillère à café" }
+                    ],
+                    instructions: "Mixez tous les ingrédients jusqu'à obtenir une texture lisse."
+                }
+            ],
+            fruits_de_mer: [
+                {
+                    name: "Risotto aux légumes grillés",
+                    ingredients: [
+                        { item: "Riz Arborio", quantity: "200g" },
+                        { item: "Courgettes grillées", quantity: "100g" },
+                        { item: "Aubergines grillées", quantity: "100g" },
+                        { item: "Bouillon de légumes", quantity: "500ml" },
+                        { item: "Oignon", quantity: "1" },
+                        { item: "Huile d'olive", quantity: "2 cuillères à soupe" }
+                    ],
+                    instructions: "Faites revenir l'oignon dans l'huile, ajoutez les légumes grillés, puis le riz. Versez le bouillon progressivement en remuant jusqu'à cuisson complète."
+                },
+                {
+                    name: "Paëlla végétarienne",
+                    ingredients: [
+                        { item: "Riz", quantity: "200g" },
+                        { item: "Poivrons rouges", quantity: "100g" },
+                        { item: "Pois chiches cuits", quantity: "100g" },
+                        { item: "Tomates", quantity: "2" },
+                        { item: "Bouillon de légumes", quantity: "500ml" },
+                        { item: "Safran", quantity: "1 pincée" }
+                    ],
+                    instructions: "Faites revenir les poivrons, ajoutez le riz et le bouillon. Ajoutez les pois chiches et les tomates en fin de cuisson et laissez mijoter avec le safran."
+                },
+                {
+                    name: "Soupe aux légumes et tofu",
+                    ingredients: [
+                        { item: "Tofu ferme", quantity: "150g" },
+                        { item: "Carottes", quantity: "150g" },
+                        { item: "Bouillon de légumes", quantity: "500ml" },
+                        { item: "Tomates", quantity: "2" },
+                        { item: "Ail", quantity: "2 gousses" }
+                    ],
+                    instructions: "Faites revenir l'ail, ajoutez les tomates, les carottes et le bouillon. Ajoutez le tofu et laissez mijoter."
+                },
+                {
+                    name: "Tagliatelles au tofu et crème",
+                    ingredients: [
+                        { item: "Tagliatelles", quantity: "200g" },
+                        { item: "Tofu ferme", quantity: "100g" },
+                        { item: "Champignons", quantity: "100g" },
+                        { item: "Crème fraîche", quantity: "200ml" },
+                        { item: "Ail", quantity: "1 gousse" }
+                    ],
+                    instructions: "Faites cuire les tagliatelles. Faites revenir le tofu avec les champignons et l'ail, puis ajoutez la crème et mélangez."
+                },
+                {
+                    name: "Risotto aux champignons",
+                    ingredients: [
+                        { item: "Riz Arborio", quantity: "200g" },
+                        { item: "Champignons", quantity: "150g" },
+                        { item: "Bouillon de légumes", quantity: "500ml" },
+                        { item: "Parmesan", quantity: "50g" },
+                        { item: "Oignon", quantity: "1" }
+                    ],
+                    instructions: "Faites revenir l'oignon, ajoutez le riz et le bouillon. Ajoutez les champignons en fin de cuisson avec le parmesan."
+                },
+                {
+                    name: "Curry de légumes au lait de coco",
+                    ingredients: [
+                        { item: "Carottes", quantity: "100g" },
+                        { item: "Brocoli", quantity: "100g" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Pâte de curry", quantity: "2 cuillères à soupe" },
+                        { item: "Tomates", quantity: "2" }
+                    ],
+                    instructions: "Faites cuire les tomates avec la pâte de curry, ajoutez le lait de coco et les légumes, laissez mijoter."
+                },
+                {
+                    name: "Tacos végétariens au haricots rouges",
+                    ingredients: [
+                        { item: "Tortillas", quantity: "4" },
+                        { item: "Haricots rouges cuits", quantity: "150g" },
+                        { item: "Avocat", quantity: "1" },
+                        { item: "Tomates", quantity: "2" },
+                        { item: "Sauce épicée", quantity: "Au goût" }
+                    ],
+                    instructions: "Disposez les haricots rouges, l'avocat et les tomates dans les tortillas, ajoutez la sauce et roulez."
+                },
+                {
+                    name: "Gratin aux légumes",
+                    ingredients: [
+                        { item: "Courgettes", quantity: "200g" },
+                        { item: "Carottes", quantity: "200g" },
+                        { item: "Crème fraîche", quantity: "300ml" },
+                        { item: "Parmesan", quantity: "50g" },
+                        { item: "Chapelure", quantity: "50g" }
+                    ],
+                    instructions: "Disposez les légumes dans un plat, versez la crème, saupoudrez de parmesan et de chapelure, faites gratiner au four."
+                },
+                {
+                    name: "Pizza aux légumes",
+                    ingredients: [
+                        { item: "Pâte à pizza", quantity: "1" },
+                        { item: "Courgettes", quantity: "100g" },
+                        { item: "Champignons", quantity: "100g" },
+                        { item: "Sauce tomate", quantity: "150ml" },
+                        { item: "Mozzarella", quantity: "100g" }
+                    ],
+                    instructions: "Étalez la pâte, ajoutez la sauce tomate, disposez les légumes et la mozzarella, faites cuire au four."
+                },
+                {
+                    name: "Brochettes de légumes grillés",
+                    ingredients: [
+                        { item: "Courgettes", quantity: "150g" },
+                        { item: "Champignons", quantity: "150g" },
+                        { item: "Tomates cerises", quantity: "100g" },
+                        { item: "Sauce au citron", quantity: "Au goût" }
+                    ],
+                    instructions: "Enfilez les légumes sur des brochettes, faites cuire au gril et servez avec la sauce."
+                }
+            ],
+            celeri: [
+                {
+                    name: "Soupe de pommes de terre et poireaux",
+                    ingredients: [
+                        { item: "Poireaux", quantity: "200g" },
+                        { item: "Pommes de terre", quantity: "300g" },
+                        { item: "Bouillon de légumes", quantity: "500ml" },
+                        { item: "Crème fraîche", quantity: "100ml" },
+                        { item: "Oignon", quantity: "1" }
+                    ],
+                    instructions: "Faites revenir l'oignon, ajoutez les poireaux et les pommes de terre. Couvrez avec le bouillon, cuisez, puis mixez et ajoutez la crème."
+                },
+                {
+                    name: "Salade de pommes et carottes râpées",
+                    ingredients: [
+                        { item: "Pommes", quantity: "2" },
+                        { item: "Carottes râpées", quantity: "200g" },
+                        { item: "Noix", quantity: "50g" },
+                        { item: "Yaourt nature", quantity: "100g" },
+                        { item: "Jus de citron", quantity: "1 cuillère à soupe" }
+                    ],
+                    instructions: "Mélangez les pommes et les carottes râpées. Ajoutez les noix, le yaourt et le jus de citron, mélangez bien."
+                },
+                {
+                    name: "Gratin de courgettes au fromage",
+                    ingredients: [
+                        { item: "Courgettes", quantity: "300g" },
+                        { item: "Crème fraîche", quantity: "200ml" },
+                        { item: "Fromage râpé", quantity: "100g" },
+                        { item: "Sel et poivre", quantity: "Au goût" }
+                    ],
+                    instructions: "Disposez les courgettes dans un plat, ajoutez la crème et saupoudrez de fromage. Faites gratiner au four pendant 20 minutes."
+                },
+                {
+                    name: "Purée de pommes de terre et carottes",
+                    ingredients: [
+                        { item: "Pommes de terre", quantity: "300g" },
+                        { item: "Carottes", quantity: "200g" },
+                        { item: "Lait", quantity: "100ml" },
+                        { item: "Beurre", quantity: "20g" },
+                        { item: "Sel", quantity: "Au goût" }
+                    ],
+                    instructions: "Faites cuire les carottes et les pommes de terre, puis écrasez avec le lait et le beurre jusqu'à consistance lisse."
+                },
+                {
+                    name: "Carottes braisées au jus de citron",
+                    ingredients: [
+                        { item: "Carottes", quantity: "400g" },
+                        { item: "Bouillon de légumes", quantity: "300ml" },
+                        { item: "Jus de citron", quantity: "1 cuillère à soupe" },
+                        { item: "Beurre", quantity: "30g" }
+                    ],
+                    instructions: "Faites braiser les carottes avec le beurre, ajoutez le bouillon et laissez mijoter. Ajoutez le jus de citron avant de servir."
+                },
+                {
+                    name: "Curry de légumes au lait de coco",
+                    ingredients: [
+                        { item: "Carottes", quantity: "200g" },
+                        { item: "Brocoli", quantity: "200g" },
+                        { item: "Lait de coco", quantity: "200ml" },
+                        { item: "Pâte de curry", quantity: "1 cuillère à soupe" },
+                        { item: "Oignon", quantity: "1" }
+                    ],
+                    instructions: "Faites revenir l'oignon, ajoutez les carottes, le brocoli et la pâte de curry. Ajoutez le lait de coco et laissez mijoter."
+                },
+                {
+                    name: "Spaghettis à la sauce aux courgettes",
+                    ingredients: [
+                        { item: "Spaghettis", quantity: "200g" },
+                        { item: "Courgettes", quantity: "150g" },
+                        { item: "Crème fraîche", quantity: "100ml" },
+                        { item: "Parmesan", quantity: "50g" }
+                    ],
+                    instructions: "Faites cuire les spaghettis. Mixez les courgettes avec la crème et servez avec le parmesan râpé."
+                },
+                {
+                    name: "Tartines aux carottes et fromage frais",
+                    ingredients: [
+                        { item: "Carottes râpées", quantity: "200g" },
+                        { item: "Fromage frais", quantity: "100g" },
+                        { item: "Pain complet", quantity: "2 tranches" },
+                        { item: "Noix", quantity: "50g" }
+                    ],
+                    instructions: "Étalez le fromage frais sur le pain, ajoutez les carottes râpées et parsemez de noix."
+                },
+                {
+                    name: "Soufflé au brocoli",
+                    ingredients: [
+                        { item: "Brocoli", quantity: "200g" },
+                        { item: "Beurre", quantity: "50g" },
+                        { item: "Farine", quantity: "50g" },
+                        { item: "Lait", quantity: "300ml" },
+                        { item: "Œufs", quantity: "3" }
+                    ],
+                    instructions: "Préparez une béchamel avec le beurre, la farine et le lait. Ajoutez le brocoli et les jaunes d'œufs, puis les blancs en neige. Faites cuire au four."
+                },
+                {
+                    name: "Velouté de poireaux et pommes de terre",
+                    ingredients: [
+                        { item: "Poireaux", quantity: "200g" },
+                        { item: "Pommes de terre", quantity: "300g" },
+                        { item: "Bouillon de légumes", quantity: "500ml" },
+                        { item: "Crème fraîche", quantity: "100ml" }
+                    ],
+                    instructions: "Faites cuire les poireaux et les pommes de terre dans le bouillon, mixez et ajoutez la crème fraîche avant de servir."
+                },
+            ],
+            crustacés: [
+            {
+                name: "Salade façon crabe avec cœur de palmier",
+                ingredients: [
+                    { item: "Cœurs de palmier", quantity: "200g" },
+                    { item: "Mayonnaise", quantity: "3 cuillères à soupe" },
+                    { item: "Jus de citron", quantity: "1 cuillère à soupe" },
+                    { item: "Paprika", quantity: "1/2 cuillère à café" },
+                    { item: "Sel et poivre", quantity: "au goût" }
+                ],
+                instructions: "Coupez les cœurs de palmier en fines lamelles. Mélangez avec la mayonnaise, le jus de citron, le paprika, le sel et le poivre. Servez frais."
+            },
+            {
+                name: "Risotto aux champignons et algues",
+                ingredients: [
+                    { item: "Riz arborio", quantity: "300g" },
+                    { item: "Champignons", quantity: "200g" },
+                    { item: "Algues séchées", quantity: "10g" },
+                    { item: "Bouillon de légumes", quantity: "1L" },
+                    { item: "Oignon", quantity: "1" },
+                    { item: "Ail", quantity: "2 gousses" },
+                    { item: "Parmesan râpé", quantity: "50g" },
+                    { item: "Huile d'olive", quantity: "2 cuillères à soupe" }
+                ],
+                instructions: "Faites revenir l'oignon et l'ail dans l'huile d'olive. Ajoutez les champignons et les algues, puis le riz. Mélangez bien. Versez le bouillon petit à petit en remuant jusqu'à ce que le riz soit cuit. Incorporez le parmesan avant de servir."
+            },
+            {
+                name: "Tofu mariné façon crevettes",
+                ingredients: [
+                    { item: "Tofu ferme", quantity: "200g" },
+                    { item: "Jus de citron", quantity: "2 cuillères à soupe" },
+                    { item: "Algues Nori", quantity: "5g" },
+                    { item: "Ail", quantity: "1 gousse" },
+                    { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                ],
+                instructions: "Coupez le tofu en cubes et faites-le mariner avec le jus de citron, les algues et l'ail. Faites revenir dans l'huile jusqu'à ce qu'il soit doré."
+            },
+            {
+                name: "Jackfruit façon gambas",
+                ingredients: [
+                    { item: "Jacquier", quantity: "300g" },
+                    { item: "Jus de citron", quantity: "2 cuillères à soupe" },
+                    { item: "Paprika fumé", quantity: "1 cuillère à café" },
+                    { item: "Ail", quantity: "1 gousse" },
+                    { item: "Huile d'olive", quantity: "2 cuillères à soupe" }
+                ],
+                instructions: "Égouttez le jackfruit et faites-le mariner avec le jus de citron, le paprika et l'ail. Faites revenir dans l'huile jusqu'à ce qu'il soit légèrement doré."
+            },
+            {
+                name: "Coquilles Saint-Jacques végétales",
+                ingredients: [
+                    { item: "Champignons", quantity: "200g" },
+                    { item: "Beurre végétal", quantity: "2 cuillères à soupe" },
+                    { item: "Ail", quantity: "1 gousse" },
+                    { item: "Persil haché", quantity: "1 cuillère à soupe" }
+                ],
+                instructions: "Coupez les champignons en rondelles épaisses. Faites-les revenir dans le beurre avec l'ail et le persil."
+            },
+            {
+                name: "Soupe aux algues et légumes",
+                ingredients: [
+                    { item: "Algues séchées", quantity: "10g" },
+                    { item: "Carottes", quantity: "2" },
+                    { item: "Pommes de terre", quantity: "2" },
+                    { item: "Bouillon de légumes", quantity: "1L" },
+                    { item: "Oignon", quantity: "1" }
+                ],
+                instructions: "Faites revenir l'oignon, puis ajoutez les légumes coupés en morceaux. Ajoutez les algues et le bouillon, puis laissez mijoter jusqu'à cuisson."
+            },
+            {
+                name: "Boulettes de pois chiches façon fruits de mer",
+                ingredients: [
+                    { item: "Pois chiches cuits", quantity: "400g" },
+                    { item: "Algues Nori", quantity: "5g" },
+                    { item: "Farine", quantity: "50g" },
+                    { item: "Ail", quantity: "1 gousse" },
+                    { item: "Jus de citron", quantity: "1 cuillère à soupe" },
+                    { item: "Paprika fumé", quantity: "1 cuillère à café" },
+                    { item: "Huile pour la cuisson", quantity: "2 cuillères à soupe" }
+                ],
+                instructions: "Mixez les pois chiches, les algues, l'ail, le jus de citron et le paprika. Formez des boulettes et roulez-les dans la farine. Faites-les cuire dans l'huile jusqu'à ce qu'elles soient dorées."
+            },
+            {
+                name: "Seitan façon pétoncles",
+                ingredients: [
+                    { item: "Seitan", quantity: "200g" },
+                    { item: "Jus de citron", quantity: "1 cuillère à soupe" },
+                    { item: "Algues Nori", quantity: "5g" },
+                    { item: "Huile d'olive", quantity: "1 cuillère à soupe" }
+                ],
+                instructions: "Coupez le seitan en rondelles et faites-le mariner avec le jus de citron et les algues. Faites revenir dans l'huile jusqu'à ce qu'il soit doré."
+            },
+        ],
+  cerealesSansGluten: [
+    {
+      "name": "Porridge au quinoa et fruits frais",
+      "ingredients": [
+        { "item": "Quinoa", "quantity": "200g" },
+        { "item": "Lait d'amande", "quantity": "300ml" },
+        { "item": "Fruits frais", "quantity": "150g" },
+        { "item": "Graines de chia", "quantity": "1 cuillère à soupe" }
+      ],
+      "instructions": "Rincez le quinoa et faites-le cuire dans le lait d'amande jusqu'à épaississement. Ajoutez les fruits frais et les graines de chia avant de servir."
+    },
+    {
+      "name": "Taboulé au quinoa",
+      "ingredients": [
+        { "item": "Quinoa", "quantity": "300g" },
+        { "item": "Tomates", "quantity": "200g" },
+        { "item": "Concombre", "quantity": "150g" },
+        { "item": "Menthe fraîche", "quantity": "1 cuillère à soupe" },
+        { "item": "Citron", "quantity": "1" }
+      ],
+      "instructions": "Faites cuire le quinoa et laissez-le refroidir. Ajoutez les légumes coupés en dés, la menthe et le jus de citron. Mélangez bien et servez frais."
+    },
+    {
+      "name": "Risotto au riz complet",
+      "ingredients": [
+        { "item": "Riz complet", "quantity": "300g" },
+        { "item": "Bouillon de légumes", "quantity": "1L" },
+        { "item": "Champignons", "quantity": "200g" },
+        { "item": "Oignon", "quantity": "1" },
+        { "item": "Huile d'olive", "quantity": "2 cuillères à soupe" }
+      ],
+      "instructions": "Faites revenir l'oignon dans l'huile. Ajoutez les champignons, le riz, et le bouillon progressivement jusqu'à cuisson complète."
+    },
+    {
+      "name": "Galettes de sarrasin",
+      "ingredients": [
+        { "item": "Farine de sarrasin", "quantity": "150g" },
+        { "item": "Œufs", "quantity": "2" },
+        { "item": "Lait végétal", "quantity": "300ml" },
+        { "item": "Sel", "quantity": "1 pincée" }
+      ],
+      "instructions": "Mélangez tous les ingrédients pour former une pâte. Faites cuire les galettes dans une poêle chaude et servez avec des garnitures au choix."
+    },
+    {
+      "name": "Pain aux graines sans gluten",
+      "ingredients": [
+        { "item": "Farine sans gluten", "quantity": "300g" },
+        { "item": "Graines de tournesol", "quantity": "50g" },
+        { "item": "Levure", "quantity": "1 sachet" },
+        { "item": "Eau tiède", "quantity": "200ml" },
+        { "item": "Sel", "quantity": "1 cuillère à café" }
+      ],
+      "instructions": "Mélangez tous les ingrédients et laissez lever. Faites cuire au four à 180°C pendant 30 minutes."
+    },
+    {
+      "name": "Soupe au millet et légumes",
+      "ingredients": [
+        { "item": "Millet", "quantity": "100g" },
+        { "item": "Carottes", "quantity": "200g" },
+        { "item": "Courgettes", "quantity": "200g" },
+        { "item": "Bouillon de légumes", "quantity": "1L" },
+        { "item": "Oignon", "quantity": "1" }
+      ],
+      "instructions": "Faites revenir l'oignon, puis ajoutez le millet, les légumes et le bouillon. Laissez mijoter jusqu'à cuisson."
+    },
+    {
+      "name": "Crêpes au riz",
+      "ingredients": [
+        { "item": "Farine de riz", "quantity": "150g" },
+        { "item": "Lait végétal", "quantity": "300ml" },
+        { "item": "Œufs", "quantity": "2" },
+        { "item": "Huile", "quantity": "1 cuillère à soupe" }
+      ],
+      "instructions": "Mélangez tous les ingrédients pour obtenir une pâte lisse. Faites cuire les crêpes dans une poêle chaude."
+    },
+    {
+      "name": "Muffins au sarrasin et chocolat",
+      "ingredients": [
+        { "item": "Farine de sarrasin", "quantity": "200g" },
+        { "item": "Chocolat noir", "quantity": "100g" },
+        { "item": "Sucre", "quantity": "100g" },
+        { "item": "Œufs", "quantity": "2" },
+        { "item": "Lait végétal", "quantity": "100ml" }
+      ],
+      "instructions": "Mélangez tous les ingrédients, puis répartissez dans des moules. Faites cuire au four à 180°C pendant 20 minutes."
+    },
+    {
+      "name": "Pancakes au quinoa",
+      "ingredients": [
+        { "item": "Farine de quinoa", "quantity": "150g" },
+        { "item": "Lait végétal", "quantity": "200ml" },
+        { "item": "Œufs", "quantity": "2" },
+        { "item": "Levure chimique", "quantity": "1 cuillère à café" }
+      ],
+      "instructions": "Mélangez tous les ingrédients pour obtenir une pâte. Faites cuire les pancakes dans une poêle chaude."
+    },
+    {
+      "name": "Salade de riz sauvage et légumes grillés",
+      "ingredients": [
+        { "item": "Riz sauvage", "quantity": "200g" },
+        { "item": "Légumes grillés", "quantity": "300g" },
+        { "item": "Huile d'olive", "quantity": "2 cuillères à soupe" },
+        { "item": "Jus de citron", "quantity": "1 cuillère à soupe" }
+      ],
+      "instructions": "Faites cuire le riz sauvage. Ajoutez les légumes grillés, l'huile et le jus de citron. Servez frais."
+    }
+  ],
+    fruitsCoques: [
+        {
+            "name": "Smoothie à l'amande et banane",
+            "ingredients": [
+                { "item": "Lait d'amande", "quantity": "300ml" },
+                { "item": "Banane", "quantity": "1" },
+                { "item": "Miel", "quantity": "1 cuillère à soupe" },
+                { "item": "Beurre d'amande", "quantity": "1 cuillère à soupe" }
+            ],
+            "instructions": "Mixez tous les ingrédients jusqu'à consistance lisse. Servez frais."
+        },
+        {
+            "name": "Salade aux noix et fromage",
+            "ingredients": [
+                { "item": "Laitue", "quantity": "150g" },
+                { "item": "Noix", "quantity": "50g" },
+                { "item": "Fromage bleu", "quantity": "30g" },
+                { "item": "Vinaigrette", "quantity": "2 cuillères à soupe" }
+            ],
+            "instructions": "Mélangez la laitue, les noix et le fromage. Ajoutez la vinaigrette et servez."
+        },
+        {
+            "name": "Risotto aux noisettes",
+            "ingredients": [
+                { "item": "Riz Arborio", "quantity": "300g" },
+                { "item": "Bouillon de légumes", "quantity": "1L" },
+                { "item": "Noisettes concassées", "quantity": "50g" },
+                { "item": "Parmesan", "quantity": "50g" },
+                { "item": "Oignon", "quantity": "1" }
+            ],
+            "instructions": "Faites revenir l'oignon dans l'huile. Ajoutez le riz et le bouillon progressivement. Incorporez les noisettes et le parmesan avant de servir."
+        },
+        {
+            "name": "Poulet aux noix de cajou",
+            "ingredients": [
+                { "item": "Poulet", "quantity": "500g" },
+                { "item": "Noix de cajou", "quantity": "100g" },
+                { "item": "Sauce soja", "quantity": "2 cuillères à soupe" },
+                { "item": "Miel", "quantity": "1 cuillère à soupe" },
+                { "item": "Gingembre", "quantity": "1 cuillère à café" }
+            ],
+            "instructions": "Faites revenir le poulet dans l'huile. Ajoutez les noix de cajou, la sauce soja, le miel et le gingembre. Laissez mijoter quelques minutes."
+        },
+        {
+            "name": "Cake aux amandes",
+            "ingredients": [
+                { "item": "Farine", "quantity": "200g" },
+                { "item": "Sucre", "quantity": "100g" },
+                { "item": "Œufs", "quantity": "3" },
+                { "item": "Poudre d'amandes", "quantity": "50g" },
+                { "item": "Beurre fondu", "quantity": "100g" }
+            ],
+            "instructions": "Mélangez tous les ingrédients. Versez dans un moule et faites cuire au four à 180°C pendant 30 minutes."
+        },
+        {
+            "name": "Soupe à la noix de coco et carottes",
+            "ingredients": [
+                { "item": "Carottes", "quantity": "500g" },
+                { "item": "Lait de coco", "quantity": "200ml" },
+                { "item": "Oignon", "quantity": "1" },
+                { "item": "Gingembre", "quantity": "1 cuillère à café" },
+                { "item": "Bouillon de légumes", "quantity": "500ml" }
+            ],
+            "instructions": "Faites revenir l'oignon dans l'huile, ajoutez les carottes et le gingembre. Ajoutez le bouillon et faites cuire. Mixez, puis ajoutez le lait de coco avant de servir."
+        },
+        {
+            "name": "Granola aux fruits secs et noix",
+            "ingredients": [
+                { "item": "Flocons d'avoine", "quantity": "300g" },
+                { "item": "Miel", "quantity": "3 cuillères à soupe" },
+                { "item": "Noix", "quantity": "100g" },
+                { "item": "Raisins secs", "quantity": "50g" }
+            ],
+            "instructions": "Mélangez tous les ingrédients, étalez sur une plaque et faites cuire au four à 180°C pendant 20 minutes."
+        },
+        {
+            "name": "Tarte aux noisettes",
+            "ingredients": [
+                { "item": "Pâte brisée", "quantity": "1" },
+                { "item": "Noisettes moulues", "quantity": "100g" },
+                { "item": "Sucre", "quantity": "50g" },
+                { "item": "Crème fraîche", "quantity": "200ml" },
+                { "item": "Œufs", "quantity": "2" }
+            ],
+            "instructions": "Mélangez les noisettes, le sucre, la crème et les œufs. Versez sur la pâte et faites cuire au four à 180°C pendant 30 minutes."
+        },
+        {
+            "name": "Poisson aux amandes",
+            "ingredients": [
+                { "item": "Filets de poisson", "quantity": "500g" },
+                { "item": "Amandes effilées", "quantity": "50g" },
+                { "item": "Jus de citron", "quantity": "2 cuillères à soupe" },
+                { "item": "Beurre", "quantity": "30g" }
+            ],
+            "instructions": "Faites cuire le poisson. Ajoutez les amandes grillées, le beurre fondu et le jus de citron avant de servir."
+        },
+        {
+            "name": "Riz sauté aux noix de cajou",
+            "ingredients": [
+                { "item": "Riz cuit", "quantity": "300g" },
+                { "item": "Noix de cajou", "quantity": "50g" },
+                { "item": "Légumes variés", "quantity": "200g" },
+                { "item": "Sauce soja", "quantity": "2 cuillères à soupe" },
+                { "item": "Ail", "quantity": "1 gousse" }
+            ],
+            "instructions": "Faites revenir les légumes et l'ail. Ajoutez le riz, les noix de cajou et la sauce soja. Mélangez bien."
+        },
+        {
+            "name": "Brownies aux noix",
+            "ingredients": [
+                { "item": "Farine", "quantity": "100g" },
+                { "item": "Chocolat noir", "quantity": "200g" },
+                { "item": "Sucre", "quantity": "150g" },
+                { "item": "Œufs", "quantity": "3" },
+                { "item": "Noix", "quantity": "50g" }
+            ],
+            "instructions": "Faites fondre le chocolat, mélangez avec les autres ingrédients. Incorporez les noix concassées. Faites cuire au four à 180°C pendant 25 minutes."
+        },
+        {
+            "name": "Muffins aux noisettes",
+            "ingredients": [
+                { "item": "Farine", "quantity": "200g" },
+                { "item": "Noisettes moulues", "quantity": "50g" },
+                { "item": "Sucre", "quantity": "100g" },
+                { "item": "Œufs", "quantity": "2" },
+                { "item": "Lait végétal", "quantity": "100ml" }
+            ],
+            "instructions": "Mélangez tous les ingrédients, répartissez dans des moules et faites cuire au four à 180°C pendant 20 minutes."
+        },
+        {
+            "name": "Pâtes aux noix de pécan et roquefort",
+            "ingredients": [
+                { "item": "Pâtes sans gluten", "quantity": "300g" },
+                { "item": "Noix de pécan", "quantity": "50g" },
+                { "item": "Roquefort", "quantity": "50g" },
+                { "item": "Crème fraîche", "quantity": "100ml" }
+            ],
+            "instructions": "Faites cuire les pâtes. Mélangez avec les noix de pécan, le roquefort et la crème fraîche."
+        }
+    ]
+};
+ // Pour afficher ou manipuler ces recettes, vous pouvez parcourir le tableau "Arachides".
+      // Fonction pour afficher les recettes
+      function displayRecipes(recipes) {
+      recipeList.innerHTML = recipes.map(recipe => `
+            <li>
+                <b>${recipe.name}</b>
+                <button class="view-recipe" data-name="${recipe.name}">Voir Détails</button>
+            </li>
+        `).join("");
+      document.querySelectorAll(".view-recipe").forEach(button => {
+        button.addEventListener("click", () => {
+          const recipeName = button.dataset.name;
+          const recipe = recipes.find(r => r.name === recipeName);
+          showRecipeDetails(recipe);
+        });
+      });
+    }
+    // Fonction pour afficher les détails d'une recette
+    function showRecipeDetails(recipe) {
+      recipeDetails.innerHTML = `
+            <h2>${recipe.name}</h2>
+            <p><b>Ingrédients :</b> ${recipe.ingredients.map(ingredient => `${ingredient.item} (${ingredient.quantity})`).join(", ")}</p>
+            <p><b>Instructions :</b> ${recipe.instructions}</p>
+            <button id="close-details">Fermer</button>
+        `;
+      recipeDetails.style.display = "block";
+      document.getElementById("close-details").addEventListener("click", () => {
+        recipeDetails.style.display = "none";
+      });
+    }
+    // Gestion de la recherche
+    searchButton.addEventListener("click", () => {
+      const selectedAllergies = Array.from(document.getElementById("allergies").selectedOptions).map(option => option.value);
+      const recipesToShow = selectedAllergies.flatMap(allergy => allergyRecipes[allergy] || []);
+      displayRecipes(recipesToShow);
+    });
+  });
+</script>
+</body>
+</html>

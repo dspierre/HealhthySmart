@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport Annuel de Santé</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 { color: #70e0b6; }
+        select, button { width: 100%; padding: 10px; margin-bottom: 10px; }
+        button { background-color: #70e0b6; color: white; cursor: pointer; }
+        #loader { font-size: 16px; color: #70e0b6; display: none; }
+        body.dark-mode { background-color: #2c3e50; color: white; }
+        .container.dark-mode { background-color: #34495e; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Rapport Annuel de Santé</h1>
+    <div id="loader">Chargement en cours...</div>
+    <div id="statistiques">
+        <h2>Statistiques Clés</h2>
+        <ul>
+            <li>Nombre de pas : <span id="pas">0</span></li>
+            <li>Sommeil : <span id="sommeil">0 h</span></li>
+            <li>Liquide : <span id="liquide">0 L</span></li>
+            <li>Fréquence cardiaque : <span id="frequenceCardiaque">0 bpm</span></li>
+        </ul>
+    </div>
+    <select id="category-filter">
+        <option value="sommeil">Sommeil</option>
+        <option value="liquide">Consommation liquide</option>
+        <option value="pas">Nombre de pas</option>
+        <option value="frequenceCardiaque">Fréquence cardiaque</option>
+    </select>
+    <select id="time-filter">
+        <option value="week">Cette semaine</option>
+        <option value="month">Ce mois</option>
+        <option value="year">Cette année</option>
+    </select>
+    
+    <div id="graphiques">
+        <canvas id="graphique-sante"></canvas>
+    </div>
+    <button id="download-pdf">Exporter en PDF</button>
+    <button id="toggle-dark-mode">Mode Sombre</button>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    const ctx = document.getElementById("graphique-sante").getContext("2d");
+    const categoryFilter = document.getElementById("category-filter");
+    let chart;
+    async function fetchDataFromAPI() {
+        try {
+            const response = await fetch('http://localhost:3000/api/all_stats');
+            if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+            const data = await response.json();
+            if (!data.length) {
+                throw new Error("❌ Aucune donnée trouvée !");
+            }
+            console.log("✅ Données API reçues :", data);
+            return data;
+        } catch (error) {
+            console.error("❌ Erreur API :", error);
+            document.getElementById("statistiques").innerHTML = "<p>⚠ Impossible de récupérer les données.</p>";
+            return null;
+        }
+    }
+    function updateStatistics(data) {
+        if (!data || data.length === 0) {
+            console.error("❌ Aucune donnée reçue !");
+            return;
+        }
+        const totalPas = data.reduce((sum, entry) => sum + (entry.steps || 0), 0);
+        const totalSommeil = data.reduce((sum, entry) => sum + (entry.sleep || 0), 0);
+        const totalLiquide = data.reduce((sum, entry) => sum + (entry.water || 0), 0);
+        const totalFrequenceCardiaque = data.reduce((sum, entry) => sum + (entry.heartRate || 0), 0);
+        const moyenneFrequenceCardiaque = data.length > 0 ? totalFrequenceCardiaque / data.length : 0;
+        document.getElementById("pas").textContent = totalPas;
+        document.getElementById("sommeil").textContent = totalSommeil + " h";
+        document.getElementById("liquide").textContent = totalLiquide + " L";
+        document.getElementById("frequenceCardiaque").textContent = Math.round(moyenneFrequenceCardiaque) + " bpm";
+    }
+    function filterDataByTimePeriod(data, period) {
+    const now = new Date();
+    console.log("🔍 Période sélectionnée :", period);
+    const filteredData = data.filter(entry => {
+        const entryDate = new Date(entry.date);
+        console.log("📅 Date de l'entrée :", entryDate); // Affiche chaque date avant le filtrage
+        
+        if (period === "week") {
+            return now - entryDate <= 7 * 24 * 60 * 60 * 1000;
+        } else if (period === "month") {
+            return now.getMonth() === entryDate.getMonth() && now.getFullYear() === entryDate.getFullYear();
+        } else if (period === "year") {
+            return now.getFullYear() === entryDate.getFullYear();
+        }
+    });
+
+    console.log("✅ Données filtrées :", filteredData); // Affiche les données après filtrage
+    return filteredData;
+}
+function trieChronologiqueData(data) {
+    if (!data || data.length === 0) {
+        console.error("❌ Aucune donnée à trier !");
+        return [];
+    }
+    const sortedData = data
+        .filter(entry => entry.date) // Filtre les entrées sans date
+        .map(entry => ({
+            ...entry,
+            date: new Date(entry.date) // Convertit les dates en objets Date
+        }))
+        .sort((a, b) => a.date - b.date); // Trie par ordre chronologique
+    console.log("✅ Données triées chronologiquement :", sortedData); // Affichage des données triées
+    return sortedData;
+}
+
+function createChartByCategory(category, data) {
+    if (!data || !category) {
+        console.error("❌ Erreur: Données ou catégorie invalides !");
+        return;
+    }
+    const categoriesMap = {
+        sommeil: { label: "Sommeil (heures)", property: "sleep", color: "cyan" },
+        liquide: { label: "Liquide (litres)", property: "water", color: "teal" },
+        pas: { label: "Nombre de pas", property: "steps", color: "purple" },
+        frequenceCardiaque: { label: "Fréquence cardiaque (bpm)", property: "heartRate", color: "red" }
+    };
+    // 🔹 Utilisation de la fonction de tri
+    const sortedData = trieChronologiqueData(data);
+    const labels = sortedData.map(entry => entry.date.toISOString().split("T")[0]); // Formate les dates
+    const values = sortedData.map(entry => entry[categoriesMap[category].property]);
+    if (chart) {
+        chart.destroy();
+    }
+    chart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: categoriesMap[category].label,
+                data: values,
+                borderColor: categoriesMap[category].color,
+                backgroundColor: `${categoriesMap[category].color}33`,
+                borderWidth: 2
+            }]
+        },
+        options: { responsive: true }
+    });
+}
+
+
+    document.getElementById("download-pdf").addEventListener("click", () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("📄 Rapport Annuel de Santé", 10, 10);
+        const stats = [
+            `Nombre de pas : ${document.getElementById("pas").textContent}`,
+            `Sommeil : ${document.getElementById("sommeil").textContent}`,
+            `Liquide : ${document.getElementById("liquide").textContent}`,
+            `Fréquence cardiaque : ${document.getElementById("frequenceCardiaque").textContent}`
+        ];
+        let y = 30;
+        stats.forEach(stat => {
+            doc.text(stat, 10, y);
+            y += 10;
+        });
+        doc.save("rapport_sante.pdf");
+    });
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toISOString().split("T")[0];
+    }
+
+    function generateDateRange(startDate, endDate) {
+        const dates = [];
+        let currentDate = new Date(startDate);
+        const stopDate = new Date(endDate);
+        while (currentDate <= stopDate) {
+            dates.push(formatDate(currentDate));
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        return dates;
+    }
+
+    document.getElementById("toggle-dark-mode").addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        document.querySelector(".container").classList.toggle("dark-mode");
+    });
+    const init = async () => {
+        const data = await fetchDataFromAPI();
+        if (!data) return;
+        updateStatistics(data);
+        createChartByCategory(categoryFilter.value, data);
+        categoryFilter.addEventListener("change", () => {
+            createChartByCategory(categoryFilter.value, data);
+        });
+    };
+    init();
+});
+</script>
+</body>
+</html>

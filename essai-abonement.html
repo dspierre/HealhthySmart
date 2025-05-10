@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abonnement SaaS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .plan-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .plan {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .plan h2 {
+            color: #70e0b6;
+        }
+        .btn {
+            background-color: #70e0b6;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Choisissez votre abonnement</h1>
+
+    <div class="plan-container">
+        <div class="plan">
+            <h2>Starter (Gratuit)</h2>
+            <p>Essai gratuit pendant 14 jours.</p>
+            <button class="btn" onclick="startTrial()">Commencer l’essai</button>
+        </div>
+        <div class="plan">
+            <h2>Premium (€9.99/mois)</h2>
+            <p>Accès complet et support prioritaire.</p>
+            <button class="btn" id="checkout-button">Souscrire</button>
+        </div>
+    </div>
+
+    <script>
+        function startTrial() {
+            alert("Votre essai gratuit est activé pour 14 jours !");
+        }
+    </script>
+
+</body>
+</html>

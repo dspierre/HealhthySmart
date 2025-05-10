@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntegrSmart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .circle-container {
+            position: relative;
+            width: 900px;
+            height: 900px;
+        }
+        .central-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-color: #555;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .category {
+            position: absolute;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            transition: transform 0.5s ease, background-color 0.3s ease;
+        }
+        .category:hover {
+            transform: scale(1.2);
+            background-color: #333;
+        }
+        .category:hover::before {
+            content: attr(data-pricing) "\a" attr(data-description-part1) "\a" attr(data-description-part2);
+            position: absolute;
+            white-space: pre-wrap;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .category.health { background-color: lightgreen; }
+        .category.edu { background-color: darkviolet; }
+        .category.time { background-color: orange; }
+        .category.travel { background-color: turquoise; }
+        .category.invest { background-color: #800000; color: white; }
+        .category.eco { background-color: olive; }
+        .category.family { background-color: pink; }
+        .category.secure { background-color: #00A8CC; }
+        .category.event { background-color: #FFDEAD; }
+        .category.green { background-color: forestgreen; }
+        .category.home { background-color: tan; }
+        .category.spend { background-color:#00308F; color: black; }
+        .category.mind { background-color: lavender; }
+        @media screen and (max-width: 768px) {
+            .circle-container {
+                width: 500px;
+                height: 500px;
+            }
+            .category {
+                width: 70px;
+                height: 70px;
+                font-size: 12px;
+            }
+        }
+        #modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 350px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            z-index: 1000;
+        }
+        #modal h2 {
+            margin: 0 0 10px;
+        }
+        #modal p {
+            margin: 10px 0;
+        }
+        #modal button {
+            background: #800000;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #modal button:hover {
+            background: #333;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffffff, #ffffff); /* Dégradé vert clair */
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        header nav ul li {
+            display: inline;
+            position: relative;
+        }
+        header nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        header nav ul li:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="circle-container">
+    <div class="central-circle">IntegrSmart</div>
+</div>
+<div id="modal">
+    <h2 id="modal-title"></h2>
+    <p><strong>Prix :</strong> <span id="modal-pricing"></span></p>
+    <p><strong>Description :</strong> <span id="modal-description-part1"></span></p>
+    <p><span id="modal-description-part2"></span></p>
+    <button onclick="closeModal()">Fermer</button>
+</div>
+<script>
+    const saas = [
+        {
+            name: "SpendSmart",
+            class: "spend",
+            descriptionPart1: "Suivi des dépenses, notifications d'échéances.",
+            descriptionPart2: "Analyse IA des dépenses, simulateurs financiers avancés.",
+            pricing: "Starter : 8,50€ | Premium : 15,50€"
+        },
+        {
+            name: "EduSkill",
+            class: "edu",
+            descriptionPart1: "Outils de gestion des cours, calendrier d'activités.",
+            descriptionPart2: "Suivi des performances, intégrations éducatives avancées.",
+            pricing: "Starter : 10€ | Premium : 25€"
+        },
+        {
+            name: "HealthSmart",
+            class: "health",
+            descriptionPart1: "Suivi des dépenses santé, rappels médicaux.",
+            descriptionPart2: "Programmes de bien-être personnalisés, gestion des dossiers médicaux.",
+            pricing: "Starter : 8.5 | Premium : 20€",
+            url:"HealthSmart_index_premium.html",
+        },
+        {
+            name: "TimeSmart",
+            class: "time",
+            descriptionPart1: "Calendrier simplifié, rappels de tâches.",
+            descriptionPart2: "Synchronisation multi-appareils, analyse de la gestion du temps.",
+            pricing: "Starter : 6.99€ "
+        },
+        {
+            name: "TravelSmart",
+            class: "travel",
+            descriptionPart1: "Comparateur de coûts, planificateur d'itinéraires.",
+            descriptionPart2: "Recommandations de voyage personnalisées, gestion collaborative.",
+            pricing: "Starter : 8€ | Premium : 18€"
+        },
+        {
+            name: "InvestSmart",
+            class: "invest",
+            descriptionPart1: "Simulateur d'épargne, conseils financiers.",
+            descriptionPart2: "Prévisions personnalisées, IA de suivi d'investissements," +
+                "Simulateur retraite, suivi d'objectifs financiers..",
+            pricing: "Starter : 12€ | Premium : 25€"
+        },
+        {
+            name: "FamilySmart",
+            class: "family",
+            descriptionPart1: "Gestion des emplois du temps familiaux, partage de tâches.",
+            descriptionPart2: "Tableaux de bord interactifs, gestion des activités enfants.",
+            pricing: "Starter : 6.99€ "
+        },
+        {
+    name: "VaultSmart",
+    "class": "secure",
+    "descriptionPart1": "Gestion avancée des abonnements, sécurisation des mots de passe et protection contre les cybermenaces.",
+    "descriptionPart2": "Surveillance en temps réel, alertes de sécurité et optimisation budgétaire pour éviter les dépenses inutiles.",
+    "pricing": "Starter : 6.99€ "
+     },
+        {
+            name: "EventSmart",
+            class: "event",
+            descriptionPart1: "Organisation des invités, gestion de budgets basiques.Wedding  planer",
+            descriptionPart2: "Suivi des dépenses en temps réel, outils avancés.",
+            pricing: "Starter : 7.99€ | Premium : 15.5€"
+        },
+        {
+            name: "planetSmart",
+            class: "green",
+            descriptionPart1: "Calculs d'impact écologique, émissions carbone personnelles," +
+                " Suivi de consommation énergétique.",
+            descriptionPart2: "Rapports détaillés, conseils verts, intégration reforestation.",
+            pricing: "Starter : 9€ | Premium : 20€"
+        },
+        {
+            name: "HomeSmart",
+            class: "home",
+            descriptionPart1: "Suivi des dépenses, gestion de projets de rénovation.",
+            descriptionPart2: "Comparateur de devis, gestion des contrats d'artisans.",
+            pricing: "Starter : 6.99€ | Premium : 25€"
+        },
+        {
+            name: "MindSmart",
+            class: "mind",
+            descriptionPart1: "Exercices de relaxation, gestion du stress.",
+            descriptionPart2: "Coaching personnalisé, analyse avancée des émotions.",
+            pricing: "Starter : 5.99€  "
+        }
+    ];
+    const container = document.querySelector(".circle-container");
+    const radius = Math.min(window.innerWidth, window.innerHeight) / 3;
+    const centerX = 450;
+    const centerY = 450;
+    const angleStep = (2 * Math.PI) / saas.length;
+    saas.forEach((item, index) => {
+        const angle = index * angleStep;
+        const x = centerX + radius * Math.cos(angle) - 50;
+        const y = centerY + radius * Math.sin(angle) - 50;
+        const div = document.createElement("div");
+        div.className = `category ${item.class}`;
+        div.style.left = `${x}px`;
+        div.style.top = `${y}px`;
+        div.textContent = item.name;
+        div.setAttribute("data-description-part1", item.descriptionPart1);
+        div.setAttribute("data-description-part2", item.descriptionPart2);
+        div.setAttribute("data-pricing", item.pricing);
+        div.onclick = () =>
+            openModal(
+                item.name,
+                item.pricing,
+                item.descriptionPart1,
+                item.descriptionPart2
+            );
+        container.appendChild(div);
+    });
+    function openModal(title, pricing, descriptionPart1, descriptionPart2) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-pricing").textContent = pricing;
+        document.getElementById("modal-description-part1").textContent =
+            descriptionPart1;
+        document.getElementById("modal-description-part2").textContent =
+            descriptionPart2;
+        document.getElementById("modal").style.display = "block";
+    }
+    function closeModal() {
+        document.getElementById("modal").style.display = "none";
+    }
+</script>
+</body>
+</html>

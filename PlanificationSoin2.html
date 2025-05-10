@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Médical</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+        }
+        th {
+            background-color: #70e0b6;
+            color: white;
+        }
+        .popup-menu {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #70e0b6;
+        }
+        .popup-menu {
+    display: none;
+    position: fixed;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+/* Couleurs spécifiques par catégorie */
+.appointment-prevention { background-color: #28a745; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-specialistes { background-color: #007bff; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-problemes { background-color: #dc3545; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-urgence { background-color: #ffc107; color: black; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-enfants { background-color: #6f42c1; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+.appointment-aged { background-color: #17a2b8; color: white; padding: 2px; border-radius: 4px; font-size: 0.75em; }
+td div {
+    display: inline-block;
+    margin: 2px;
+    text-align: center;
+}
+.appointment {
+            padding: 2px;
+            border-radius: 4px;
+            font-size: 0.75em;
+        }
+        .appointment-prevention { background-color: #28a745; color: white; }
+        .appointment-specialistes { background-color: #007bff; color: white; }
+        .appointment-problemes { background-color: #dc3545; color: white; }
+        .appointment-urgence { background-color: #ffc107; color: black; }
+        .appointment-enfants { background-color: #6f42c1; color: white; }
+        .appointment-aged { background-color: #17a2b8; color: white; }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #0078D7;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover { background-color: #0057a0; }
+        body.dark-mode {
+        background-color: #1e1e1e;
+        color: white;
+    }
+    </style>
+</head>
+<body>
+    <h1>Agenda Médical</h1>
+<button onclick="toggleDarkMode()">Mode Sombre</button>
+<button onclick="increaseFontSize()">Augmenter la Taille du Texte</button>
+<button onclick="exportToICal()">Exporter tous les événements en iCal</button>
+<button onclick="shareAgenda()">Partager l'Agenda</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Heures</th>
+                <th>Dimanche</th>
+                <th>Lundi</th>
+                <th>Mardi</th>
+                <th>Mercredi</th>
+                <th>Jeudi</th>
+                <th>Vendredi</th>
+                <th>Samedi</th>
+            </tr>
+        </thead>
+        <tbody id="schedule"></tbody>
+    </table>
+    <div id="popupMenu" class="popup-menu">
+        <p>Choisissez un créneau :</p>
+        <select id="exactTimeSelect"></select>
+        <p>Choisissez une catégorie :</p>
+        <select id="categorySelect" onchange="displaySubMenu()"></select>
+        <p>Choisissez un sous-type :</p>
+        <select id="subAppointmentType"></select>
+        <p>Ajoutez une note :</p>
+        <input type="text" id="appointmentNotes">
+        <br>
+        <button onclick="saveAppointment()">Sauvegarder</button>
+        <button onclick="editAppointment()">Modifier</button>
+        <button onclick="deleteAppointment()">Supprimer</button>
+        <button onclick="closePopup()">Annuler</button>
+    </div>
+<script>
+    function addAllToGoogleCalendar() {
+        const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+        let baseUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE";
+        
+        storedEvents.forEach(event => {
+            const eventUrl = `${baseUrl}&text=${encodeURIComponent(event.summary)}&dates=${encodeURIComponent(event.date)}/${encodeURIComponent(event.date)}&details=${encodeURIComponent(event.description)}`;
+            window.open(eventUrl);
+        });
+    }
+</script>
+<style>
+    body.dark-mode {
+        background-color: #1e1e1e;
+        color: white;
+    }
+    .high-contrast {
+        background-color: black;
+        color: yellow;
+    }
+</style>
+<script>
+    function exportToICal() {
+        const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+        let icsData = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//AgendaMédical//FR\nCALSCALE:GREGORIAN\n";
+        storedEvents.forEach(event => {
+            const startDate = event.date.replace(/-/g, '').replace('T', '').slice(0, 15) + "Z";
+            const endDate = event.date.replace(/-/g, '').replace('T', '').slice(0, 15) + "Z";
+            
+            icsData += `BEGIN:VEVENT\nUID:${Date.now()}@AgendaMedical\nSUMMARY:${event.summary}\nDESCRIPTION:${event.description}\nDTSTART:${startDate}\nDTEND:${endDate}\nSTATUS:CONFIRMED\nEND:VEVENT\n`;
+        });
+        icsData += "END:VCALENDAR";
+        const blob = new Blob([icsData], { type: "text/calendar" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "agenda_medical_fixed.ics";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    function exportToICal() {
+        const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
+        let icsData = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//MonAgenda//FR\n";
+        storedEvents.forEach(event => {
+            icsData += `BEGIN:VEVENT\nSUMMARY:${event.summary}\nDESCRIPTION:${event.description}\nDTSTART:${event.date.replace(/-/g, '')}\nDTEND:${event.date.replace(/-/g, '')}\nEND:VEVENT\n`;
+        });
+        icsData += "END:VCALENDAR";
+        const blob = new Blob([icsData], { type: "text/calendar" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "agenda_medical.ics";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+    }
+    function increaseFontSize() {
+        document.body.style.fontSize = "18px";
+    }
+        const submenuData = {
+            prevention: ["Médecin généraliste", "Vaccinations"],
+            specialistes: ["Cardiologue", "Dermatologue"],
+            problemes: ["Nutritionniste", "Allergologue"],
+            urgence: ["Urgences médicales", "Imagerie (IRM, scanner)"],
+            enfants: ["Pédiatre", "Orthophoniste"],
+            aged: ["Gériatre", "Audioprothésiste"]
+        };
+        document.addEventListener('DOMContentLoaded', () => {
+            const schedule = document.getElementById('schedule');
+            for (let i = 0; i < 24; i++) {
+                const row = document.createElement('tr');
+                const hourCell = document.createElement('td');
+                hourCell.textContent = `${i}:00`;
+                row.appendChild(hourCell);
+                for (let j = 0; j < 7; j++) {
+                    const dayCell = document.createElement('td');
+                    dayCell.onclick = (event) => showPopupMenu(event, i, j);
+                    row.appendChild(dayCell);
+                }
+                schedule.appendChild(row);
+            }
+            loadAppointments();
+        });
+        function showPopupMenu(event, hour, day) {
+            const popupMenu = document.getElementById('popupMenu');
+            popupMenu.style.display = 'block';
+            popupMenu.style.top = `${event.clientY}px`;
+            popupMenu.style.left = `${event.clientX}px`;
+            popupMenu.dataset.hour = hour;
+            popupMenu.dataset.day = day;
+            document.getElementById('exactTimeSelect').innerHTML = `
+                <option value="${hour}h15">${hour}h15</option>
+                <option value="${hour}h30">${hour}h30</option>
+                <option value="${hour}h45">${hour}h45</option>
+
+            `;
+            document.getElementById('categorySelect').innerHTML = Object.keys(submenuData)
+                .map(key => `<option value="${key}">${key}</option>`).join('');
+        }
+        function displaySubMenu() {
+            const categorySelect = document.getElementById('categorySelect').value;
+            document.getElementById('subAppointmentType').innerHTML = submenuData[categorySelect]
+                .map(item => `<option value="${item}">${item}</option>`).join('');
+        }
+        let events = [];
+async function saveAppointment() {
+    const summary = document.getElementById("categorySelect").value;
+    const description = document.getElementById("appointmentNotes").value;
+    const exactTime = document.getElementById("exactTimeSelect").value;
+    // Vérification des entrées
+    if (!summary || !exactTime) {
+        alert("Veuillez remplir tous les champs avant de sauvegarder !");
+        return;
+    }
+    const date = new Date().toISOString().split("T")[0] + `T${exactTime}`;
+    try {
+        const response = await fetch("http://localhost:3000/add_event", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ summary, description, date })
+        });
+        if (!response.ok) throw new Error("Erreur d'enregistrement");
+        alert("Événement enregistré sur SQLite !");
+        loadAppointments(); // Recharge la liste des événements après ajout
+    } catch (error) {
+        alert("Une erreur est survenue : " + error.message);
+    }
+}
+
+async function loadAppointments() {
+    try {
+        const response = await fetch("http://localhost:3000/events");
+        if (!response.ok) throw new Error("Erreur lors de la récupération des événements");
+        const events = await response.json();
+        const eventList = document.getElementById("eventList");
+        eventList.innerHTML = ""; // Nettoyer l'affichage avant mise à jour
+        events.forEach(event => {
+            const div = document.createElement("div");
+            div.textContent = `${event.date} - ${event.summary} - ${event.description}`;
+            eventList.appendChild(div);
+        });
+    } catch (error) {
+        alert("Impossible de charger les événements : " + error.message);
+    }
+}
+
+        function editAppointment() {
+            const popupMenu = document.getElementById('popupMenu');
+            const hour = popupMenu.dataset.hour;
+            const day = popupMenu.dataset.day;
+            showPopupMenu(null, hour, day);
+        }
+        function deleteAppointment() {
+            const popupMenu = document.getElementById('popupMenu');
+            const hour = popupMenu.dataset.hour;
+            const day = popupMenu.dataset.day;
+            document.getElementById('schedule').children[hour].children[parseInt(day) + 1].innerHTML = "";
+            localStorage.removeItem(`appointment-${hour}-${day}`);
+            closePopup();
+        } 
+        function closePopup() {
+            document.getElementById('popupMenu').style.display = 'none';
+        }
+        function loadAppointments() {
+            const schedule = document.getElementById('schedule');
+            for (let i = 0; i < 24; i++) {
+                for (let j = 0; j < 7; j++) {
+                    const savedData = localStorage.getItem(`appointment-${i}-${j}`);
+                    if (savedData) {
+                        schedule.children[i].children[j + 1].innerHTML = savedData;
+                    }
+                }
+            }
+        }
+    function shareAgenda() {
+        const shareLink = "https://agenda-medical.com/mon-agenda";
+        navigator.clipboard.writeText(shareLink);
+        alert("Lien copié dans le presse-papier !");
+    }
+    </script>
+    </body>
+    </html>
+    

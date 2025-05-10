@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeux Éducatifs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        nav {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #54c597;
+        }
+
+        #contenu {
+            width: 65%;
+            font-size: 18px;
+            font-weight: bold;
+            border-left: 3px solid #ccc;
+            padding-left: 20px;
+        }
+
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Jeux Éducatifs pour Enfants</h1>
+    <p>Choisis un jeu :</p>
+    <div class="container">
+        <nav>
+            <button onclick="chargerJeu(1)">Apprends les Chiffres</button>
+            <button onclick="chargerJeu(2)">Mémoire des Couleurs</button>
+            <button onclick="chargerJeu(3)">Trouve les Formes</button>
+            <button onclick="chargerJeu(4)">Le Chemin Magique</button>
+            <button onclick="chargerJeu(5)">Apprends l’Alphabet</button>
+            <button onclick="chargerJeu(6)">Compter avec les Étoiles</button>
+            <button onclick="chargerJeu(7)">Tic-Tac Temps</button>
+        </nav>        
+        <div id="contenu"></div>
+    </div>
+    <script>
+        const couleursPossibles = ["🔴", "🔵", "🟢", "🟡", "🟠", "🟣", "🟤", "⚫", "⚪"];
+        const chiffresPossibles = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        const directionsPossibles = ["⬆", "➡", "⬇", "⬅"];
+        const heuresPossibles = ["🕐 1h", "🕑 2h", "🕒 3h", "🕓 4h", "🕔 5h", "🕕 6h", "🕖 7h", "🕗 8h", "🕘 9h", "🕙 10h", "🕚 11h", "🕛 12h"];
+        const etoilesPossibles = ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐","⭐⭐⭐⭐⭐⭐"];
+        const formesPossibles = ["🔷", "⬜", "⭐", "🔺", "🟢"];
+
+        const jeux = {
+            1: { question: "Quel chiffre vois-tu ?", image: "", options: chiffresPossibles, correct: "" },
+            2: { question: "Retrouve la bonne couleur", image: "", options: couleursPossibles, correct: "" },
+            3: { question: "Trouve la bonne forme géométrique", image: "", options: formesPossibles, correct: "" },
+            4: { question: "Guide le lapin vers la carotte 🍀", image: "", options: directionsPossibles, correct: "" },
+            5: { question: "Quelle lettre correspond au mot 'Chat' ?", image: "🐱", options: ["A", "C", "D"], correct: "C" },
+            6: { question: "Combien vois-tu d’étoiles ?", image: "", options: etoilesPossibles, correct: "" },
+            7: { question: "Quelle heure est affichée ?", image: "", options: heuresPossibles, correct: "" }
+        };
+
+        function initialiserJeux() {
+            jeux[1].image = chiffresPossibles[Math.floor(Math.random() * chiffresPossibles.length)];
+            jeux[1].correct = jeux[1].image;
+
+            jeux[2].image = couleursPossibles[Math.floor(Math.random() * couleursPossibles.length)];
+            jeux[2].correct = jeux[2].image;
+
+            jeux[3].image = formesPossibles[Math.floor(Math.random() * formesPossibles.length)];
+            jeux[3].correct = jeux[3].image;
+
+            jeux[6].image = etoilesPossibles[Math.floor(Math.random() * etoilesPossibles.length)];
+            jeux[6].correct = jeux[6].image;
+
+            jeux[7].image = heuresPossibles[Math.floor(Math.random() * heuresPossibles.length)];
+            jeux[7].correct = jeux[7].image;
+        }
+
+        function chargerJeu(id) {
+            let contenu = document.getElementById("contenu");
+            contenu.innerHTML = "";
+
+            // Génération aléatoire du chemin du lapin avec différentes directions possibles
+            if (id === 4) {
+                jeux[4].correct = directionsPossibles[Math.floor(Math.random() * directionsPossibles.length)];
+                jeux[4].image = `🐰 ${jeux[4].correct} 🍀`;
+            }
+
+            let nouvelExercice = document.createElement("div");
+            nouvelExercice.innerHTML = `
+                <hr>
+                <p>${jeux[id].question}</p>
+                <p style="font-size: 50px;">${jeux[id].image}</p>
+                ${jeux[id].options.map(option => `<button onclick="verifierReponse('${option}', ${id})">${option}</button>`).join(' ')}
+                <p id="message${id}"></p>
+            `;
+            contenu.appendChild(nouvelExercice);
+        }
+
+        function verifierReponse(reponse, id) {
+            let message = document.getElementById(`message${id}`);
+            if (reponse === jeux[id].correct) {
+                message.textContent = "Bravo ! Bonne réponse ✅";
+                message.classList.add("correct");
+            } else {
+                message.textContent = "Oups ! Essaie encore ❌";
+                message.classList.add("incorrect");
+            }
+        }
+
+        initialiserJeux();
+    </script>
+</body>
+</html>

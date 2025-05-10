@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santé Connectée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #34d8c5;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+        .data-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            width: 300px;
+        }
+        button {
+            background-color: #34d8c5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #28b4a3;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <h1>Santé Connectée</h1>
+    </nav>
+</header>
+<main>
+    <h1>Connectez-vous à Samsung Health</h1>
+    <button id="authorizeButton">Se connecter</button>
+    <h2>Données de santé</h2>
+    <div class="data-box">
+        <p><strong>Nombre de pas :</strong> <span id="steps">...</span></p>
+        <p><strong>Calories dépensées :</strong> <span id="calories">...</span> kcal</p>
+        <p><strong>Distance parcourue :</strong> <span id="distance">...</span> km</p>
+    </div>
+    <script>
+        document.getElementById("authorizeButton").addEventListener("click", () => {
+            window.location.href = "http://localhost:3000/auth";
+        });
+        async function fetchHealthData(access_token) {
+            try {
+                const response = await fetch(`http://localhost:3000/getHealthData?access_token=${access_token}`);
+                const data = await response.json();
+                
+                document.getElementById("steps").textContent = data.steps;
+                document.getElementById("calories").textContent = data.calories.toFixed(2);
+                document.getElementById("distance").textContent = (data.distance / 1000).toFixed(2);
+            } catch (error) {
+                console.error("Erreur :", error);
+            }
+        }
+        // Récupérer le token depuis l'URL après connexion
+        const urlParams = new URLSearchParams(window.location.search);
+        const accessToken = urlParams.get("access_token");
+        if (accessToken) {
+            fetchHealthData(accessToken);
+        }
+    </script>
+    </body>
+    </html>

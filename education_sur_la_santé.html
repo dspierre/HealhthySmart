@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Santé</title>
+</head>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+    .container {
+        margin: auto;
+        max-width: 600px;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        color: #70e0b6;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+    }
+    #question {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+    #options button {
+        display: block;
+        background-color: #ffffff;
+        color: #333;
+        border: 1px solid #ddd;
+        margin: 10px auto;
+        padding: 10px 15px;
+        width: 80%;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    #options button:hover {
+        background-color: #70e0b6;
+        color: white;
+    }
+    #nextButton {
+        background-color: #70e0b6;
+        color: white;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 20px;
+        display: none; /* Caché jusqu'à ce qu'une réponse soit donnée */
+    }
+    #nextButton:hover {
+        background-color: #56c093;
+    }
+    #result {
+        font-size: 1.5rem;
+        color: #333;
+        margin-top: 20px;
+        display: none; /* Caché jusqu'à la fin du quiz */
+    }
+</style>
+<body>
+<div class="container">
+    <h1>💡 Quiz sur la Santé 💡</h1>
+    <!-- Sélection du nombre de questions -->
+    <label for="questionCount">Choisissez le nombre de questions :</label>
+    <select id="questionCount">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+    </select>
+    <button id="startQuizButton">Commencer le Quiz</button>
+    <!-- Zone pour afficher les questions -->
+    <div id="quiz" style="display:none;">
+        <p id="question"></p>
+        <div id="options"></div>
+        <button id="nextButton" style="display:none;">Suivant</button>
+    </div>
+    <!-- Résultat final -->
+    <div id="result" style="display:none;"></div>
+</div>
+<script>
+    // Sélection des éléments du DOM
+    const questionCountInput = document.getElementById('questionCount');
+    const startQuizButton = document.getElementById('startQuizButton');
+    const quizElement = document.getElementById('quiz');
+    const questionElement = document.getElementById('question');
+    const optionsElement = document.getElementById('options');
+    const nextButton = document.getElementById('nextButton');
+    const resultElement = document.getElementById('result');
+    // Tableau des questions (à remplir)
+    const questions = [
+        // Questions existantes
+        {
+            question: "Quelle est la durée moyenne recommandée de sommeil pour un adulte ?",
+            options: ["4-5 heures", "6-8 heures", "10-12 heures"],
+            answer: "6-8 heures"
+        },
+        {
+            question: "Quelle est la meilleure façon de prévenir une infection ?",
+            options: ["Se laver les mains régulièrement", "Prendre des antibiotiques", "Éviter les légumes"],
+            answer: "Se laver les mains régulièrement"
+        },
+        {
+            question: "Quels aliments sont riches en fibres ?",
+            options: ["Fruits et légumes", "Viande et poisson", "Sucres et pâtisseries"],
+            answer: "Fruits et légumes"
+        },
+        {
+            question: "Quelle est la durée minimale recommandée d'exercice par semaine ?",
+            options: ["50 minutes", "150 minutes", "300 minutes"],
+            answer: "150 minutes"
+        },
+        {
+            question: "Que faut-il faire pour rester hydraté ?",
+            options: ["Boire de l'eau régulièrement", "Manger beaucoup de sel", "Dormir plus"],
+            answer: "Boire de l'eau régulièrement"
+        },
+
+        // Questions supplémentaires
+        {
+            question: "Quel organe est responsable de la purification du sang ?",
+            options: ["Le foie", "Les reins", "Le cœur"],
+            answer: "Les reins"
+        },
+        {
+            question: "Quelle vitamine est principalement produite lorsque la peau est exposée au soleil ?",
+            options: ["Vitamine A", "Vitamine C", "Vitamine D"],
+            answer: "Vitamine D"
+        },
+        {
+            question: "Quel est le minéral essentiel pour renforcer les os ?",
+            options: ["Fer", "Calcium", "Magnésium"],
+            answer: "Calcium"
+        },
+        {
+            question: "Combien de verres d'eau est-il recommandé de boire par jour ?",
+            options: ["2-3 verres", "6-8 verres", "10-12 verres"],
+            answer: "6-8 verres"
+        },
+        {
+            question: "Quelle est la température corporelle normale d'un adulte en bonne santé ?",
+            options: ["35°C", "36.5°C à 37°C", "38°C à 39°C"],
+            answer: "36.5°C à 37°C"
+        },
+        {
+            question: "Que signifie le terme IMC ?",
+            options: ["Indice de Masse Corporelle", "Indice de Médecine Clinique", "Indice Métabolique Central"],
+            answer: "Indice de Masse Corporelle"
+        },
+        {
+            question: "Quelle activité est connue pour réduire le stress ?",
+            options: ["Méditation", "Manger des sucreries", "Regarder la télévision"],
+            answer: "Méditation"
+        },
+        {
+            question: "Que faut-il éviter pour protéger la santé des poumons ?",
+            options: ["Faire de l'exercice", "Fumer", "Manger des fruits"],
+            answer: "Fumer"
+        },
+        {
+            question: "Quel est le principal avantage d'une alimentation riche en protéines ?",
+            options: ["Augmente le poids", "Renforce les muscles", "Améliore la digestion"],
+            answer: "Renforce les muscles"
+        },
+        {
+            question: "Quel nutriment est essentiel pour transporter l'oxygène dans le sang ?",
+            options: ["Le fer", "Le calcium", "Le potassium"],
+            answer: "Le fer"
+        },
+        {
+            question: "Combien de minutes par jour un adulte devrait-il marcher pour maintenir une bonne santé ?",
+            options: ["10 minutes", "30 minutes", "60 minutes"],
+            answer: "30 minutes"
+        },
+        {
+            question: "Quelle est la meilleure méthode pour prévenir les caries dentaires ?",
+            options: ["Se brosser les dents deux fois par jour", "Boire des boissons gazeuses", "Manger des sucreries"],
+            answer: "Se brosser les dents deux fois par jour"
+        },
+        {
+            question: "Quel est un symptôme commun de la déshydratation ?",
+            options: ["Fatigue", "Augmentation de l'énergie", "Vision floue"],
+            answer: "Fatigue"
+        },
+        {
+            question: "Quel est le rôle principal des glucides dans l'alimentation ?",
+            options: ["Fournir de l'énergie", "Construire des muscles", "Augmenter les vitamines"],
+            answer: "Fournir de l'énergie"
+        },
+        {
+            question: "Quelle est la meilleure source de graisses saines ?",
+            options: ["Noix et avocats", "Chips", "Beurre"],
+            answer: "Noix et avocats"
+        },
+        {
+            question: "Quel est le niveau de cholestérol LDL considéré comme sain ?",
+            options: ["Inférieur à 100 mg/dL", "Supérieur à 200 mg/dL", "Entre 150 et 200 mg/dL"],
+            answer: "Inférieur à 100 mg/dL"
+        },
+        {
+            question: "Quel est l'effet principal d'un manque de sommeil prolongé ?",
+            options: ["Amélioration de l'immunité", "Troubles de la mémoire", "Augmentation du métabolisme"],
+            answer: "Troubles de la mémoire"
+        },
+        {
+            question: "Quel organe est principalement affecté par une consommation excessive d'alcool ?",
+            options: ["Le foie", "Les reins", "Le cœur"],
+            answer: "Le foie"
+        },
+        {
+            question: "Quel est un signe précoce d'une grippe ?",
+            options: ["Fièvre", "Gain de poids", "Nausées matinales"],
+            answer: "Fièvre"
+        },
+        {
+            question: "Quels sont les symptômes les plus courants du diabète ?",
+            options: ["Fatigue, soif excessive", "Douleurs articulaires", "Toux et fièvre"],
+            answer: "Fatigue, soif excessive"
+        },
+        {
+            question: "Quelle est la principale fonction des reins dans le corps humain ?",
+            options: ["Produire des hormones", "Filtrer le sang", "Renforcer les os"],
+            answer: "Filtrer le sang"
+        },
+        {
+            question: "Quelle est la meilleure façon de limiter la consommation de sucre ?",
+            options: ["Éviter les fruits", "Choisir des boissons sans sucre ajouté", "Manger des desserts sucrés après chaque repas"],
+            answer: "Choisir des boissons sans sucre ajouté"
+        },
+        {
+            question: "Quel type de graisse est considéré comme sain ?",
+            options: ["Graisses saturées", "Graisses insaturées", "Graisses trans"],
+            answer: "Graisses insaturées"
+        },
+        {
+            question: "Quelle est la fréquence recommandée de visites chez le dentiste ?",
+            options: ["Tous les 6 mois", "Tous les 2 ans", "Seulement en cas de douleur"],
+            answer: "Tous les 6 mois"
+        },
+        {
+            question: "Quel est l'effet de trop de sel dans l'alimentation ?",
+            options: ["Hypertension", "Faiblesse musculaire", "Augmentation de l'énergie"],
+            answer: "Hypertension"
+        },
+        {
+            question: "Quel est le rôle de la vitamine C dans l'organisme ?",
+            options: ["Renforcer le système immunitaire", "Donner de l'énergie", "Augmenter le calcium"],
+            answer: "Renforcer le système immunitaire"
+        },
+        {
+            question: "Combien de portions de fruits et légumes est-il recommandé de manger par jour ?",
+            options: ["1-2 portions", "3-5 portions", "6-8 portions"],
+            answer: "3-5 portions"
+        },
+        {
+            question: "Quelle est une bonne source de protéines végétales ?",
+            options: ["Haricots et lentilles", "Pain et pâte", "Sucres et pâtisseries"],
+            answer: "Haricots et lentilles"
+        },
+        {
+            question: "Quel aliment est connu pour être riche en oméga-3 ?",
+            options: ["Poisson gras", "Pain blanc", "Pommes de terre"],
+            answer: "Poisson gras"
+        },
+        {
+            question: "Quel est l'effet du tabac sur le corps humain ?",
+            options: ["Renforce les poumons", "Cause des maladies cardiovasculaires", "Améliore la concentration"],
+            answer: "Cause des maladies cardiovasculaires"
+        },
+        {
+            question: "Quelle est la méthode la plus efficace pour contrôler la prise de poids ?",
+            options: ["Éviter l'exercice", "Suivre une alimentation équilibrée", "Sauter des repas"],
+            answer: "Suivre une alimentation équilibrée"
+        },
+        {
+            question: "Quel est le principal rôle du magnésium dans l'organisme ?",
+            options: ["Renforcer les muscles", "Réguler les fonctions nerveuses", "Augmenter les globules rouges"],
+            answer: "Réguler les fonctions nerveuses"
+        },
+        {
+            question: "Quel type de pain est le meilleur pour une alimentation saine ?",
+            options: ["Pain complet", "Pain blanc", "Pain brioché"],
+            answer: "Pain complet"
+        },
+        {
+            question: "Quelle est la meilleure façon de traiter une brûlure légère ?",
+            options: ["Appliquer de l'eau froide", "Utiliser une pommade grasse", "Couvrir avec un pansement immédiatement"],
+            answer: "Appliquer de l'eau froide"
+        },
+        {
+            question: "Quelle est une cause fréquente de dépression ?",
+            options: ["Manque de sommeil", "Consommation excessive de vitamines", "Augmentation de l'exercice"],
+            answer: "Manque de sommeil"
+        },
+        {
+            question: "Quelle activité est la plus bénéfique pour la santé mentale ?",
+            options: ["Regarder la télévision", "Pratiquer la méditation", "Manger des bonbons"],
+            answer: "Pratiquer la méditation"
+        },
+        {
+            question: "Quel organe est principalement affecté par l'obésité ?",
+            options: ["Les poumons", "Le foie", "Les reins"],
+            answer: "Le foie"
+        },
+        {
+            question: "Que faut-il faire pour éviter une intoxication alimentaire ?",
+            options: ["Manger des aliments chauds", "Bien laver les aliments avant de les cuisiner", "Boire beaucoup d'eau"],
+            answer: "Bien laver les aliments avant de les cuisiner"
+        },
+        {
+            question: "Quel est un symptôme d'une carence en fer ?",
+            options: ["Fatigue", "Hypertension", "Peau sèche"],
+            answer: "Fatigue"
+        },
+        {
+            question: "Quel est le rôle du zinc dans le corps humain ?",
+            options: ["Renforcer l'immunité", "Augmenter la masse musculaire", "Réguler le cholestérol"],
+            answer: "Renforcer l'immunité"
+        },
+        {
+            question: "Quelle est la fonction principale de l'insuline ?",
+            options: ["Réguler la glycémie", "Augmenter les protéines", "Renforcer les globules rouges"],
+            answer: "Réguler la glycémie"
+        },
+        {
+            question: "Quels aliments sont connus pour être riches en antioxydants ?",
+            options: ["Fruits et légumes colorés", "Sucres et gâteaux", "Viande rouge"],
+            answer: "Fruits et légumes colorés"
+        },
+        {
+            question: "Quel nutriment aide à maintenir une bonne vision ?",
+            options: ["Vitamine A", "Vitamine C", "Vitamine D"],
+            answer: "Vitamine A"
+        },
+        {
+            question: "Quelle est la meilleure façon d'améliorer la posture ?",
+            options: ["Renforcer les muscles du dos", "Manger plus de protéines", "Dormir 12 heures par jour"],
+            answer: "Renforcer les muscles du dos"
+        },
+        {
+            question: "Quel est le rôle principal des globules rouges dans le sang ?",
+            options: ["Transporter l'oxygène", "Produire des anticorps", "Combattre les infections"],
+            answer: "Transporter l'oxygène"
+        },
+        {
+            question: "Quel nutriment est nécessaire pour maintenir une peau saine ?",
+            options: ["Vitamine E", "Vitamine C", "Fer"],
+            answer: "Vitamine E"
+        },
+        {
+            question: "Quel est le principal bénéfice de la marche rapide ?",
+            options: ["Améliorer la santé cardiovasculaire", "Renforcer les os", "Augmenter la masse musculaire"],
+            answer: "Améliorer la santé cardiovasculaire"
+        },
+        {
+            question: "Quels aliments contiennent le plus de vitamine D ?",
+            options: ["Poisson, œufs", "Pommes de terre, haricots", "Fruits et légumes"],
+            answer: "Poisson, œufs"
+        },
+        {
+            question: "Quelle est la durée de vie moyenne d'un globule rouge ?",
+            options: ["20 jours", "60 jours", "120 jours"],
+            answer: "120 jours"
+        },
+        {
+            question: "Quel est l'indice de glycémie idéal pour une personne saine ?",
+            options: ["Inférieur à 100 mg/dL", "Entre 120-140 mg/dL", "Supérieur à 200 mg/dL"],
+            answer: "Inférieur à 100 mg/dL"
+        },
+        {
+            question: "Quelle partie du corps est affectée par l'ostéoporose ?",
+            options: ["Les os", "Les muscles", "Le système nerveux"],
+            answer: "Les os"
+        },
+        {
+            question: "Quelle est la meilleure technique pour améliorer la qualité du sommeil ?",
+            options: ["Éviter les écrans avant de dormir", "Boire du café avant de dormir", "Dormir dans une pièce chaude"],
+            answer: "Éviter les écrans avant de dormir"
+        },
+        {
+            question: "Que faut-il faire en cas de coup de soleil sévère ?",
+            options: ["Appliquer une crème hydratante", "Boire du lait", "Faire du jogging"],
+            answer: "Appliquer une crème hydratante"
+        },
+        {
+            question: "Quel organe est principalement affecté par une forte consommation de sucre ?",
+            options: ["Le foie", "Les reins", "Le pancréas"],
+            answer: "Le pancréas"
+        },
+        {
+            question: "Quelle est la quantité minimale de fibres recommandée par jour ?",
+            options: ["10g", "25g", "50g"],
+            answer: "25g"
+        },
+        {
+            question: "Quel est le premier signe de déshydratation ?",
+            options: ["Maux de tête", "Fièvre", "Douleurs musculaires"],
+            answer: "Maux de tête"
+        },
+        {
+            question: "Quel type d'exercice est idéal pour améliorer l'endurance ?",
+            options: ["Course longue", "Exercices de musculation", "Yoga"],
+            answer: "Course longue"
+        },
+        {
+            question: "Quel nutriment est essentiel pour la santé du cerveau ?",
+            options: ["Omega-3", "Vitamine A", "Glucides"],
+            answer: "Omega-3"
+        },
+        {
+            question: "Quel est le rôle principal du cœur dans le corps humain ?",
+            options: ["Pomper le sang", "Digérer les aliments", "Produire des globules rouges"],
+            answer: "Pomper le sang"
+        },
+        {
+            question: "Quel est un bon moyen de réduire la tension artérielle ?",
+            options: ["Consommer moins de sel", "Augmenter les graisses saturées", "Boire des boissons énergétiques"],
+            answer: "Consommer moins de sel"
+        },
+        {
+            question: "Quel est le principal avantage des fruits riches en antioxydants ?",
+            options: ["Protéger les cellules contre les dommages", "Augmenter la glycémie", "Renforcer les os"],
+            answer: "Protéger les cellules contre les dommages"
+        },
+        {
+            question: "Quelle est une mesure efficace pour prévenir les maladies cardiovasculaires ?",
+            options: ["Faire de l'exercice régulièrement", "Consommer plus de graisses trans", "Sauter des repas"],
+            answer: "Faire de l'exercice régulièrement"
+        },
+        {
+            question: "Quel aliment est connu pour aider à réduire le cholestérol LDL ?",
+            options: ["Avoine", "Beurre", "Sucres raffinés"],
+            answer: "Avoine"
+        },
+        {
+            question: "Quel est le rôle de la vitamine K dans l'organisme ?",
+            options: ["Coagulation du sang", "Renforcer les dents", "Augmenter la digestion"],
+            answer: "Coagulation du sang"
+        },
+        {
+            question: "Quels sont les effets de l'activité physique sur la santé mentale ?",
+            options: ["Réduit le stress", "Augmente l'irritabilité", "Diminue la confiance en soi"],
+            answer: "Réduit le stress"
+        },
+        {
+            question: "Quelle est la meilleure méthode pour éviter les calculs rénaux ?",
+            options: ["Boire suffisamment d'eau", "Consommer plus de sel", "Limiter l'exercice"],
+            answer: "Boire suffisamment d'eau"
+        },
+        {
+            question: "Quel aliment est une source majeure de potassium ?",
+            options: ["Banane", "Pain blanc", "Chocolat"],
+            answer: "Banane"
+        },
+        {
+            question: "Quel est le principal rôle du système immunitaire ?",
+            options: ["Combattre les infections", "Produire des globules rouges", "Améliorer la digestion"],
+            answer: "Combattre les infections"
+        },
+        {
+            question: "Quel est le principal rôle du calcium dans le corps humain ?",
+            options: ["Renforcer les os et les dents", "Améliorer la digestion", "Augmenter la masse musculaire"],
+            answer: "Renforcer les os et les dents"
+        },
+        {
+            question: "Quelle activité peut aider à améliorer la concentration ?",
+            options: ["Pratiquer la méditation", "Regarder des séries", "Manger des sucreries"],
+            answer: "Pratiquer la méditation"
+        },
+        {
+            question: "Quel nutriment aide à maintenir la santé des yeux ?",
+            options: ["Vitamine A", "Fer", "Magnésium"],
+            answer: "Vitamine A"
+        },
+        {
+            question: "Quel est le meilleur moyen de prévenir les douleurs musculaires après l'exercice ?",
+            options: ["Étirements après l'effort", "Augmenter les exercices sans pause", "Consommer des sucreries"],
+            answer: "Étirements après l'effort"
+        },
+        {
+            question: "Quelle est la principale cause de l'obésité ?",
+            options: ["Consommation excessive de calories", "Manque de sommeil", "Pratiquer la course à pied"],
+            answer: "Consommation excessive de calories"
+        },
+        {
+            question: "Quel nutriment est essentiel pour la production d'énergie dans le corps ?",
+            options: ["Glucides", "Vitamine C", "Fibres"],
+            answer: "Glucides"
+        },
+        {
+            question: "Quel type d'exercice renforce principalement le cœur ?",
+            options: ["Cardio", "Yoga", "Musculation"],
+            answer: "Cardio"
+        },
+        {
+            question: "Quel est le rôle principal des fibres alimentaires ?",
+            options: ["Faciliter la digestion", "Augmenter l'énergie", "Produire des globules rouges"],
+            answer: "Faciliter la digestion"
+        },
+        {
+            question: "Quel organe est principalement responsable de la détoxification dans le corps ?",
+            options: ["Foie", "Reins", "Poumons"],
+            answer: "Foie"
+        },
+        {
+            question: "Quel minéral est crucial pour la contraction musculaire ?",
+            options: ["Magnésium", "Potassium", "Sodium"],
+            answer: "Magnésium"
+        },
+        {
+            question: "Quel est le principal facteur de risque des maladies cardiovasculaires ?",
+            options: ["Hypertension", "Manque de sommeil", "Carence en fer"],
+            answer: "Hypertension"
+        },
+        {
+            question: "Quel aliment est riche en oméga-3 ?",
+            options: ["Saumon", "Poulet", "Riz"],
+            answer: "Saumon"
+        },
+        {
+            question: "Quel est le meilleur moment pour s'étirer ?",
+            options: ["Après l'exercice", "Avant de manger", "Avant de se coucher"],
+            answer: "Après l'exercice"
+        },
+        {
+            question: "Quel est le rôle principal des protéines dans le corps ?",
+            options: ["Réparer les tissus", "Fournir de l'énergie immédiate", "Améliorer la digestion"],
+            answer: "Réparer les tissus"
+        },
+        {
+            question: "Quel fruit est une excellente source de vitamine C ?",
+            options: ["Orange", "Pomme", "Banane"],
+            answer: "Orange"
+        },
+        {
+            question: "Quelle est une habitude saine pour bien dormir ?",
+            options: ["Établir une routine de sommeil", "Utiliser son téléphone au lit", "Boire du café avant de dormir"],
+            answer: "Établir une routine de sommeil"
+        },
+        {
+            question: "Quelle boisson est essentielle pour maintenir l'hydratation ?",
+            options: ["Eau", "Thé sucré", "Soda"],
+            answer: "Eau"
+        },
+        {
+            question: "Quel aliment est riche en fer ?",
+            options: ["Épinards", "Lait", "Riz brun"],
+            answer: "Épinards"
+        },
+        {
+            question: "Quel est l'effet principal du stress prolongé sur le corps ?",
+            options: ["Affaiblissement du système immunitaire", "Augmentation de l'énergie", "Amélioration du sommeil"],
+            answer: "Affaiblissement du système immunitaire"
+        },
+        {
+            question: "Quelle vitamine est principalement synthétisée grâce à l'exposition au soleil ?",
+            options: ["Vitamine D", "Vitamine B12", "Vitamine K"],
+            answer: "Vitamine D"
+        },
+        {
+            question: "Quel organe est principalement responsable de la filtration du sang ?",
+            options: ["Reins", "Cœur", "Poumons"],
+            answer: "Reins"
+        },
+        {
+            question: "Quel aliment est une excellente source de vitamine E ?",
+            options: ["Amandes", "Pommes", "Poulet"],
+            answer: "Amandes"
+        },
+        {
+            question: "Quelle activité favorise la flexibilité du corps ?",
+            options: ["Yoga", "Course à pied", "Musculation"],
+            answer: "Yoga"
+        },
+        {
+            question: "Quel nutriment est essentiel à la croissance des cheveux ?",
+            options: ["Biotine", "Calcium", "Magnésium"],
+            answer: "Biotine"
+        },
+        {
+            question: "Quel minéral aide à maintenir la pression artérielle équilibrée ?",
+            options: ["Potassium", "Zinc", "Iode"],
+            answer: "Potassium"
+        },
+        {
+            question: "Quel aliment est riche en antioxydants ?",
+            options: ["Myrtilles", "Fromage", "Pain blanc"],
+            answer: "Myrtilles"
+        },
+        {
+            question: "Quelle est une habitude saine pour protéger sa peau ?",
+            options: ["Utiliser un écran solaire", "Dormir avec du maquillage", "Éviter de boire de l'eau"],
+            answer: "Utiliser un écran solaire"
+        },
+        {
+            question: "Quel est le rôle principal de la vitamine C dans le corps ?",
+            options: ["Renforcer le système immunitaire", "Augmenter la masse musculaire", "Produire des hormones"],
+            answer: "Renforcer le système immunitaire"
+        },
+        {
+            question: "Quelle activité est idéale pour améliorer la posture ?",
+            options: ["Pilates", "Marathon", "Cyclisme"],
+            answer: "Pilates"
+        },
+        {
+            question: "Quel est le principal bénéfice des acides gras oméga-3 ?",
+            options: ["Améliorer la santé du cœur", "Augmenter la digestion", "Favoriser la déshydratation"],
+            answer: "Améliorer la santé du cœur"
+        },
+        {
+            question: "Quel aliment est une source naturelle de fibres ?",
+            options: ["Légumes verts", "Viande rouge", "Chocolat noir"],
+            answer: "Légumes verts"
+        },
+        {
+            question: "Quel est l'avantage principal de boire du thé vert ?",
+            options: ["Riche en antioxydants", "Augmente la fatigue", "Réduit l'appétit"],
+            answer: "Riche en antioxydants"
+        },
+        {
+            question: "Quel est le rôle des globules blancs dans le corps ?",
+            options: ["Combattre les infections", "Transporter l'oxygène", "Digérer les aliments"],
+            answer: "Combattre les infections"
+        },
+        {
+            question: "Quelle technique aide à réduire le stress ?",
+            options: ["Respiration profonde", "Regarder son téléphone constamment", "Manger trop vite"],
+            answer: "Respiration profonde"
+        },
+        {
+            question: "Quel est l'effet positif de la consommation d'eau citronnée ?",
+            options: ["Détoxifie le corps", "Augmente l'acidité du sang", "Diminue l'énergie"],
+            answer: "Détoxifie le corps"
+        }
+    ]; // Ajoutez vos questions ici
+    // Variables de quiz
+    let selectedQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    // Démarrer le quiz
+    startQuizButton.addEventListener('click', () => {
+        const selectedCount = parseInt(questionCountInput.value, 10); // Nombre de questions choisi
+        if (questions.length < selectedCount) {
+            alert("Le quiz n'a pas assez de questions pour votre choix.");
+            return;
+        }
+        // Filtrer le nombre de questions
+        selectedQuestions = questions.slice(0, selectedCount);
+        currentQuestionIndex = 0;
+        score = 0;
+        startQuiz(); // Démarrage du quiz
+    });
+    // Afficher une question
+    function displayQuestion() {
+        const currentQuestion = selectedQuestions[currentQuestionIndex];
+        questionElement.textContent = currentQuestion.question;
+        optionsElement.innerHTML = ""; // Réinitialiser les options
+        currentQuestion.options.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.onclick = () => checkAnswer(option);
+            optionsElement.appendChild(button);
+        });
+
+        nextButton.style.display = "none"; // Cacher le bouton suivant
+    }
+    // Vérifier la réponse
+    function checkAnswer(selectedOption) {
+        const correctAnswer = selectedQuestions[currentQuestionIndex].answer;
+        if (selectedOption === correctAnswer) {
+            score += 50; // Points pour la bonne réponse
+            alert("Bonne réponse ! 🎉 Vous gagnez 50 points !");
+        } else {
+            score -= 15; // Points perdus pour une mauvaise réponse
+            alert(`Mauvaise réponse. 😔 La bonne réponse était : ${correctAnswer}. Vous perdez 15 points.`);
+        }
+        nextButton.style.display = "block"; // Afficher le bouton suivant
+    }
+    // Passer à la question suivante
+    nextButton.addEventListener('click', () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < selectedQuestions.length) {
+            displayQuestion();
+        } else {
+            displayResult();
+        }
+    });
+    // Résultat final
+    function displayResult() {
+        resultElement.innerHTML = `
+                <p>Quiz terminé ! 🎉</p>
+                <p>Votre score final est de <strong>${score}</strong> points.</p>
+            `;
+        resultElement.style.display = "block";
+        quizElement.style.display = "none"; // Cacher le quiz
+    }
+    // Lancer le quiz
+    function startQuiz() {
+        quizElement.style.display = "block";
+        resultElement.style.display = "none";
+        displayQuestion();
+    }
+</script>
+</body>
+</html>

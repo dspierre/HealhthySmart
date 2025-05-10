@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bibliotheque medical</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+         body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f9fafc;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #70e0b6;
+            color: white;
+            width: 100%;
+        }
+        h1, h2, h3 {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        h2, h3 {
+            margin: 10px 0;
+        }
+        .main-content {
+            width: 80%;
+            max-width: 1200px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .main-content img {
+            width: 50%;
+            height: auto;
+            margin: 10px 0;
+        }
+        .feature-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .feature-box {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            width: 200px;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .feature-box:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+        .feature-box h3 {
+            font-size: 15px;
+            color: #70e0b6;
+            margin-bottom: 7px;
+        }
+        .feature-box a {
+            text-decoration: none;
+            color: #70e0b6;
+            font-weight: bold;
+        }
+        .feature-box p {
+            font-size: 12px;
+            margin: 3px 0;
+        }
+        footer {
+            background-color: #70e0b6;
+            color: white;
+            padding: 10px;
+            width: 90%;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+        }
+        img[src="une femme qui fait du yoga jolie.png"] {
+    width: 35%; /* Réduisez selon vos besoins */
+    height: auto; /* Conserve les proportions de l'image */
+    display: block; /* Centre l'image dans le conteneur, facultatif */
+    margin: 0 auto; /* Aligne l'image au centre horizontalement, facultatif */
+}
+</style>
+</head>
+<body>
+    <img src="spensmart-logo.jpg" alt="Savemonay Logo">
+    <section class="feature-section">
+        <div class="feature-box">
+            <h3><a href="ConseilAstuce2.html">Conseil Astuce</a></h3>
+            <p>Visualisez vos progrès avec des graphiques interactifs et des rapports hebdomadaires.</p>
+        </div>
+        <div class="feature-box">
+            <h3><a href="personal_tracking.html">Suivi des habitudes</a></h3>
+            <p>Visualisez vos progrès grâce à des graphiques interactifs et des rapports hebdomadaires,</p>
+            <p>tout en restant motivé pour atteindre vos objectifs.</p>
+        </div>
+        <div class="feature-box">
+            <h3><a href="Suivi_des_Allergies_et_Intolérances2.html">Suivi des Allergies et Intolérances:</a></h3>
+            <p>Met en avant le suivi actif et les alertes utiles pour éviter des déclencheurs allergiques.</p> 
+        </div>
+        <div class="feature-box">
+            <h3><a href="Rapports_Annuels_de_Santé.html">Rapports Annuels de Santé:</a></h3>
+            <p>Accédez à un résumé détaillé de vos progrès et habitudes au cours de l'année.</p>
+            <p>Analysez votre santé globale grâce à des rapports clairs et engageants.</p>
+        </div>
+        <div class="feature-box">
+            <h3><a href="education_sur_la_santé.html">Éducation sur la Santé</a></h3>
+            <p>Apprenez les bonnes pratiques pour prendre soin de votre santé avec des contenus fiables et engageants.</p>
+            <p>Renforcez vos connaissances en santé pour adopter des habitudes durables et positives.</p>
+        </div>
+    </section>
+    <img src="une femme qui fait du yoga jolie.png" alt="Bibliothèque Médicale">
+</div>
+<br>
+    <div class="main-content">
+        <header>
+            <h1 id="greeting"></h1>
+        </header>
+    </div>
+    <script>
+    function displayGreeting() {
+        const greetingElement = document.getElementById('greeting');
+        const hours = new Date().getHours();
+        let greeting;
+        if (hours < 12) {
+            greeting = "Bonjour";
+        } else if (hours < 18) {
+            greeting = "Bon après-midi";
+        } else {
+            greeting = "Bonsoir";
+        }
+        greetingElement.innerText = `${greeting} Votre santé, simplifiée avec HealthSmart. !`;
+    }
+    document.addEventListener('DOMContentLoaded', displayGreeting);
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Semaines</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9fafc;
+        }
+        section {
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #70e0b6;
+            text-align: center;
+        }
+        select {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+            max-width: 300px;
+        }
+        p {
+            text-align: center;
+            font-size: 16px;
+            color: #555;
+        }
+img[src="images/femme-enceinte.jpeg"] {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%; /* Ajustez si nécessaire */
+    height: auto;
+}
+img.foetus-img {
+    width: 100px; /* Taille fixe en pixels */
+    height: 100px;
+    object-fit: cover; /* Ajuste l'image sans déformation */
+    display: block;
+    margin: 10px auto;
+}
+
+</style>
+</head>
+<body>
+<section id="semaines">
+    <h2>Suivi des Semaines</h2>
+    <img src="images/femme-enceinte.jpeg" alt="Bibliothèque Médicale" width="395" height="auto">
+    <select id="week-selector">
+        <!-- Options dynamiquement générées -->
+    </select>
+    <p id="infos-semaine">Informations de la semaine sélectionnée...</p>
+    <p id="conseil-semaine">Conseil personnalisé pour cette semaine...</p>
+</section>
+<script>
+    // Initialisation des éléments HTML
+    const weekInfo = document.getElementById("infos-semaine");
+    const conseilInfo = document.getElementById("conseil-semaine");
+    const weekSelector = document.getElementById("week-selector");
+    // Nombre total de semaines
+    const totalWeeks = 39;
+    // Exemple d'informations par semaine
+    const weekData = [
+        "Semaine 1 : Début de la grossesse.",
+        "Semaine 2 : Préparation de l'implantation.",
+        "Semaine 3 : Développement embryonnaire initial.",
+        "Semaine 4 : Implantation complète.",
+        "Semaine 5 : Début de la formation du cœur.",
+        "Semaine 6 : Croissance des bras et jambes.",
+        "Semaine 7 : Développement du cerveau.",
+        "Semaine 8 : Formation des doigts.",
+        "Semaine 9 : Premiers mouvements du fœtus.",
+        "Semaine 10 : Début de la formation des organes vitaux.",
+        "Semaine 11 : Croissance rapide et développement musculaire.",
+        "Semaine 12 : Le fœtus peut bouger ses bras et jambes.",
+        "Semaine 13 : Traits faciaux distincts.",
+        "Semaine 14 : Formation des cheveux et des ongles.",
+        "Semaine 15 : Perception du son.",
+        "Semaine 16 : Premiers coups du bébé perceptibles.",
+        "Semaine 17 : Croissance rapide du poids.",
+        "Semaine 18 : Formation du système immunitaire.",
+        "Semaine 19 : Développement des poumons.",
+        "Semaine 20 : Demi-parcours de la grossesse.",
+        "Semaine 21 : Bébé commence à dormir et à se réveiller.",
+        "Semaine 22 : Développement des yeux.",
+        "Semaine 23 : Sensation de mouvements réguliers.",
+        "Semaine 24 : Développement des empreintes digitales.",
+        "Semaine 25 : Croissance rapide du cerveau.",
+        "Semaine 26 : Début de la coordination des mouvements.",
+        "Semaine 27 : Réactivité au toucher.",
+        "Semaine 28 : Bébé peut ouvrir et fermer les yeux.",
+        "Semaine 29 : Préparation pour la vie extérieure.",
+        "Semaine 30 : Début de la formation des muscles.",
+        "Semaine 31 : Croissance rapide des tissus adipeux.",
+        "Semaine 32 : Bébé commence à se retourner.",
+        "Semaine 33 : Renforcement des os.",
+        "Semaine 34 : Réglage des systèmes internes.",
+        "Semaine 35 : Bébé prend position pour l'accouchement.",
+        "Semaine 36 : Derniers préparatifs avant la naissance.",
+        "Semaine 37 : Derniers préparatifs avant la naissance.",
+        "Semaine 38 : Derniers préparatifs avant la naissance.",
+        "Semaine 39: Derniers préparatifs avant la naissance.",
+    ];
+
+    // Conseils personnalisés par semaine
+    const conseilData = [
+        "Prenez des vitamines prénatales pour préparer votre corps.",
+        "Commencez une alimentation équilibrée avec des aliments riches en folates.",
+        "Évitez l'alcool et le tabac pour protéger le développement embryonnaire.",
+        "Prenez rendez-vous avec votre médecin pour confirmer la grossesse.",
+        "Reposez-vous bien, votre corps travaille dur.",
+        "Faites un point sur vos habitudes alimentaires avec un nutritionniste.",
+        "Hydratez-vous correctement, buvez au moins 1,5 litre d'eau par jour.",
+        "Évitez les aliments crus comme la viande ou le poisson pour limiter les risques d'infection.",
+        "Commencez un journal de grossesse pour suivre cette belle aventure.",
+        "Intégrez des exercices doux comme le yoga prénatal.",
+        "Pensez à déclarer votre grossesse à la sécurité sociale.",
+        "Préparez-vous pour la première échographie importante.",
+        "Portez des vêtements confortables adaptés à votre grossesse.",
+        "Surveillez votre posture pour réduire les douleurs au dos.",
+        "Apprenez à reconnaître les signes des premiers mouvements du bébé.",
+        "Échangez avec d'autres futures mamans pour partager vos expériences.",
+        "Introduisez plus de fruits et légumes dans votre alimentation.",
+        "Commencez à planifier votre congé maternité.",
+        "Prenez soin de votre peau avec des huiles naturelles pour limiter les vergetures.",
+        "Effectuez une échographie morphologique pour voir le développement du bébé.",
+        "Assurez-vous de bien dormir avec un oreiller de grossesse.",
+        "Pensez à un cours de préparation à l'accouchement.",
+        "Ralentissez votre rythme si vous vous sentez fatiguée.",
+        "Faites un point avec votre médecin sur vos besoins en fer.",
+        "Apprenez à reconnaître les contractions de Braxton Hicks.",
+        "Préparez une liste des produits essentiels pour le bébé.",
+        "Écoutez de la musique douce, votre bébé peut maintenant entendre.",
+        "Commencez à préparer votre valise pour la maternité.",
+        "Faites des exercices de respiration pour vous préparer à l'accouchement.",
+        "Réduisez votre consommation de sel pour éviter les gonflements.",
+        "Parlez à votre bébé, cela renforce votre lien.",
+        "Vérifiez les démarches administratives pour l’arrivée du bébé.",
+        "Installez un siège-auto pour préparer le premier trajet du bébé.",
+        "Entraînez-vous aux positions d’accouchement qui peuvent vous soulager.",
+        "Assurez-vous que votre domicile est prêt pour accueillir le bébé.",
+        "Détendez-vous et reposez-vous, vous êtes bientôt à la fin du parcours."
+    ];
+    const foetusSizeData = [
+    "Votre fœtus est une graine de sésame.", // Semaine 4
+    "Votre fœtus est une lentille.", // Semaine 5
+    "Votre fœtus est un noyau de grenade.", // Semaine 6
+    "Votre fœtus est une myrtille.", // Semaine 7
+    "Votre fœtus est un grain de raisin.", // Semaine 8
+    "Votre fœtus est un chou de Bruxelles.", // Semaine 9
+    "Votre fœtus est une figue.", // Semaine 10
+    "Votre fœtus est un citron.", // Semaine 11
+    "Votre fœtus est une pomme.", // Semaine 12
+    "Votre fœtus est une nectarine.", // Semaine 13
+    "Votre fœtus est un avocat.", // Semaine 14
+    "Votre fœtus est une betterave.", // Semaine 15
+    "Votre fœtus est une patate douce.", // Semaine 16
+    "Votre fœtus est une mangue.", // Semaine 17
+    "Votre fœtus est un poivron.", // Semaine 18
+    "Votre fœtus est une carotte.", // Semaine 19
+    "Votre fœtus est une banane.", // Semaine 20
+    "Votre fœtus est un artichaut.", // Semaine 21
+    "Votre fœtus est une papaye.", // Semaine 22
+    "Votre fœtus est une aubergine.", // Semaine 23
+    "Votre fœtus est une courgette.", // Semaine 24
+    "Votre fœtus est un épi de maïs.", // Semaine 25
+    "Votre fœtus est un chou-fleur.", // Semaine 26
+    "Votre fœtus est du céleri.", // Semaine 27
+    "Votre fœtus est un ananas.", // Semaine 28
+    "Votre fœtus est une laitue.", // Semaine 29
+    "Votre fœtus est un chou chinois.", // Semaine 30
+    "Votre fœtus est un melon d'eau.", // Semaine 31
+    "Votre fœtus est un concombre.", // Semaine 32
+    "Votre fœtus est une rhubarbe.", // Semaine 33
+    "Votre fœtus est une blette.", // Semaine 34
+    "Votre fœtus est un oignon nouveau.", // Semaine 35
+    "Votre fœtus est un poireau.", // Semaine 36
+    "Votre fœtus est un potimarron.", // Semaine 37
+    "Votre fœtus est une pastèque.", // Semaine 38
+    "Votre fœtus est une citrouille." // Semaine 39
+];
+
+const foetusImageData = [
+    "images/semaine/sesame.png", // Semaine 4
+    "images/semaine/flora-blonde.jpg", // Semaine 5
+    "images/semaine/grenade.png", // Semaine 6
+    "images/semaine/myrtilles-6.jpg", // Semaine 7
+    "images/raisin.png", // Semaine 8
+    "images/semaine/Chou_Bruxelles-1.jpg", // Semaine 9
+    "images/semaine/figue.jpg", // Semaine 10
+    "images/semaine/une-citron.jpg", // Semaine 11
+    "images/semaine/pomme.jpg", // Semaine 12
+    "images/semaine/Nectarine.png", // Semaine 13
+    "images/semaine/avocat.jpg", // Semaine 14
+    "images/semaine/_betterave.jpg", // Semaine 15
+    "images/semaine/patate-douce.jpg", // Semaine 16
+    "images/semaine/Mangue.jpg", // Semaine 17
+    "images/semaine/poivron.jpg", // Semaine 18
+    "images/semaine/carotte.jpg", // Semaine 19
+    "images/semaine/banane.png", // Semaine 20
+    "images/semaine/artichaux.png", // Semaine 21
+    "images/semaine/papaye1.jpg", // Semaine 22
+    "images/semaine/aubergine.jpg", // Semaine 23
+    "images/semaine/Courgette.png", // Semaine 24
+    "images/semaine/mais.jpg", // Semaine 25
+    "images/semaine/choufleurblanc.jpg", // Semaine 26
+    "images/semaine/celeri.jpg", // Semaine 27
+    "images/semaine/ananas.jpg", // Semaine 28
+    "images/semaine/romaine-laitu.jpg", // Semaine 29
+    "images/chou_chinois.png", // Semaine 30
+    "images/melon_eau.png", // Semaine 31
+    "images/semaine/concombre.png", // Semaine 32
+    "images/semaine/rubarbe.jpg", // Semaine 33
+    "images/blette.png", // Semaine 34
+    "images/oignon_nouveau.png", // Semaine 35
+    "images/poireau.png", // Semaine 36
+    "images/potimarron.png", // Semaine 37
+    "images/pasteque.png", // Semaine 38
+    "images/citrouille.png" // Semaine 39
+];
+    // Remplir le menu déroulant
+    for (let i = 1; i <= totalWeeks; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = `Semaine ${i}`;
+        weekSelector.appendChild(option);
+    }
+    // Fonction pour mettre à jour les informations
+    function updateWeekDetails(week) {
+    weekInfo.innerHTML = `<strong>${weekData[week - 1]}</strong><br><br>${conseilData[week - 1]}`;
+    // Affichage de l'image et description de taille du fœtus
+    const foetusImage = foetusImageData[week - 4] || ""; 
+    const foetusDescription = foetusSizeData[week - 4] || "";
+    if (foetusImage) {
+        weekInfo.innerHTML += `<br><br><img src="${foetusImage}" alt="Image du fœtus" style="width: 30%; display: block; margin: 10px auto;">`;
+    }
+    if (foetusDescription) {
+        weekInfo.innerHTML += `<br><br><em>${foetusDescription}</em>`;
+    }
+}
+    // Écouteur pour mise à jour des informations lorsque l'utilisateur change de semaine
+    weekSelector.addEventListener("change", (e) => {
+        const selectedWeek = parseInt(e.target.value, 10);
+        updateWeekDetails(selectedWeek);
+    });
+    // Charger la première semaine par défaut
+    updateWeekDetails(1);
+    weekSelector.value = "1";
+</script>
+</body>
+</html>

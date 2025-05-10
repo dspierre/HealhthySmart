@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprentissage de l'Alphabet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .alphabet {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .letter {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            background-color: #70e0b6;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .letter.highlight {
+            transform: scale(1.5);
+            background-color: #FFA500;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .letter.correct {
+            background-color: #4CAF50; /* Vert quand c’est correct */
+        }
+
+        .letter.wrong {
+            background-color: #FF5733; /* Rouge quand c’est incorrect */
+        }
+
+        #quiz-container {
+            margin-top: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            display: none;
+        }
+
+        #image-container {
+            margin-top: 20px;
+            font-size: 50px;
+            display: none; /* Caché avant validation correcte */
+        }
+    </style>
+</head>
+<body>
+    <h1>📖 Apprends l'Alphabet 🎶</h1>
+    <p>Clique sur "Écouter toutes les lettres", puis tente le quizz !</p>
+    <div class="alphabet"></div>
+    <button id="playAll">🔄 Écouter toutes les lettres</button>
+    <button id="newQuiz" style="display:none;">🎯 Nouveau Quizz</button>
+    <div id="quiz-container">
+        <p id="quiz-question"></p>
+    </div>
+    <div id="image-container"></div>
+    <script>
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+        const imagesAssociees = {
+            A: "🍏 Abricot", B: "🐝 Banane", C: "🐱 Carotte", D: "🦌 Daim",
+            E: "🥚 Escargot", F: "🎣 Fraise", G: "🦒 Grenouille", H: "🏨 Hôtel",
+            I: "🍦 Igloo", J: "🦘 Jaguar", K: "🔑 Koala", L: "🍋 Laitue",
+            M: "🐵 Mouton", N: "🌙 Navet", O: "🦉 Orange", P: "🍍 Pomme",
+            Q: "👑 Quiche", R: "🌈 Radis", S: "⭐ Serpent",
+            T: "🐢 Tomate", U: "🦄 Uniforme", V: "🌋 Vanille", W: "🍉 Wagon",
+            X: "❌ Xylophone", Y: "🪀 Yaourt", Z: "🦓 Zèbre"
+        };
+        let index = 0;
+        let score = 0;
+        let lettreQuizz;
+        const container = document.querySelector(".alphabet");
+        const quizContainer = document.getElementById("quiz-container");
+        const quizQuestion = document.getElementById("quiz-question");
+        const newQuizButton = document.getElementById("newQuiz");
+        const imageContainer = document.getElementById("image-container");
+        function afficherAlphabet() {
+            container.innerHTML = "";
+            alphabet.forEach(letter => {
+                let div = document.createElement("div");
+                div.className = "letter";
+                div.textContent = letter;
+                div.addEventListener("click", () => verifierReponse(letter));
+                container.appendChild(div);
+            });
+        }
+        function animerLettres() {
+            afficherAlphabet();
+            function animer() {
+                document.querySelectorAll(".letter").forEach((letter, i) => {
+                    letter.classList.toggle("highlight", i === index);
+                });
+                if (index < alphabet.length - 1) {
+                    index++;
+                    setTimeout(animer, 1000);
+                } else {
+                    setTimeout(() => {
+                        if (window.confirm("Voulez-vous commencer le quizz ?")) {
+                            lancerQuizz();
+                        }
+                    }, 1000);
+                }
+            }
+            animer();
+        }
+        function lancerQuizz() {
+            quizContainer.style.display = "block";
+            newQuizButton.style.display = "block";
+            score = 0;
+            poserQuestion();
+        }
+        function poserQuestion() {
+            if (score < alphabet.length) {
+                lettreQuizz = alphabet[score];
+                quizQuestion.textContent = `Clique sur la lettre "${lettreQuizz}" !`;
+                imageContainer.style.display = "none"; // Masquer l’image au début
+            } else {
+                alert(`Quizz terminé ! Tu as obtenu ${score} points 🎯`);
+            }
+        }
+        function verifierReponse(letter) {
+            if (letter === lettreQuizz) {
+                document.querySelectorAll(".letter").forEach(div => {
+                    if (div.textContent === letter) {
+                        div.classList.add("correct");
+                    }
+                });
+                alert("Bravo ! Bonne réponse 🎉");
+                score++;
+                imageContainer.style.display = "block";
+                imageContainer.textContent = imagesAssociees[lettreQuizz];
+                setTimeout(() => {
+                    document.querySelectorAll(".letter").forEach(div => div.classList.remove("correct"));
+                    poserQuestion();
+                }, 2000);
+            } else {
+                document.querySelectorAll(".letter").forEach(div => {
+                    if (div.textContent === letter) {
+                        div.classList.add("wrong");
+                        setTimeout(() => div.classList.remove("wrong"), 1000);
+                    }
+                });
+                alert("Oups ! Essaie encore ❌");
+            }
+        }
+        newQuizButton.addEventListener("click", lancerQuizz);
+        document.getElementById("playAll").addEventListener("click", animerLettres);
+    </script>
+</body>
+</html>

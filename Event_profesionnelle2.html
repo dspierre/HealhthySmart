@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EventSmart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SpendSmart - Transformez vos finances, transformez votre vie. Découvrez notre solution de gestion complète pour les bons gestionnaires de budgets.">
+    <meta name="keywords" content="gestion financière, budget, économies, retraite, impôts, IA, immobilier">
+    <style>
+        /* Section Contact */
+        #contact {
+            background-color: #ffffff;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        form input, form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        form button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1e90ff;
+            color: #fff;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #1c86ee;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            font-size: 0.9em;
+        }
+        .feature-grid .feature {
+            background-color: #ffffff;
+            padding: 17px; /* Reduced from 20px to approximately 85% */
+            border-radius: 8.5px; /* Proportional adjustment from 10px */
+            box-shadow: 0 1.7px 3.4px rgba(0, 0, 0, 0.085); /* Slightly reduced for consistency */
+            width: 230px; /* Reduced from 300px (15%) */
+            text-align: center;
+            margin: 17px; /* Adjusted for spacing consistency */
+        }
+        .feature-grid {
+            gap: 8.5px; /* Reduced the spacing between features by 15% */
+        }
+        .feature-grid img {
+            width: 25.5%; /* Reduced image size from 30% */
+            height: auto;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #FFDEAD, #ffffff); /* Dégradé vert clair */
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+        header nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        header nav ul li {
+            display: inline;
+            position: relative;
+        }
+        header nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        header nav ul li:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 10px;
+        }
+        .dropdown-content a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            white-space: nowrap;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        header nav .profile {
+            display: flex;
+            align-items: center;
+        }
+        header nav .profile .login, .inscription-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            background-color: #fff;
+            border: 2px solid #333;
+            margin-left: 10px;
+        }
+        header nav .profile .login:hover, .inscription-button:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+        header nav .logo {
+            width: 80px; /* Ajustez cette valeur pour réduire la taille du logo */
+            height: auto;
+        }
+        /* Section Hero */
+        #hero {
+            background: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?crop=entropy&cs=tinysrgb&w=1920&fit=max') no-repeat center center/cover;
+            color: #fff;
+            padding: 100px 20px;
+            text-align: center;
+        }
+        #hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        #hero p {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        #features, #pricing, #testimonials, #contact {
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .feature-grid, .pricing-grid, .testimonial-grid {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .feature, .pricing-plan, .testimonial {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .feature .icon {
+            font-size: 2.5em; /* Augmentez la taille des icônes */
+            display: block;
+            margin-bottom: 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        form label {
+            text-align: left;
+        }
+        form input, form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1e90ff;
+            color: #fff;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #1c86ee;
+        }
+        /* Media Queries for Responsive Design */
+        @media (max-width: 768px) {
+            .feature, .pricing-plan, .testimonial {
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            header nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+            #hero h1 {
+                font-size: 2em;
+            }
+            #hero p {
+                font-size: 1em;
+            }
+        }
+        button, .blue-button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #1e90ff;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        button:hover, .blue-button:hover {
+            background-color: #1c86ee;
+            transform: scale(1.05);
+        }
+        .feature-grid .feature {
+            background-color: #ffffff;
+            padding: 10px; /* Réduit l'espace interne */
+            border-radius: 6px; /* Réduction de l'arrondi */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Ajustement de l'ombre */
+            width: 180px; /* Taille réduite à 180px au lieu de 230px */
+            text-align: center;
+            margin: 10px; /* Espace externe réduit */
+        }
+        .pricing-grid {
+            display: flex;
+            gap: 80px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <img src="spendsmart.png" alt="Logo SpendSmart" class="logo">
+        <ul>
+            <li><a href="#features">Fonctionnalités</a></li>
+            <li><a href="#pricing">Tarifs</a></li>
+            <li><a href="#testimonials">Témoignages</a></li>
+            <li class="dropdown">
+                <a href="#outil" class="dropbtn">Outil</a>
+                <div class="dropdown-content">
+                    <a href="EventSmart.html">Wedding Planner</a>
+                    <a href="Event_perso.html">Événement Personnel</a>
+                    <a href="Event_profesionnelle2.html">Événement Professionnel</a>
+                </div>
+            </li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="profile">
+            <a href="login.html" class="login">🔑 Login</a>
+            <a href="register3.html" class="inscription-button">Inscription</a>
+        </div>
+    </nav>
+</header>
+<main>
+    <section id="hero">
+        <div class="container">
+            <h2>Votre santé, simplifiée avec HealthSmart</h2>
+            <p>Gérez vos données médicales, suivez vos habitudes et plus encore.</p>
+            <a href="#features" class="blue-button">En savoir plus</a>
+        </div>
+    </section>
+    <section id="event-professionnelle">
+        <h2>Événements Professionnels</h2>
+        <div class="feature-grid">
+            <div class="feature">
+                <span class="icon">📅</span>
+                <h3>Agenda et Gestion des Rendez-vous</h3>
+                <p>Planifiez les réunions et sessions avec des rappels intégrés pour un suivi efficace.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">👥</span>
+                <h3>Suivi des Participants</h3>
+                <p>Inscription et suivi des participants, avec la possibilité d'envoyer des confirmations automatiques.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">🏢</span>
+                <h3>Réservation des Lieux</h3>
+                <p>Réservez des salles de conférence ou autres espaces adaptés pour votre événement.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">📂</span>
+                <h3>Documents et Contrats</h3>
+                <p>Stockez et gérez tous les documents nécessaires, comme les contrats et les factures.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">📞</span>
+                <h3>Coordination des Fournisseurs</h3>
+                <p>Gérez vos prestataires avec un suivi des communications et des paiements.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">💼</span>
+                <h3>Gestion des Budgets</h3>
+                <p>Analysez et suivez les dépenses liées à l'événement pour optimiser votre budget.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">🔔</span>
+                <h3>Rappels Importants</h3>
+                <p>Recevez des alertes pour les deadlines cruciales et les étapes à venir.</p>
+            </div>
+            <div class="feature">
+                <span class="icon">📊</span>
+                <h3>Rapports et Statistiques</h3>
+                <p>Obtenez des rapports détaillés sur la participation, les dépenses et les retours.</p>
+            </div>
+        </div>
+    </section>
+    <section id="pricing">
+        <h2>Tarifs</h2>
+        <div class="pricing-grid">
+            <div class="pricing-plan">
+                <h3>Personnel</h3>
+                <p>Prix : 6,99€/mois</p>
+                <p>Stockage sécurisé, rappels santé, suivi des habitudes.</p>
+            </div>
+            <!-- Autres plans -->
+        </div>
+    </section>
+    <section id="contact">
+        <h2>Contact</h2>
+        <form id="contactForm">
+            <label for="name">Nom :</label>
+            <input type="text" id="name" name="name" required>
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" required>
+            <label for="message">Message :</label>
+            <textarea id="message" name="message" required></textarea>
+            <button type="submit" class="blue-button">Envoyer</button>
+        </form>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2025 HealthSmart. Tous droits réservés.</p>
+</footer>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contactForm');
+        contactForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            alert('Votre message a été envoyé avec succès !');
+        });
+    });
+</script>
+</body>
+</html>

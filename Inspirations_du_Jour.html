@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspirations du Jour</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h3 {
+            color: #70e0b6;
+        }
+        .quote {
+            font-style: italic;
+            color: #333;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .author {
+            text-align: right;
+            font-weight: bold;
+            color: #70e0b6;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #56c093;
+        }
+        .list {
+            margin-top: 20px;
+        }
+        img {
+            display: block;
+            margin: 20px auto;
+            width: 35%; /* Réduction de la taille de l'image à 75 % */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h3>Inspirations du Jour</h3>
+    <p>Découvrez une citation inspirante chaque jour :</p>
+    <div class="quote" id="dailyQuote"></div>
+    <div class="author" id="quoteAuthor"></div>
+</div>
+<img src="beautiful sunset.png" alt="Bibliothèque Médicale">
+</div>
+<script>
+    // Array of inspirational quotes
+    const quotes = [
+        { text: "Le succès n'est pas final, l'échec n'est pas fatal : c'est le courage de continuer qui compte.", author: "Winston Churchill" },
+        { text: "La meilleure façon de prédire l'avenir est de le créer.", author: "Abraham Lincoln" },
+        { text: "La vie est ce qui arrive quand vous êtes occupé à faire d'autres projets.", author: "John Lennon" },
+        { text: "L'éducation est l'arme la plus puissante pour changer le monde.", author: "Nelson Mandela" },
+        { text: "Le bonheur dépend de nous-mêmes.", author: "Aristote" },
+        { text: "Vous devez être le changement que vous voulez voir dans le monde.", author: "Mahatma Gandhi" },
+        { text: "La seule limite à notre réalisation de demain sera nos doutes d'aujourd'hui.", author: "Franklin D. Roosevelt" },
+        { text: "La connaissance parle, mais la sagesse écoute.", author: "Jimi Hendrix" },
+        { text: "Tout ce que vous pouvez imaginer est réel.", author: "Pablo Picasso" },
+        { text: "Ne jugez pas chaque jour à la récolte que vous faites, mais aux graines que vous plantez.", author: "Robert Louis Stevenson" },
+        { text: "Ce n'est pas ce que vous regardez qui compte, c'est ce que vous voyez.", author: "Henry David Thoreau" },
+        { text: "La simplicité est la sophistication suprême.", author: "Leonard de Vinci" },
+        { text: "Croyez en vos rêves et ils pourraient se réaliser. Croyez en vous et ils se réaliseront sûrement.", author: "Martin Luther King Jr." },
+        { text: "Commence là où tu es, utilise ce que tu as, fais ce que tu peux.", author: "Arthur Ashe" },
+        { text: "Avec un effort constant, les montagnes peuvent être déplacées.", author: "Confucius" },
+        { text: "Celui qui déplace une montagne commence par enlever de petites pierres.", author: "Proverbe chinois" },
+        { text: "Rien de grand n'a été accompli sans enthousiasme.", author: "Ralph Waldo Emerson" },
+        { text: "Vous êtes braver que vous ne le croyez, plus fort que vous ne le semblez et plus intelligent que vous ne le pensez.", author: "A.A. Milne" },
+        { text: "Soyez vous-même, tous les autres sont déjà pris.", author: "Oscar Wilde" },
+        { text: "Le plus grand risque est de ne prendre aucun risque.", author: "Mark Zuckerberg" },
+        { text: "En faisant scintiller notre lumière, nous donnons aux autres la permission d'en faire autant.", author: "Nelson Mandela" },
+        { text: "Les opportunités ne se produisent pas. Vous les créez.", author: "Chris Grosser" },
+        { text: "Chaque réussite commence par la décision d'essayer.", author: "John F. Kennedy" },
+        { text: "Ne vous noyez pas dans le succès, restez humble.", author: "Michael Jordan" },
+        { text: "C'est notre attitude face à la vie qui détermine l'attitude de la vie envers nous.", author: "John N. Mitchell" },
+        { text: "Le courage est la résistance à la peur, la maîtrise de la peur - pas l'absence de peur.", author: "Mark Twain" },
+        { text: "Votre temps est limité, ne le gaspillez pas à vivre la vie de quelqu'un d'autre.", author: "Steve Jobs" },
+        { text: "N'abandonnez jamais un rêve à cause du temps qu'il faudra pour le réaliser.", author: "Earl Nightingale" },
+        { text: "Tout semble impossible jusqu'à ce qu'il soit fait.", author: "Nelson Mandela" },
+        { text: "Un voyage de mille lieues commence toujours par un premier pas.", author: "Lao Tseu" },
+        { text: "Rêvez grand et osez échouer.", author: "Norman Vaughan" },
+        { text: "Le chemin vers le succès est de toujours viser plus haut que ce que vous pouvez atteindre.", author: "Ralph Waldo Emerson" },
+        { text: "Le travail dur bat le talent quand le talent ne travaille pas dur.", author: "Tim Notke" },
+        { text: "Le moment que vous acceptez la responsabilité de tout dans votre vie, est le moment que vous gagnez le pouvoir de changer quoi que ce soit.", author: "Hal Elrod" },
+        { text: "La grandeur d'un homme ne se mesure pas à sa richesse, mais à son intégrité et à sa capacité d'affecter positivement ceux qui l'entourent.", author: "Bob Marley" },
+        { text: "Rien n'est particulièrement difficile si vous le décomposez en petites tâches.", author: "Henry Ford" },
+        { text: "La différence entre ordinaire et extraordinaire, c'est ce petit extra.", author: "Jimmy Johnson" },
+        { text: "Si vous voulez aller vite, allez seul. Si vous voulez aller loin, allez ensemble.", author: "Proverbe africain" },
+        { text: "La créativité, c'est l'intelligence qui s'amuse.", author: "Albert Einstein" },
+        { text: "On ne peut rien enseigner à un homme, on peut seulement l'aider à trouver ce qui est en lui.", author: "Galilée" },
+        { text: "S'il n'y a pas de lutte, il n'y a pas de progrès.", author: "Frederick Douglass" },
+        { text: "L'échec est une leçon déguisée en opportunité.", author: "Oprah Winfrey" },
+        { text: "La chance sourit aux esprits préparés.", author: "Louis Pasteur" },
+        { text: "Ce que vous faites fait la différence, et vous devez décider quel genre de différence vous voulez faire.", author: "Jane Goodall" },
+        { text: "Apprenez à apprécier chaque instant de votre vie.", author: "Dalai Lama" },
+        { text: "N'ayez pas peur d'abandonner le bien pour aller vers le grand.", author: "John D. Rockefeller" },
+        { text: "Restez concentré, croyez en vous et prouvez que vous pouvez le faire.", author: "Simone Biles" },
+        { text: "C'est dans la tempête que vous découvrez votre vrai caractère.", author: "Roy T. Bennett" },
+        { text: "L'effort d'aujourd'hui produit les résultats de demain.", author: "John Maxwell" },
+        { text: "Vous ne pouvez jamais traverser l'océan si vous n'avez pas le courage de perdre de vue le rivage.", author: "Christophe Colomb" },
+        { text: "Le but n'est pas d'être meilleur que les autres, mais d'être meilleur que vous-même hier.", author: "Dalai Lama" },
+        { text: "La réussite, c'est obtenir ce que vous voulez. Le bonheur, c'est aimer ce que vous avez.", author: "Dale Carnegie" },
+        { text: "Il n'y a pas de raccourci vers un endroit qui vaut la peine d'être atteint.", author: "Beverly Sills" },
+        { text: "La seule chose que vous pouvez vraiment contrôler, c'est vous-même.", author: "Oprah Winfrey" },
+        { text: "Le futur appartient à ceux qui croient en la beauté de leurs rêves.", author: "Eleanor Roosevelt" },
+        { text: "Ce que nous pensons, nous le devenons.", author: "Bouddha" },
+        { text: "Faites chaque jour quelque chose qui vous fait peur.", author: "Eleanor Roosevelt" },
+        { text: "Le plus grand échec est de ne pas avoir essayé.", author: "Debbie Fields" },
+        { text: "La vie est une aventure audacieuse ou elle n'est rien.", author: "Helen Keller" },
+        { text: "Ce n'est pas l'espérance qui mène à l'action, mais l'action qui mène à l'espérance.", author: "Barack Obama" },
+        { text: "Le pessimisme conduit à la faiblesse, l'optimisme au pouvoir.", author: "William James" },
+        { text: "Tout ce que vous avez toujours voulu est de l'autre côté de la peur.", author: "George Addair" },
+        { text: "Il est toujours trop tôt pour abandonner.", author: "Norman Vincent Peale" },
+        { text: "Notre plus grande gloire n'est pas de ne jamais tomber, mais de nous relever à chaque fois que nous tombons.", author: "Confucius" },
+        { text: "N'attendez pas que les opportunités viennent à vous. Créez-les.", author: "George Bernard Shaw" },
+        { text: "La créativité est contagieuse, partagez-la.", author: "Albert Einstein" },
+        { text: "Agissez comme s'il était impossible d'échouer.", author: "Dorothea Brande" },
+        { text: "Celui qui n'ose rien, n'obtient rien.", author: "Proverbe Français" },
+        { text: "Personne n'est libre de ses propres chaînes, mais nous pouvons tous rêver d'être libres.", author: "Bob Dylan" },
+        { text: "Votre seule limite, c'est vous-même.", author: "Richard Bach" },
+        { text: "Pour réaliser de grandes choses, nous ne devons pas seulement agir, mais aussi rêver.", author: "Anatole France" },
+        { text: "Celui qui n'avance pas, recule.", author: "Proverbe Latin" },
+        { text: "Le moment présent est le seul moment sur lequel nous avons un certain contrôle.", author: "Oprah Winfrey" },
+        { text: "La discipline est le pont entre vos objectifs et leur accomplissement.", author: "Jim Rohn" },
+        { text: "Pour chaque minute passée en colère, vous perdez soixante secondes de bonheur.", author: "Ralph Waldo Emerson" },
+        { text: "L'action est la clé fondamentale de tout succès.", author: "Pablo Picasso" },
+        { text: "Les rêves sont le carburant des grandes réalisations.", author: "Napoleon Hill" },
+        { text: "Ne comptez pas les jours, faites en sorte que les jours comptent.", author: "Muhammad Ali" },
+        { text: "Les grands esprits ont toujours rencontré une opposition violente des esprits médiocres.", author: "Albert Einstein" },
+        { text: "Ce n'est pas la chance qui crée le succès, mais la persévérance.", author: "Barack Obama" },
+        { text: "Soyez le maître de votre destin, le capitaine de votre âme.", author: "William Ernest Henley" },
+        { text: "Les opportunités sont souvent déguisées en travail difficile.", author: "Thomas Edison" },
+        { text: "Le changement est le processus par lequel le futur envahit nos vies.", author: "Alvin Toffler" },
+        { text: "Donnez toujours plus que ce que vous prenez.", author: "Dalai Lama" },
+        { text: "L'espoir est une chose puissante. Il inspire de l'action.", author: "Barack Obama" },
+        { text: "Ne laissez pas hier consommer trop de votre aujourd'hui.", author: "Will Rogers" },
+        { text: "Tout ce que l'esprit peut concevoir et croire, il peut le réaliser.", author: "Napoleon Hill" },
+        { text: "Chaque jour est une nouvelle opportunité de changer votre vie.", author: "Roy T. Bennett" },
+        { text: "Le succès est la somme de petits efforts répétés jour après jour.", author: "Robert Collier" },
+        { text: "Quand vous croyez en vous, tout devient possible.", author: "Joe Namath" },
+        { text: "L'obscurité ne chasse pas l'obscurité, seule la lumière peut le faire.", author: "Martin Luther King Jr." },
+        { text: "Le plus grand plaisir de la vie est de réaliser ce que les autres pensent impossible.", author: "Walter Bagehot" },
+        { text: "N'ayez pas peur de faire un grand pas si c'est nécessaire. Vous ne pouvez pas traverser un gouffre en deux petits bonds.", author: "David Lloyd George" },
+        { text: "La vie, c'est ce qui arrive quand vous avez d'autres projets.", author: "John Lennon" },
+        { text: "Chérissez vos visions et vos rêves, car ils sont les enfants de votre âme.", author: "Napoleon Hill" },
+        { text: "Les grands leaders ne se concentrent pas sur les problèmes mais sur les opportunités.", author: "Tony Robbins" },
+        { text: "L'innovation distingue un leader d'un suiveur.", author: "Steve Jobs" },
+        { text: "Chaque choix que nous faisons peut nous élever ou nous abaisser.", author: "Debbie Ford" },
+        { text: "Votre valeur ne diminue jamais en fonction de l'incapacité de quelqu'un à la reconnaître.", author: "Zig Ziglar" },
+        { text: "Vous ne pouvez pas contrôler chaque événement, mais vous pouvez choisir de ne pas être affecté par eux.", author: "Maya Angelou" },
+        { text: "N'ayez pas peur de prendre une grande décision aujourd'hui. Chaque décision vous rapproche ou vous éloigne de vos rêves.", author: "Jim Rohn" },
+        { text: "Vous êtes le héros de votre propre histoire.", author: "Joseph Campbell" },
+        { text: "La vie est 10% ce qui nous arrive et 90% comment nous réagissons.", author: "Charles R. Swindoll" },
+        { text: "Vos échecs ne vous définissent pas, mais la façon dont vous réagissez à eux, oui.", author: "Michelle Obama" },
+        { text: "L'intégrité est le fondement d'une vie réussie.", author: "Rex Tillerson" },
+        { text: "Le courage n'est pas l'absence de peur, mais la décision que quelque chose d'autre est plus important.", author: "Franklin D. Roosevelt" },
+        { text: "Ne suivez pas où le chemin peut mener. Allez là où il n'y a pas de chemin et laissez une trace.", author: "Ralph Waldo Emerson" },
+        { text: "Être heureux ne signifie pas que tout est parfait. Cela signifie que vous avez décidé de regarder au-delà des imperfections.", author: "Roy T. Bennett" },
+        { text: "La vie est comme une bicyclette, pour garder l'équilibre, vous devez continuer à avancer.", author: "Albert Einstein" },
+        { text: "Croyez que vous pouvez, et vous serez déjà à mi-chemin.", author: "Theodore Roosevelt" },
+        { text: "La gratitude transforme ce que nous avons en suffisance.", author: "Aesop" },
+        { text: "La sagesse commence dans l'émerveillement.", author: "Socrate" },
+        { text: "Les limites de nos réalisations sont dans notre esprit.", author: "Stephen Covey" },
+        { text: "Si vous ne pouvez pas voler, courez. Si vous ne pouvez pas courir, marchez. Mais continuez à avancer.", author: "Martin Luther King Jr." },
+        { text: "Ce n'est pas parce que les choses sont difficiles que nous n'osons pas. C'est parce que nous n'osons pas qu'elles sont difficiles.", author: "Sénèque" },
+        { text: "Le plus grand secret pour réussir, c'est d'avoir confiance en soi.", author: "Ralph Waldo Emerson" },
+        { text: "Le bonheur n'est pas quelque chose de prêt à l'emploi. Cela vient de vos propres actions.", author: "Dalai Lama" },
+        { text: "N'attendez pas. Le moment parfait n'existe pas.", author: "Napoleon Hill" },
+        {text: "Rêvez grand, commencez petit, mais surtout, commencez." ,author:-" Simon Sinek"},
+        {text :"La persévérance, c'est ne jamais abandonner malgré les obstacles." ,author: "Winston Churchill"},
+        {text :"Les échecs sont simplement l'opportunité de recommencer, mais avec plus d'expérience.",author: "Henry Ford"},
+        {text :" La confiance en soi est le premier secret du succès." , author: "Ralph Waldo Emerson"},
+        {text :"Changez vos pensées et vous changerez votre monde." , author:"Norman Vincent Peale"},
+        {text :"Votre avenir est créé par ce que vous faites aujourd'hui, pas demain.", author:"Robert Kiyosaki"},
+        {text :"Le succès n'est pas la clé du bonheur. Le bonheur est la clé du succès." , author: "Albert Schweitzer "},
+        {text :"Faites toujours de votre mieux. Ce que vous plantez aujourd'hui, vous le récolterez demain.", author:"Og Mandino "},
+        {text :"Ne jugez pas chaque jour par la récolte que vous faites, mais par les graines que vous plantez.",author:"Robert Louis Stevenson"},
+        {text :"La meilleure façon de prévoir l'avenir est de le créer." , author: "Peter Drucker"},
+        {text :"Ne sous-estimez jamais la puissance des rêves et de l'esprit humain.",author: "Wilma Rudolph "},
+        {text :"La discipline est le pont entre les objectifs et les réalisations.",author : "Ralph Waldo Emerson"},
+        {text :"Allez-y doucement, mais ne vous arrêtez jamais.", author: "Confucius"},
+        {text :"Vous êtes plus fort que vous ne le croyez, plus courageux que vous ne le pensez.", author:"A.A. Milne" },
+        {text :"Les limites n'existent que dans notre esprit.",author:" Napoleon Hill"},
+        {text :"Ce que vous faites régulièrement devient votre réalité.",author:"John Maxwell"},
+        {text :"La vie commence là où finit votre zone de confort.",author:" Neale Donald Walsch"},
+        {text :"N'abandonnez jamais, car c'est souvent le dernier coup de clé qui ouvre la porte.", author:"Paulo Coelho"},
+        {text :"Les rêves ne sont pas ce que nous voyons en dormant, mais ce qui nous empêche de dormir.", author:"A.P.J. Abdul Kalam"},
+        {text :"Être occupé ne signifie pas être productif. Concentrez-vous sur ce qui compte vraiment.",author:"Tim Ferriss"},
+        {text : "La beauté de la vie réside dans l'aventure et la découverte.",author:"Eleanor Roosevelt"},
+        {text :"La patience est amère, mais ses fruits sont doux." ,author: "Jean-Jacques Rousseau"},
+        {text :"Faites du temps votre allié, pas votre ennemi.", author:"Auteur inconnu"},
+        {text :"L'énergie suit l'intention.", author:"James Redfield"},
+        {text :"Un objectif sans plan n'est qu'un souhait." ,author:"Antoine de Saint-Exupéry"},
+        {text :"La simplicité est la clé de l'élégance et de la productivité.",author:"Steve Jobs"},
+    ];
+    // Display the daily inspirational quote
+    const displayDailyQuote = () => {
+        const today = new Date().toISOString().split('T')[0];
+        const storedQuote = localStorage.getItem('dailyQuote');
+        const storedDate = localStorage.getItem('quoteDate');
+        if (storedQuote && storedDate === today) {
+            const quote = JSON.parse(storedQuote);
+            document.getElementById('dailyQuote').textContent = `"${quote.text}"`;
+            document.getElementById('quoteAuthor').textContent = `- ${quote.author}`;
+        } else {
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            localStorage.setItem('dailyQuote', JSON.stringify(quote));
+            localStorage.setItem('quoteDate', today);
+            document.getElementById('dailyQuote').textContent = `"${quote.text}"`;
+            document.getElementById('quoteAuthor').textContent = `- ${quote.author}`;
+        }
+    };
+    // Save a new note and update points
+    const saveNote = () => {
+        const note = document.getElementById('positiveNote').value.trim();
+        if (!note) {
+            alert("Veuillez écrire une inspiration avant de sauvegarder !");
+            return;
+        }
+        const date = new Date().toISOString().split('T')[0];
+        let inspirations = JSON.parse(localStorage.getItem('inspirations')) || [];
+        inspirations.push({ date, note });
+        localStorage.setItem('inspirations', JSON.stringify(inspirations));
+        document.getElementById('positiveNote').value = "";
+        displayNotes();
+        // Add points logic
+        let userPoints = parseInt(localStorage.getItem('userPoints')) || 0;
+        userPoints += 30;
+        localStorage.setItem('userPoints', userPoints);
+        displayPoints();
+    };
+    // Display all saved notes
+    const displayNotes = () => {
+        const notesList = document.getElementById('notesList');
+        if (!notesList) {
+            console.error("Element with ID 'notesList' not found in the DOM.");
+            return;
+        }
+        const inspirations = JSON.parse(localStorage.getItem('inspirations')) || [];
+        notesList.innerHTML = "";
+        inspirations.forEach((item, index) => {
+            const noteElement = document.createElement('div');
+            noteElement.className = "note-item";
+            const noteText = document.createElement('span');
+            noteText.textContent = `${item.date} - ${item.note}`;
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Supprimer";
+            deleteButton.className = "delete-btn";
+            deleteButton.onclick = () => {
+                inspirations.splice(index, 1);
+                localStorage.setItem('inspirations', JSON.stringify(inspirations));
+                displayNotes();
+            };
+            noteElement.appendChild(noteText);
+            noteElement.appendChild(deleteButton);
+            notesList.appendChild(noteElement);
+        });
+    };
+    // Display points
+    const displayPoints = () => {
+        const userPoints = parseInt(localStorage.getItem('userPoints')) || 0;
+        document.getElementById('userPoints').textContent = `Points: ${userPoints}`;
+    };
+    // Filter inspirations by date
+    const filterByDate = () => {
+        const filterDate = document.getElementById('filterDate').value;
+        if (!filterDate) {
+            alert("Veuillez sélectionner une date !");
+            return;
+        }
+        const inspirations = JSON.parse(localStorage.getItem('inspirations')) || [];
+        const filtered = inspirations.filter(item => item.date === filterDate);
+        const notesList = document.getElementById('notesList');
+        notesList.innerHTML = "";
+        if (filtered.length === 0) {
+            notesList.innerHTML = "<p>Aucune inspiration trouvée pour cette date.</p>";
+        } else {
+            filtered.forEach(item => {
+                const noteElement = document.createElement('div');
+                noteElement.className = "note-item";
+                const noteText = document.createElement('span');
+                noteText.textContent = `${item.date} - ${item.note}`;
+                noteElement.appendChild(noteText);
+                notesList.appendChild(noteElement);
+            });
+        }
+    };
+    // Initial page load
+    window.onload = () => {
+        displayDailyQuote();
+        displayNotes();
+        displayPoints();
+    };
+</script>
+</body>
+</html>

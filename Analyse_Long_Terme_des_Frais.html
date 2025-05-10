@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord : Frais Santé</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            text-align: center;
+            background-color:#70e0b6;;
+            color: white;
+            padding: 1rem;
+        }
+        h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+        .input-section, .filters {
+            text-align: center;
+            margin: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        form input, button {
+            padding: 10px;
+            width: 250px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        button {
+            cursor: pointer;
+            background-color: #70e0b6;;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #70e0b6;;
+        }
+        .dashboard {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+        .column {
+            width: 45%;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px #aaa;
+        }
+        canvas {
+            display: block;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Tableau de Bord : Frais Santé</h1>
+</header>
+<main>
+    <section class="input-section">
+        <h2>Entrer des Données</h2>
+        <form id="data-form">
+            <label for="date">Date :</label>
+            <input type="month" id="date" name="date" required>
+            <label for="expenses">Dépenses (€) :</label>
+            <input type="number" id="expenses" name="expenses" placeholder="Ex : 300" required>
+            <label for="reimbursements">Remboursements (€) :</label>
+            <input type="number" id="reimbursements" name="reimbursements" placeholder="Ex : 100" required>
+            <button type="button" id="add-data">Ajouter</button>
+        </form>
+    </section>
+    <section class="filters">
+        <h3>Filtrer par Mois</h3>
+        <input type="month" id="filter-date">
+        <button type="button" id="apply-filter">Appliquer Filtre</button>
+    </section>
+    <section class="dashboard">
+        <div class="column" id="expenses-list">
+            <h3>Dépenses</h3>
+            <ul></ul>
+        </div>
+        <div class="column" id="reimbursements-list">
+            <h3>Remboursements</h3>
+            <ul></ul>
+        </div>
+    </section>
+    <section>
+        <h2>Graphique</h2>
+        <canvas id="costChart"></canvas>
+    </section>
+    <script>
+        // Tableau de données
+        let data = [];
+        // Références aux champs de saisie et au filtre
+        const dateInput = document.getElementById("date");
+        const expensesInput = document.getElementById("expenses");
+        const reimbursementsInput = document.getElementById("reimbursements");
+        const filterDateInput = document.getElementById("filter-date");
+        // Événement pour ajouter des données
+        document.getElementById("add-data").addEventListener("click", () => {
+            const date = dateInput.value;
+            const expenses = parseFloat(expensesInput.value);
+            const reimbursements = parseFloat(reimbursementsInput.value);
+            if (date && expenses && reimbursements) {
+                const existingData = data.find(item => item.date === date);
+                if (existingData) {
+                    existingData.expenses = expenses;
+                    existingData.reimbursements = reimbursements;
+                } else {
+                    data.push({ date, expenses, reimbursements });
+                }
+                updateDashboard();
+                updateChart();
+            } else {
+                alert("Veuillez remplir tous les champs.");
+            }
+        });
+        // Événement pour appliquer le filtre
+        document.getElementById("apply-filter").addEventListener("click", () => {
+            const filterDate = filterDateInput.value;
+            updateDashboard(filterDate);
+        });
+        // Mise à jour des listes dans le tableau de bord
+        function updateDashboard(filterDate = null) {
+            const expensesList = document.querySelector("#expenses-list ul");
+            const reimbursementsList = document.querySelector("#reimbursements-list ul");
+            expensesList.innerHTML = "";
+            reimbursementsList.innerHTML = "";
+            data.forEach(item => {
+                if (!filterDate || item.date.startsWith(filterDate)) {
+                    const expenseItem = document.createElement("li");
+                    expenseItem.textContent = `${item.date} : €${item.expenses.toFixed(2)}`;
+                    expensesList.appendChild(expenseItem);
+                    const reimbursementItem = document.createElement("li");
+                    reimbursementItem.textContent = `${item.date} : €${item.reimbursements.toFixed(2)}`;
+                    reimbursementsList.appendChild(reimbursementItem);
+                }
+            });
+        }
+        // Initialisation du graphique avec Chart.js
+        const ctx = document.getElementById("costChart").getContext("2d");
+        let costChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Dépenses (€)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        data: []
+                    },
+                    {
+                        label: 'Remboursements (€)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        data: []
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        // Mise à jour du graphique
+        function updateChart() {
+            costChart.data.labels = data.map(item => item.date);
+            costChart.data.datasets[0].data = data.map(item => item.expenses);
+            costChart.data.datasets[1].data = data.map(item => item.reimbursements);
+            costChart.update();
+        }
+    </script>
+</main>
+</body>
+</html>

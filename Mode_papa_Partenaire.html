@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Maternité</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9fafc;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #70e0b6;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .category {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #70e0b6;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #70e0b6; /* Rouge par défaut */
+            transition: all 0.3s ease;
+        }
+        .checklist li.in-progress { background: #f7e08e; } /* Jaune */
+        .checklist li.done { background: #a8e6a8; } /* Vert */
+        select {
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .date {
+            font-size: 12px;
+            color: #555;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mode Papa/Partenaire</h1>
+    <div class="container">
+        <div class="category">👜 Sac de maternité (Maman)</div>
+        <ul class="checklist" id="momChecklist">
+            <li>Documents nécessaires 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Vêtements confortables 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Protection post-accouchement 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Snacks et eau
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Chargeur de téléphone
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Oreiller ou coussin
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Nécessaire de toilette
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+        </ul>
+    </ul>
+        <div class="category">👶 Pour le bébé</div>
+        <ul class="checklist" id="babyChecklist">
+            <li>Bodies et pyjamas 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Couverture douce 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Bonnets et chaussettes
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Couches pour nouveau-né
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Lingettes et coton
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li> Biberons et tétines
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>  Siège auto
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+        </ul>
+        <div class="category">🧑‍🤝‍🧑 Pour l’accompagnant</div>
+        <ul class="checklist" id="partnerChecklist">
+            <li>Vêtements confortables 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>En-cas et eau 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Chargeur de téléphone & caméra
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Liste de contacts important
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Petit nécessaire pour rester la nuit
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Distractions (livre, écouteurs)
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+        </ul>
+        <div class="category">🚗 Logistique & Organisation</div>
+        <ul class="checklist" id="logisticsChecklist">
+            <li>Vérifier le trajet vers la maternité 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Préparer un moyen de transport 
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Prévenir les proches
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Vérifier les horaires et procédures
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+            <li>Prévoir les premiers jours à domicile
+                <select class="status" onchange="updateStatus(this)">
+                    <option value="to-do">🔴 À faire</option>
+                    <option value="in-progress">🟡 En cours</option>
+                    <option value="done">✅ Fait</option>
+                </select>
+                <span class="date"></span>
+            </li>
+        </ul>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            loadChecklist();
+        });
+        function updateStatus(selectElement) {
+            let taskElement = selectElement.parentElement;
+            let dateElement = taskElement.querySelector(".date");
+            taskElement.className = "";  
+            taskElement.classList.add(selectElement.value);
+            if (selectElement.value === "done") {
+                let currentDate = new Date().toLocaleDateString();
+                dateElement.textContent = "Fait le " + currentDate;
+            } else {
+                dateElement.textContent = "";
+            }
+            saveChecklist();
+        }
+        function saveChecklist() {
+            let tasks = [];
+            document.querySelectorAll(".checklist li").forEach(task => {
+                let text = task.innerText.split("\n")[0].trim();
+                let status = task.querySelector("select").value;
+                let date = task.querySelector(".date").textContent;
+                tasks.push({ text, status, date });
+            });
+            localStorage.setItem("checklist", JSON.stringify(tasks));
+        }
+        function loadChecklist() {
+            let savedTasks = JSON.parse(localStorage.getItem("checklist")) || [];
+            let checklists = document.querySelectorAll(".checklist");
+            savedTasks.forEach((task, index) => {
+                checklists.forEach(checklist => {
+                    let listItem = checklist.children[index];
+                    if (listItem) {
+                        listItem.classList.add(task.status);
+                        listItem.querySelector("select").value = task.status;
+                        listItem.querySelector(".date").textContent = task.date || "";
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

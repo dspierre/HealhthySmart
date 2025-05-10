@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Tableau de Santé Familiale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header input[type="text"], header button {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        header button {
+            background-color: #70e0b6;
+            color: white;
+            cursor: pointer;
+        }
+        header button:hover {
+            background-color: #70e0b6;
+        }
+        .health-dashboard table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .health-dashboard th, .health-dashboard td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .health-dashboard th {
+            background-color: #70e0b6;
+            color: white;
+        }
+        .health-dashboard tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .health-dashboard tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        .statistics {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f4f4f9;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+            text-align: center;
+        }
+        .feedback {
+            color: #70e0b6;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+        /* Modal for member profile */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        .modal button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal button:hover {
+            background-color: #c0392b;
+        }
+        @media (max-width: 768px) {
+            header input[type="text"], header button {
+                width: 100%;
+                margin-top: 5px;
+            }
+            .health-dashboard th, .health-dashboard td {
+                font-size: 0.9rem;
+            }
+            .add-member-form input, .add-member-form button {
+                font-size: 0.9rem;
+            }
+        }
+        .add-member-form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .add-member-form h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #70e0b6;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .form-group i {
+            margin-right: 5px;
+            color: #70e0b6;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #70e0b6;
+            box-shadow: 0 0 6px rgba(112, 224, 182, 0.5);
+            outline: none;
+        }
+        .form-btn {
+            display: block;
+            width: 60%;
+            padding: 10px;
+            font-size: 1rem;
+            color: white;
+            background-color: #70e0b6;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .form-btn:hover {
+            background-color: #70e0b6;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .feedback {
+            text-align: center;
+            color: #70e0b6;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        /* Common styles for action buttons */
+        .edit-btn, .delete-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Styles for the "Modifier" button */
+        .edit-btn {
+            background-color: #70e0b6; /* Blue for editing */
+        }
+        .edit-btn:hover {
+            background-color: #70e0b6; /* Darker blue on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        /* Styles for the "Supprimer" button */
+        .delete-btn {
+            background-color: #e74c3c; /* Red for deletion */
+        }
+        .delete-btn:hover {
+            background-color: #c0392b; /* Darker red on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📊 Tableau de Santé Familiale</h1>
+        <p>Visualisez les données de santé pour chaque membre de la famille.</p>
+        <input type="text" id="searchBar" placeholder="Rechercher un membre...">
+        <button onclick="exportToCSV()">Exporter en CSV</button>
+        <button onclick="exportJSON()">Exporter JSON</button>
+        <button onclick="importJSON()">Importer JSON</button>
+        <input type="file" id="jsonFileInput" style="display: none;" onchange="handleJSONFile(event)">
+    </header>
+    <main>
+        <section class="health-dashboard">
+            <table id="familyTable">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Âge</th>
+                    <th>Poids (kg)</th>
+                    <th>Taille (cm)</th>
+                    <th>Indice IMC</th>
+                    <th>Dernière Consultation</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Rows will be dynamically generated -->
+                </tbody>
+            </table>
+        </section>
+        <section id="statistics" class="statistics">
+            <!-- Family statistics will be displayed here -->
+        </section>
+        <section class="add-member-form">
+            <h2>Ajouter un Membre</h2>
+            <form id="addMemberForm">
+                <div class="form-group">
+                    <label for="name"><i class="fas fa-user"></i> Nom :</label>
+                    <input type="text" id="name" placeholder="Ex : Jean" required>
+                </div>
+                <div class="form-group">
+                    <label for="age"><i class="fas fa-birthday-cake"></i> Âge :</label>
+                    <input type="number" id="age" min="1" placeholder="Ex : 30" required>
+                </div>
+                <div class="form-group">
+                    <label for="weight"><i class="fas fa-weight"></i> Poids (kg) :</label>
+                    <input type="number" id="weight" min="1" placeholder="Ex : 70" required>
+                </div>
+                <div class="form-group">
+                    <label for="height"><i class="fas fa-ruler-vertical"></i> Taille (cm) :</label>
+                    <input type="number" id="height" min="1" placeholder="Ex : 170" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastVisit"><i class="fas fa-calendar-alt"></i> Dernière Consultation :</label>
+                    <input type="date" id="lastVisit" required>
+                </div>
+                <button type="submit" class="form-btn">Ajouter</button>
+            </form>
+            <p id="feedback" class="feedback"></p>
+        </section>
+
+        <section id="chartSection">
+            <canvas id="bmiChart" width="400" height="200"></canvas>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Tableau de Santé Familiale | Tous droits réservés.</p>
+    </footer>
+</div>
+</body>
+<script>
+    // Family health data initialized from localStorage
+    let familyData = JSON.parse(localStorage.getItem('familyData')) || [];
+    const familyTable = document.querySelector('#familyTable tbody');
+    const addMemberForm = document.querySelector('#addMemberForm');
+    const feedback = document.querySelector('#feedback');
+    // Show notifications for success or error actions
+    const showNotification = (message, type = 'success') => {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000); // Auto-remove after 3 seconds
+    };
+    // Render the table dynamically
+    const renderTable = () => {
+        familyTable.innerHTML = ''; // Clear existing rows
+        familyData.forEach((member, index) => {
+            const row = `
+            <tr>
+                <td>${member.name}</td>
+                <td>${member.age}</td>
+                <td>${member.weight}</td>
+                <td>${member.height}</td>
+                <td>${member.bmi}</td>
+                <td>${member.lastVisit}</td>
+                <td>
+                    <button class="edit-btn" onclick="editMember(${index})">Modifier</button>
+                    <button class="delete-btn" onclick="deleteMember(${index})">Supprimer</button>
+                </td>
+            </tr>`;
+            familyTable.innerHTML += row; // Add new rows dynamically
+        });
+        displayStatistics(); // Update family statistics
+        renderBMIChart(); // Render BMI chart
+    };
+    // Calculate BMI based on weight and height
+    const calculateBMI = (weight, height) => {
+        if (!weight || !height || height <= 0 || weight <= 0) return 'Invalid';
+        return (weight / ((height / 100) ** 2)).toFixed(2);
+    };
+    // Add a new member
+    addMemberForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent default form submission
+        const name = document.querySelector('#name').value.trim();
+        const age = parseInt(document.querySelector('#age').value);
+        const weight = parseFloat(document.querySelector('#weight').value);
+        const height = parseFloat(document.querySelector('#height').value);
+        const lastVisit = document.querySelector('#lastVisit').value;
+        if (!name || age <= 0 || weight <= 0 || height <= 0 || !lastVisit) {
+            feedback.textContent = 'Veuillez remplir tous les champs correctement !';
+            setTimeout(() => feedback.textContent = '', 3000);
+            return;
+        }
+        const bmi = calculateBMI(weight, height); // Calculate BMI
+        familyData.push({ name, age, weight, height, bmi, lastVisit }); // Add to family data
+        localStorage.setItem('familyData', JSON.stringify(familyData)); // Save to localStorage
+        addMemberForm.reset(); // Clear the form
+        showNotification('Membre ajouté avec succès !');
+        renderTable(); // Refresh the table
+    });
+    // Edit a member's details
+    const editMember = (index) => {
+        const member = familyData[index];
+        document.querySelector('#name').value = member.name;
+        document.querySelector('#age').value = member.age;
+        document.querySelector('#weight').value = member.weight;
+        document.querySelector('#height').value = member.height;
+        document.querySelector('#lastVisit').value = member.lastVisit;
+        showNotification(`Modification activée pour ${member.name}`, 'success');
+        addMemberForm.onsubmit = (event) => {
+            event.preventDefault();
+            const name = document.querySelector('#name').value.trim();
+            const age = parseInt(document.querySelector('#age').value);
+            const weight = parseFloat(document.querySelector('#weight').value);
+            const height = parseFloat(document.querySelector('#height').value);
+            const lastVisit = document.querySelector('#lastVisit').value;
+            if (!name || age <= 0 || weight <= 0 || height <= 0 || !lastVisit) {
+                feedback.textContent = 'Veuillez remplir tous les champs correctement !';
+                setTimeout(() => feedback.textContent = '', 3000);
+                return;
+            }
+            const bmi = calculateBMI(weight, height); // Recalculate BMI
+            familyData[index] = { name, age, weight, height, bmi, lastVisit }; // Update in family data
+            localStorage.setItem('familyData', JSON.stringify(familyData)); // Save updates
+            addMemberForm.reset();
+            addMemberForm.onsubmit = null; // Restore default behavior
+            renderTable();
+            showNotification(`${name} mis à jour avec succès !`, 'success');
+        };
+    };
+    // Delete a member
+    const deleteMember = (index) => {
+        const member = familyData[index];
+        if (confirm(`Êtes-vous sûr de vouloir supprimer ${member.name} ?`)) {
+            familyData.splice(index, 1); // Remove member
+            localStorage.setItem('familyData', JSON.stringify(familyData)); // Save changes
+            renderTable();
+            showNotification(`${member.name} supprimé avec succès !`, 'success');
+        }
+    };
+    // Display family statistics
+    const displayStatistics = () => {
+        const totalMembers = familyData.length;
+        const avgBMI = (familyData.reduce((sum, member) => sum + parseFloat(member.bmi || 0), 0) / totalMembers).toFixed(2);
+        const statsSection = document.querySelector('#statistics');
+        statsSection.innerHTML = `
+        <p>Total Membres: ${totalMembers}</p>
+        <p>IMC Moyen: ${avgBMI}</p>`;
+    };
+    // Render BMI chart using Chart.js
+    const renderBMIChart = () => {
+        const labels = familyData.map(member => member.name);
+        const data = familyData.map(member => parseFloat(member.bmi));
+        const ctx = document.getElementById('bmiChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'IMC des Membres',
+                    data,
+                    backgroundColor: '#3498db',
+                    borderColor: '#2980b9',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    };
+    // Export family data as JSON
+    const exportJSON = () => {
+        const json = JSON.stringify(familyData);
+        const blob = new Blob([json], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'family_health_data.json';
+        link.click();
+    };
+    // Import JSON data
+    const importJSON = () => {
+        document.querySelector('#jsonFileInput').click();
+    };
+    const handleJSONFile = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            familyData = JSON.parse(reader.result);
+            localStorage.setItem('familyData', JSON.stringify(familyData));
+            renderTable();
+        };
+        reader.readAsText(file);
+    };
+    // Initialize table and data on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTable();
+    });
+</script>
+</html>

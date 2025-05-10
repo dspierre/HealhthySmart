@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remboursements Automatisés</title>
+    <style>
+        /* Général */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafc;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #70e0b6;
+            color: white;
+        }
+        h1 {
+            font-size: 26px;
+            margin: 0;
+        }
+        main {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        /* Feature box */
+        .feature-box {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .feature-box:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+        .feature-box .icon {
+            font-size: 50px;
+            color: #70e0b6;
+            margin-bottom: 10px;
+        }
+        .feature-box h3 {
+            font-size: 20px;
+            color: #333;
+        }
+        .feature-box p {
+            font-size: 14px;
+            color: #555;
+        }
+        /* Formulaire de remboursement */
+        .form-container {
+            width: 100%;
+            max-width: 500px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h3 {
+            margin-bottom: 20px;
+            color: #70e0b6;
+        }
+        .form-container label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-container button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #5cc7a3;
+        }
+        /* Résumé des fichiers et prévisualisation */
+        .preview-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .thumbnail {
+            width: 100px;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .thumbnail:hover {
+            transform: scale(1.1);
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border: 5px solid white;
+            border-radius: 10px;
+        }
+        .modal:hover {
+            cursor: pointer;
+        }
+        /* Barre de progression */
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f3f3f3;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .progress-bar div {
+            height: 100%;
+            background-color: #70e0b6;
+            width: 0;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Enregistrer votre carte vitale</h1>
+</header>
+<main>
+    <!-- Formulaire de téléchargement -->
+    <div id="formulaire" class="form-container">
+        <h3>Soumettez vos carte vitale</h3>
+        <form id="remboursementForm" onsubmit="processRemboursement(event)">
+            <label for="justificatif1">carte vitale recto:</label>
+            <input type="file" id="justificatif1" accept=".pdf, .png, .jpg, .jpeg" required>
+            <label for="justificatif2">carte vitale verso:</label>
+            <input type="file" id="justificatif2" accept=".pdf, .png, .jpg, .jpeg" required>
+            <button type="submit">Soumettre</button>
+        </form>
+        <div id="progressBar" class="progress-bar">
+            <div></div>
+        </div>
+        <div id="previewGallery" class="preview-gallery"></div>
+    </div>
+</main>
+<footer>
+    <p>&copy; 2025 Remboursements Automatisés - Votre remboursement en toute simplicité.</p>
+</footer>
+<!-- Modal pour afficher l'image en grand format -->
+<div class="modal" id="imageModal" onclick="closeModal()">
+    <img id="modalImage" src="" alt="Image agrandie">
+</div>
+<script>
+    function processRemboursement(event) {
+        event.preventDefault(); // Empêche le rechargement de la page
+        const file1 = document.getElementById('justificatif1').files[0];
+        const file2 = document.getElementById('justificatif2').files[0];
+        const files = [file1, file2];
+        const progressBar = document.querySelector('.progress-bar div');
+        progressBar.style.width = "0"; // Initialise la barre de progression
+        let progress = 0;
+        const increment = 100 / files.length;
+        const previewGallery = document.getElementById('previewGallery');
+        previewGallery.innerHTML = ""; // Réinitialise la galerie avant d'ajouter des miniatures
+        files.forEach((file, index) => {
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result; // Charge le contenu de l'image
+                    img.className = "thumbnail";
+                    img.onclick = () => showModal(e.target.result); // Affiche l'image dans le modal
+                    previewGallery.appendChild(img); // Ajoute la miniature à la galerie
+                    progress += increment; // Augmente la progression
+                    progressBar.style.width = `${progress}%`; // Met à jour la barre de progression
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        alert("Vos fichiers ont été soumis avec succès !");
+    }
+    function showModal(imageSrc) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = imageSrc; // Source de l'image agrandie
+        modal.style.display = "flex"; // Affiche le modal
+    }
+    function closeModal() {
+        const modal = document.getElementById('imageModal');
+        modal.style.display = "none";
+    }
+</script>
+</body>
+</html>

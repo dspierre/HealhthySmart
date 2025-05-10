@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suggestions Culinaires et Notation</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f9fafc;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    select, button {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #70e0b6;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #56c29c;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      text-align: left;
+      font-size: 16px;
+      margin: 10px 0;
+      border-bottom: 1px solid #ececec;
+      padding-bottom: 10px;
+    }
+    #recipe-details {
+      display: none;
+      margin-top: 20px;
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    #pagination-controls button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Suggestions Culinaires et Notation</h1>
+  <form id="allergy-form">
+    <label for="allergies">Types d'allergies ou intolérances :</label>
+    <select id="allergies" multiple>
+      <option value="pollens">🌾 Pollens</option>
+      <option value="gluten">🍞 Gluten</option>
+      <option value="lactose">🥛 Lactose</option>
+      <option value="arachides">🥜 Arachides</option>
+      <option value="fruits_de_mer">🦐 Fruits de mer</option>
+      <option value="arachide">🥜 Arachide</option>
+      <option value="celeri">🥕 Céleri</option>
+      <option value="crustaces">🦀 Crustacés</option>
+      <option value="cereales_gluten">🌾 Céréales contenant du Gluten</option>
+      <option value="fruits_a_coque">🌰 Fruits à coque</option>
+      <option value="lait">🥛 Lait</option>
+      <option value="lupin">🌿 Lupin</option>
+      <option value="oeuf">🍳 Œuf</option>
+      <option value="mollusques">🐚 Mollusques</option>
+      <option value="moutarde">🌿 Moutarde</option>
+      <option value="sesame">🥒 Sésame</option>
+      <option value="soja">🥦 Soja</option>
+      <option value="sulfites">🍇 Sulfites</option>
+    </select>
+    <button type="button" id="search-button">Rechercher</button>
+  </form>
+  <div id="recipe-results">
+    <ul id="recipe-list"></ul> <!-- Liste des recettes -->
+  </div>
+  <div id="recipe-details">
+    <h3 id="recipe-title"></h3>
+    <p id="recipe-ingredients"></p>
+    <p id="recipe-instructions"></p>
+    <button id="close-details">Fermer</button>
+  </div>
+  <div id="pagination-controls"></div>
+</div>
+<script>
+
+       
+</script>
+</body>
+</html>

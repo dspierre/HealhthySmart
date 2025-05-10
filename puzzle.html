@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Interactif</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #puzzle-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 300px;
+            height: 300px;
+            margin: auto;
+            position: relative;
+            border: 2px solid #000;
+        }
+
+        .piece {
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            position: absolute;
+            cursor: grab;
+        }
+
+        #success-message {
+            font-size: 20px;
+            font-weight: bold;
+            color: green;
+            display: none;
+            margin-top: 20px;
+        }
+        .piece {
+    border: 1px solid black;
+}
+</style>
+</head>
+<body>
+    <h1>🧩 Puzzle des objets du quotidien 🏡</h1>
+    <p>Déplace les pièces pour reconstituer l’image !</p>
+    <div id="puzzle-container"></div>
+    <p id="success-message">🎉 Bravo ! Tu as complété le puzzle !</p>
+    <script>
+        const imageURL = "images/maison.png";
+        // Image de l’objet à reconstruire
+        const successSound = "sons/success.mp3"; // Son de réussite
+        const puzzleContainer = document.getElementById("puzzle-container");
+        let pieces = [
+            { x: 0, y: 0 }, { x: 100, y: 0 }, { x: 200, y: 0 },
+            { x: 0, y: 100 }, { x: 100, y: 100 }, { x: 200, y: 100 },
+            { x: 0, y: 200 }, { x: 100, y: 200 }, { x: 200, y: 200 }
+        ];
+        pieces.forEach((pos, index) => {
+            let piece = document.createElement("div");
+            piece.className = "piece";
+            piece.style.left = `${Math.random() * 200}px`;
+            piece.style.top = `${Math.random() * 200}px`;
+            piece.style.backgroundImage = `url(${imageURL})`;
+            piece.style.backgroundPosition = `-${pos.x}px -${pos.y}px`;
+            piece.style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+            piece.setAttribute("draggable", true);
+            piece.addEventListener("dragstart", (e) => {
+                e.dataTransfer.setData("text/plain", index);
+            });
+            puzzleContainer.appendChild(piece);
+        });
+        puzzleContainer.addEventListener("dragover", (e) => e.preventDefault());
+        puzzleContainer.addEventListener("drop", (e) => {
+            e.preventDefault();
+            let index = e.dataTransfer.getData("text/plain");
+            let piece = puzzleContainer.children[index];
+            piece.style.left = `${pieces[index].x}px`;
+            piece.style.top = `${pieces[index].y}px`;
+            piece.style.transform = "rotate(0deg)";
+            if (Array.from(puzzleContainer.children).every((p, i) => {
+                return p.style.left === `${pieces[i].x}px` && p.style.top === `${pieces[i].y}px`;
+            })) {
+                document.getElementById("success-message").style.display = "block";
+                new Audio(successSound).play();
+            }
+        });
+    </script>
+</body>
+</html>
