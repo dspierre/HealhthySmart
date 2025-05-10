@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <style>
+        .register-form {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .register-form input, .register-form button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .register-form button {
+            background-color: #70e0b6;
+            color: white;
+            border: none;
+        }
+        .error-message {
+            color: red;
+            display: none;
+        }
+        .valid {
+            color: green;
+        }
+        .invalid {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="register-form">
+    <h2>Inscription</h2>
+    <form id="registerForm">
+        <label for="firstname">Prénom</label>
+        <input type="text" id="firstname" required>
+        <label for="name">Nom</label>
+        <input type="text" id="name" required>
+        <label for="email">Email</label>
+        <input type="email" id="email" required>
+        <span id="emailError" class="error-message">Email invalide.</span>
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" required oninput="updatePasswordStrength()">
+        <span id="passwordStrength"></span>
+        <label for="confirmPassword">Confirmez le mot de passe</label>
+        <input type="password" id="confirmPassword" required>
+        <span id="confirmPasswordError" class="error-message">Les mots de passe ne correspondent pas.</span>
+        <button type="button" onclick="togglePasswordVisibility()">Afficher/Masquer</button>
+        <input type="checkbox" id="consent" required>
+        <label for="consent">J'accepte la politique de confidentialité et les conditions d'utilisation.</label>
+        <button type="submit">S'inscrire</button>
+    </form>
+</div>
+<script>
+    function togglePasswordVisibility() {
+        var passwordInput = document.getElementById('password');
+        passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+    }
+    function updatePasswordStrength() {
+        const password = document.getElementById('password').value;
+        const timeToCrack = calculatePasswordStrength(password);
+        const strengthElement = document.getElementById('passwordStrength');
+
+        if (timeToCrack >= 10000) {
+            strengthElement.textContent = `✔ Temps estimé pour casser : ${timeToCrack.toFixed(2)} ans (Fort)`;
+            strengthElement.classList.add('valid');
+            strengthElement.classList.remove('invalid');
+        } else {
+            strengthElement.textContent = `❌ Temps estimé pour casser : ${timeToCrack.toFixed(2)} ans (Faible)`;
+            strengthElement.classList.add('invalid');
+            strengthElement.classList.remove('valid');
+        }
+    }
+    function calculatePasswordStrength(password) {
+        const entropy = calculateEntropy(password);
+        return calculateTimeToCrack(entropy);
+    }
+    function calculateEntropy(password) {
+        const charsetSize = getCharsetSize(password);
+        return password.length * Math.log2(charsetSize);
+    }
+    function getCharsetSize(password) {
+        let charsetSize = 0;
+        if (/[a-z]/.test(password)) charsetSize += 26;
+        if (/[A-Z]/.test(password)) charsetSize += 26;
+        if (/[0-9]/.test(password)) charsetSize += 10;
+        if (/[^a-zA-Z0-9]/.test(password)) charsetSize += 32;
+        return charsetSize;
+    }
+    function calculateTimeToCrack(entropy) {
+        const guessesPerSecond = 1e10;
+        const secondsInYear = 60 * 60 * 24 * 365;
+        return Math.pow(2, entropy) / guessesPerSecond / secondsInYear;
+    }
+    document.getElementById("registerForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+        const password = document.getElementById("password").value;
+        const prenom = document.getElementById("firstname").value;
+        const nom = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        if (password !== confirmPassword) {
+            document.getElementById("confirmPasswordError").style.display = "block";
+            return;
+        } else {
+            document.getElementById("confirmPasswordError").style.display = "none";
+        }
+        const timeToCrack = calculatePasswordStrength(password);
+        if (timeToCrack < 10000) {
+            alert("❌ Le mot de passe est trop faible. Essayez un mot de passe plus sécurisé !");
+            return;
+        }
+        console.log("📤 Envoi des données au serveur...");
+        try {
+            const response = await fetch("http://localhost:3000/enregistrer-utilisateur", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prenom, nom, email, password })
+            });
+            if (!response.ok) {
+                throw new Error(`❌ Erreur HTTP : ${response.status}`);
+            }
+            const result = await response.json();
+            alert(result.message);
+            window.location.href = "index.html";
+        } catch (error) {
+            console.error("❌ Erreur lors de la requête :", error);
+        }
+    });
+</script>
+</body>
+</html>

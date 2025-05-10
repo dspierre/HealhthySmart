@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💉 Vaccination Familiale</title>
+    <style>
+        /* Style général */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafc;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #70e0b6;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+        }
+        main {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+        button {
+            background-color: #70e0b6;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #58c6a2;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        thead {
+            background-color: #70e0b6;
+            color: white;
+        }
+        /* Style du menu déroulant */
+        select {
+            padding: 10px;
+            font-size: 16px;
+            color: #333;
+            background-color: #f9fafc;
+            border: 2px solid #70e0b6;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        /* Style au survol */
+        select:hover {
+            border-color: #58c6a2;
+            background-color: #e8f6f1;
+        }
+        /* Style au clic (focus) */
+        select:focus {
+            outline: none;
+            border-color: #3aa88f;
+            background-color: #dff2eb;
+        }
+        /* Style des options */
+        select option {
+            padding: 10px;
+            background-color: #ffffff;
+            color: #333;
+        }
+        /* Désactive la sélection d'une option vide (par défaut) */
+        select option[disabled] {
+            color: #aaa;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>💉 Suivi de Vaccination Familiale</h1>
+</header>
+<main>
+    <section class="form-section">
+        <h2>Ajouter un Membre de la Famille</h2>
+        <form id="vaccinationForm">
+            <label for="familyMember">Nom :</label>
+            <input type="text" id="familyMember" required>
+            <label for="vaccine">Nom du Vaccin :</label>
+            <select id="vaccine" required>
+                <option value="" disabled selected>Choisissez un vaccin</option>
+                <option value="Hépatite B">Hépatite B</option>
+                <option value="BCG (Tuberculose)">BCG (Tuberculose)</option>
+                <option value="Diphtérie-Tétanos-Polio">Diphtérie-Tétanos-Polio</option>
+                <option value="Coqueluche">Coqueluche</option>
+                <option value="Rougeole-Oreillons-Rubéole (ROR)">Rougeole-Oreillons-Rubéole (ROR)</option>
+                <option value="Pneumocoque">Pneumocoque</option>
+                <option value="Méningocoque C">Méningocoque C</option>
+                <option value="Papillomavirus (HPV)">Papillomavirus (HPV)</option>
+                <option value="Grippe saisonnière">Grippe saisonnière</option>
+                <option value="Covid-19">Covid-19</option>
+            </select>
+            <label for="date">Date de la Dernière Dose :</label>
+            <input type="date" id="date" required>
+            <label for="reminder">Intervalle (en jours) pour Rappel :</label>
+            <input type="number" id="reminder" required>
+            <button type="submit">Ajouter</button>
+        </form>
+    </section>
+    <section class="data-section">
+        <h2>Rappels de Vaccination</h2>
+        <table id="vaccinationTable">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Vaccin</th>
+                <th>Date Dernière Dose</th>
+                <th>Prochain Rappel</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button id="exportButton">Exporter en CSV</button>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2025 Vaccination Familiale</p>
+</footer>
+<script>
+    // Tableau pour stocker les données des vaccinations
+    const vaccinationData = [];
+    // Sélection des éléments HTML
+    const vaccinationForm = document.getElementById('vaccinationForm');
+    const vaccinationTableBody = document.querySelector('#vaccinationTable tbody');
+    const exportButton = document.getElementById('exportButton');
+    // Fonction pour calculer la date de rappel
+    function calculateNextReminder(date, interval) {
+        const lastDoseDate = new Date(date);
+        const nextReminderDate = new Date(lastDoseDate.getTime() + interval * 24 * 60 * 60 * 1000);
+        return nextReminderDate.toLocaleDateString('fr-FR');
+    }
+    // Fonction pour ajouter les données de vaccination
+    vaccinationForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const familyMember = document.getElementById('familyMember').value;
+        const vaccine = document.getElementById('vaccine').value;
+        const date = document.getElementById('date').value;
+        const reminder = parseInt(document.getElementById('reminder').value);
+        const nextReminder = calculateNextReminder(date, reminder);
+        vaccinationData.push({ familyMember, vaccine, date, nextReminder });
+        // Réinitialiser le formulaire
+        vaccinationForm.reset();
+        // Mettre à jour le tableau
+        updateVaccinationTable();
+    });
+    // Fonction pour mettre à jour le tableau des vaccinations
+    function updateVaccinationTable() {
+        vaccinationTableBody.innerHTML = '';
+        vaccinationData.forEach((data, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${data.familyMember}</td>
+            <td>${data.vaccine}</td>
+            <td>${new Date(data.date).toLocaleDateString('fr-FR')}</td>
+            <td>${data.nextReminder}</td>
+            <td>
+                <button onclick="deleteEntry(${index})">Supprimer</button>
+            </td>
+        `;
+            vaccinationTableBody.appendChild(row);
+        });
+    }
+    // Fonction pour supprimer une entrée
+    function deleteEntry(index) {
+        vaccinationData.splice(index, 1);
+        updateVaccinationTable();
+    }
+    // Fonction pour exporter les données en CSV
+    function exportToCSV() {
+        let csvContent = "data:text/csv;charset=utf-8,Nom,Vaccin,Date Dernière Dose,Prochain Rappel\n";
+        vaccinationData.forEach(data => {
+            csvContent += `${data.familyMember},${data.vaccine},${data.date},${data.nextReminder}\n`;
+        });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'vaccination_familiale.csv');
+        document.body.appendChild(link);
+        link.click();
+    }
+    // Ajouter l'événement pour le bouton d'exportation
+    exportButton.addEventListener('click', exportToCSV);
+    // Initialisation
+    updateVaccinationTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Urgences Familiales</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .container {
+            background-color: #34495e;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #e74c3c;
+        }
+        header p {
+            color: #666;
+        }
+        .feature-box {
+            margin-bottom: 30px;
+        }
+        .feature-box h2 {
+            color: #70e0b6;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        form input, form textarea, form button {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+        form button {
+            background-color: #70e0b6;
+            color: white;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #2980b9;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background: #f4f4f9;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-left: 4px solid #70e0b6;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        body.dark-mode ul li {
+            background-color: #2c3e50;
+            border-left: 4px solid #1abc9c;
+        }
+        ul li button {
+            background-color: #e74c3c;
+            border: none;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        ul li button:hover {
+            background-color: #c0392b;
+        }
+        .edit-btn {
+            background-color: #70e0b6;
+        }
+        .edit-btn:hover {
+            background-color: #70e0b6;
+        }
+        .sort-btn {
+            background-color: #70e0b6;
+            border: none;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .sort-btn:hover {
+            background-color: #70e0b6;
+        }
+        .dark-mode-toggle {
+            background-color: #95a5a6;
+            border: none;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .dark-mode-toggle:hover {
+            background-color: #7f8c8d;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .feedback {
+            color: #27ae60;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            .container {
+                padding: 15px;
+            }
+            form input, form textarea, form button {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🚨 Urgences Familiales</h1>
+        <p>Gérez les informations vitales pour les urgences de manière efficace.</p>
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">Mode Sombre</button>
+    </header>
+    <main>
+        <section class="feature-box">
+            <h2>Ajouter une Information d'Urgence</h2>
+            <form id="emergencyForm">
+                <label for="prenomInput">Prénom :</label>
+                <input type="text" id="prenomInput" placeholder="Prénom" required>
+                <label for="nameInput">Nom :</label>
+                <input type="text" id="nameInput" placeholder="Nom de famille" required>
+                <label for="relationInput">Relation :</label>
+                <input type="text" id="relationInput" placeholder="Relation (ex : père, sœur)" required>
+                <label for="phoneInput">Numéro de Téléphone :</label>
+                <input type="tel" id="phoneInput" placeholder="Numéro de téléphone" required>
+                <label for="notesInput">Notes supplémentaires :</label>
+                <textarea id="notesInput" placeholder="Ex : Allergies, maladies..."></textarea>
+                <button type="submit">Ajouter</button>
+            </form>
+            <p id="feedback" class="feedback"></p>
+        </section>
+        <section class="feature-box">
+            <h2>Liste d'Urgences</h2>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Rechercher une personne...">
+            </div>
+            <div>
+                <button class="sort-btn" onclick="sortList('name')">Trier par Nom</button>
+                <button class="sort-btn" onclick="sortList('relation')">Trier par Relation</button>
+            </div>
+            <ul id="emergencyList"></ul>
+        </section>
+    </main>
+</div>
+<script>
+    // Select form elements and list container
+    const emergencyForm = document.getElementById('emergencyForm');
+    const prenomInput = document.getElementById('prenomInput');
+    const nameInput = document.getElementById('nameInput');
+    const relationInput = document.getElementById('relationInput');
+    const phoneInput = document.getElementById('phoneInput');
+    const notesInput = document.getElementById('notesInput');
+    const emergencyList = document.getElementById('emergencyList');
+    const searchInput = document.getElementById('searchInput');
+    const feedback = document.getElementById('feedback');
+    // Retrieve saved data from localStorage or initialize as empty array
+    const emergencyData = JSON.parse(localStorage.getItem('emergencyData')) || [];
+    // Save updated data to localStorage
+    const saveData = () => {
+        localStorage.setItem('emergencyData', JSON.stringify(emergencyData));
+    };
+    // Safely access properties and ensure they exist
+    const safeString = (value) => (value ? value.toLowerCase() : '');
+    // Render the list of emergency entries
+    const renderList = (filter = '') => {
+        emergencyList.innerHTML = ''; // Clear the list
+        // Filter entries based on search input
+        const filteredData = emergencyData.filter(entry =>
+            safeString(entry.prenom).includes(filter.toLowerCase()) ||
+            safeString(entry.name).includes(filter.toLowerCase()) ||
+            safeString(entry.relation).includes(filter.toLowerCase())
+        );
+        // Render each entry in the filtered list
+        filteredData.forEach((entry, index) => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+            <div>
+                <strong>${entry.prenom || ''} ${entry.name || ''}</strong> (${entry.relation || ''})<br>
+                📞 ${entry.phone || 'Inconnu'}<br>
+                📝 ${entry.notes || 'Aucune note'}
+            </div>
+            <div>
+                <button class="edit-btn" onclick="editEntry(${index})">Modifier</button>
+                <button onclick="deleteEntry(${index})">Supprimer</button>
+            </div>
+        `;
+            emergencyList.appendChild(listItem);
+        });
+    };
+    // Delete an entry
+    const deleteEntry = (index) => {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette entrée ?')) {
+            emergencyData.splice(index, 1); // Remove the entry
+            saveData(); // Save updated data
+            renderList(); // Re-render the list
+            feedback.textContent = 'Entrée supprimée avec succès !';
+            // Clear feedback after 3 seconds
+            setTimeout(() => {
+                feedback.textContent = '';
+            }, 3000);
+        }
+    };
+    // Edit an existing entry
+    const editEntry = (index) => {
+        const entry = emergencyData[index];
+        // Fill form inputs with the current entry values
+        prenomInput.value = entry.prenom || '';
+        nameInput.value = entry.name || '';
+        relationInput.value = entry.relation || '';
+        phoneInput.value = entry.phone || '';
+        notesInput.value = entry.notes || '';
+        // Remove the entry temporarily (until saved again)
+        emergencyData.splice(index, 1);
+        saveData();
+        renderList();
+        feedback.textContent = 'Vous pouvez modifier les informations !';
+        setTimeout(() => feedback.textContent = '', 3000);
+    };
+    // Handle form submission
+    emergencyForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent default form submission
+        // Create a new entry object
+        const newEntry = {
+            prenom: prenomInput.value.trim(),
+            name: nameInput.value.trim(),
+            relation: relationInput.value.trim(),
+            phone: phoneInput.value.trim(),
+            notes: notesInput.value.trim()
+        };
+        // Validate form inputs
+        if (!newEntry.prenom || !newEntry.name || !newEntry.relation || !newEntry.phone) {
+            feedback.textContent = 'Veuillez remplir tous les champs obligatoires !';
+            setTimeout(() => feedback.textContent = '', 3000);
+            return;
+        }
+        // Add the new entry to the data array
+        emergencyData.push(newEntry);
+        saveData(); // Save updated data
+        renderList(); // Re-render the list
+        emergencyForm.reset(); // Clear form inputs
+        feedback.textContent = 'Entrée ajoutée avec succès !';
+        setTimeout(() => feedback.textContent = '', 3000);
+    });
+    // Search functionality
+    searchInput.addEventListener('input', () => renderList(searchInput.value));
+    // Sort entries dynamically
+    const sortList = (key) => {
+        emergencyData.sort((a, b) => safeString(a[key]).localeCompare(safeString(b[key])));
+        saveData(); // Save sorted data
+        renderList(); // Re-render the list
+        feedback.textContent = `Liste triée par ${key} !`;
+        setTimeout(() => feedback.textContent = '', 3000);
+    };
+    // Toggle dark mode with persistence
+    const toggleDarkMode = () => {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+    };
+    // Initialize dark mode based on user preference
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+    // Initial render on page load
+    renderList();
+</script>
+</body>
+</html>
